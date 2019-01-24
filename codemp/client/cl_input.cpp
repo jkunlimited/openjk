@@ -4,6 +4,7 @@ Copyright (C) 1999 - 2005, Id Software, Inc.
 Copyright (C) 2000 - 2013, Raven Software, Inc.
 Copyright (C) 2001 - 2013, Activision, Inc.
 Copyright (C) 2013 - 2015, OpenJK contributors
+Copyright (C) 2019 - 2020, Jedi Knight Unlimited
 
 This file is part of the OpenJK source code.
 
@@ -69,12 +70,13 @@ kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
 kbutton_t	in_strafe, in_speed;
 kbutton_t	in_up, in_down;
 
-#define MAX_KBUTTONS 16
+#define MAX_KBUTTONS 17
 
 kbutton_t	in_buttons[MAX_KBUTTONS];
 
 
 qboolean	in_mlooking;
+
 
 void IN_Button11Down(void);
 void IN_Button11Up(void);
@@ -162,6 +164,18 @@ void IN_MLookUp( void ) {
 		IN_CenterView ();
 	}
 }
+
+// [Jedi Knight: Unlimited]
+// [Blocking Button]
+void IN_Button16Down(void) {
+	cl.gcmdSendValue = qtrue;
+	cl.gcmdValue = GENCMD_BLOCK;
+}
+void IN_Button16Up(void) {
+	cl.gcmdSendValue = qtrue;
+	cl.gcmdValue = GENCMD_BLOCK_STOP;
+}
+// [/Jedi Knight Unlimited]
 
 void IN_GenCMD1( void )
 {
@@ -793,7 +807,6 @@ void IN_Button14Down(void) {IN_KeyDown(&in_buttons[14]);}
 void IN_Button14Up(void) {IN_KeyUp(&in_buttons[14]);}
 void IN_Button15Down(void) {IN_KeyDown(&in_buttons[15]);}
 void IN_Button15Up(void) {IN_KeyUp(&in_buttons[15]);}
-
 void IN_CenterView (void) {
 	cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
 }
@@ -1713,6 +1726,10 @@ static const cmdList_t inputCmds[] =
 	{ "-button14", NULL, IN_Button14Up, NULL },
 	{ "+button15", "Button 15", IN_Button15Down, NULL },
 	{ "-button15", NULL, IN_Button15Up, NULL },
+	// [Jedi Knight: Unlimited]
+	{ "+button16", "Button 16", IN_Button16Down, NULL},
+	{ "-button16", NULL, IN_Button16Up, NULL},
+	// [/Jedi Knight: Unlimited]
 	{ "+mlook", "Hold to use mouse look", IN_MLookDown, NULL },
 	{ "-mlook", NULL, IN_MLookUp, NULL },
 	{ "sv_saberswitch", "Holster/activate lightsaber", IN_GenCMD1, NULL },

@@ -5,6 +5,7 @@ Copyright (C) 2000 - 2013, Raven Software, Inc.
 Copyright (C) 2001 - 2013, Activision, Inc.
 Copyright (C) 2005 - 2015, ioquake3 contributors
 Copyright (C) 2013 - 2015, OpenJK contributors
+Copyright (C) 2019 - 2020, Jedi Knight Unlimited
 
 This file is part of the OpenJK source code.
 
@@ -1332,6 +1333,10 @@ typedef struct playerState_s {
 	vec3_t		userVec1;
 	vec3_t		userVec2;
 
+	// [Jedi Knight: Unlimited]
+	qboolean	JKU_saberBlocking;
+	// [/Jedi Knight: Unlimited]
+
 #ifdef _ONEBIT_COMBO
 	int			deltaOneBits;
 	int			deltaNumBits;
@@ -1421,7 +1426,12 @@ typedef enum
 	GENCMD_BOW,
 	GENCMD_MEDITATE,
 	GENCMD_FLOURISH,
-	GENCMD_GLOAT
+	GENCMD_GLOAT,
+	// [Jedi Knight: Unlimited]
+	// [Blocking Button]
+	GENCMD_BLOCK,
+	GENCMD_BLOCK_STOP
+	// [/Jedi Knight: Unlimited]
 } genCmds_t;
 
 // usercmd_t is sent to the server each client frame

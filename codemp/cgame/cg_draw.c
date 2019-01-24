@@ -4,6 +4,7 @@ Copyright (C) 1999 - 2005, Id Software, Inc.
 Copyright (C) 2000 - 2013, Raven Software, Inc.
 Copyright (C) 2001 - 2013, Activision, Inc.
 Copyright (C) 2013 - 2015, OpenJK contributors
+Copyright (C) 2019 - 2020, Jedi Knight Unlimited
 
 This file is part of the OpenJK source code.
 
@@ -867,6 +868,365 @@ static void CG_DrawSaberStyle( centity_t *cent, menuDef_t *menuHUD)
 
 }
 
+// [Jedi Knight: Unlimited]
+static void JKU_DrawForcePower(centity_t *cent, menuDef_t *menuHUD)
+{
+	itemDef_t		*focusItem;
+
+	// Can we find the menu?
+	if (!menuHUD)
+	{
+		return;
+	}
+
+	// don't display if dead
+	if (cg.snap->ps.stats[STAT_HEALTH] <= 0)
+	{
+		return;
+	}
+
+	// Don't render if we don't know their force power
+	if (!cg.snap->ps.fd.forcePowersKnown)
+	{
+		return;
+	}
+
+	if (!cg.snap->ps.fd.forcePowerSelected)
+	{
+		// Set default force power selected to avoid NPE
+		cg.snap->ps.fd.forcePowerSelected = FP_SEE;
+	}
+
+
+	// draw the current selected force power in this menu
+	switch (cg.snap->ps.fd.forcePowerSelected)
+	{
+		default:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_see");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_HEAL:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_heal");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_LEVITATION:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_levitation");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_SPEED:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_speed");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_PUSH:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_push");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_PULL:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_pull");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_TELEPATHY:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_telepathy");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_GRIP:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_grip");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_LIGHTNING:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_lightning");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_RAGE:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_rage");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_PROTECT:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_protect");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_ABSORB:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_absorb");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_TEAM_HEAL:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_team_heal");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_TEAM_FORCE:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_team_force");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_DRAIN:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_drain");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_SEE:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_see");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_SABER_OFFENSE:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_see");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_SABER_DEFENSE:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_see");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+		case FP_SABERTHROW:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_saberthrow");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+	}
+}
+
 /*
 ================
 CG_DrawAmmo
@@ -1026,9 +1386,10 @@ CG_DrawForcePower
 */
 void CG_DrawForcePower( menuDef_t *menuHUD )
 {
-	int				i;
-	vec4_t			calcColor;
-	float			value,inc,percent;
+	// int				i;
+	//vec4_t			calcColor;
+	float			value, inc;
+	// float			percent;
 	itemDef_t		*focusItem;
 	const int		maxForcePower = 100;
 	qboolean	flash=qfalse;
@@ -1073,59 +1434,59 @@ void CG_DrawForcePower( menuDef_t *menuHUD )
 	inc = (float)  maxForcePower / MAX_HUD_TICS;
 	value = cg.snap->ps.fd.forcePower;
 
-	for (i=MAX_HUD_TICS-1;i>=0;i--)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, forceTicName[i]);
-
-		if (!focusItem)
-		{
-			continue;
-		}
-
-//		memcpy(calcColor, colorTable[CT_WHITE], sizeof(vec4_t));
-
-		if ( value <= 0 )	// done
-		{
-			break;
-		}
-		else if (value < inc)	// partial tic
-		{
-			if (flash)
-			{
-				memcpy(calcColor,  colorTable[CT_RED], sizeof(vec4_t));
-			}
-			else
-			{
-				memcpy(calcColor,  colorTable[CT_WHITE], sizeof(vec4_t));
-			}
-
-			percent = value / inc;
-			calcColor[3] = percent;
-		}
-		else
-		{
-			if (flash)
-			{
-				memcpy(calcColor,  colorTable[CT_RED], sizeof(vec4_t));
-			}
-			else
-			{
-				memcpy(calcColor,  colorTable[CT_WHITE], sizeof(vec4_t));
-			}
-		}
-
-		trap->R_SetColor( calcColor);
-
-		CG_DrawPic(
-			focusItem->window.rect.x,
-			focusItem->window.rect.y,
-			focusItem->window.rect.w,
-			focusItem->window.rect.h,
-			focusItem->window.background
-			);
-
-		value -= inc;
-	}
+	//for (i=MAX_HUD_TICS-1;i>=0;i--)
+	//{
+	//	focusItem = Menu_FindItemByName(menuHUD, forceTicName[i]);
+	//
+	//	if (!focusItem)
+	//	{
+	//		continue;
+	//	}
+	//
+//	//	memcpy(calcColor, colorTable[CT_WHITE], sizeof(vec4_t));
+	//
+	//	if ( value <= 0 )	// done
+	//	{
+	//		break;
+	//	}
+	//	else if (value < inc)	// partial tic
+	//	{
+	//		if (flash)
+	//		{
+	//			memcpy(calcColor,  colorTable[CT_RED], sizeof(vec4_t));
+	//		}
+	//		else
+	//		{
+	//			memcpy(calcColor,  colorTable[CT_WHITE], sizeof(vec4_t));
+	//		}
+	//
+	//		percent = value / inc;
+	//		calcColor[3] = percent;
+	//	}
+	//	else
+	//	{
+	//		if (flash)
+	//		{
+	//			memcpy(calcColor,  colorTable[CT_RED], sizeof(vec4_t));
+	//		}
+	//		else
+	//		{
+	//			memcpy(calcColor,  colorTable[CT_WHITE], sizeof(vec4_t));
+	//		}
+	//	}
+	//
+	//	trap->R_SetColor( calcColor);
+	//
+	//	CG_DrawPic(
+	//		focusItem->window.rect.x,
+	//		focusItem->window.rect.y,
+	//		focusItem->window.rect.w,
+	//		focusItem->window.rect.h,
+	//		focusItem->window.background
+	//		);
+	//
+	//	value -= inc;
+	//}
 
 	focusItem = Menu_FindItemByName(menuHUD, "forceamount");
 
@@ -1324,9 +1685,6 @@ void CG_DrawHUD(centity_t	*cent)
 {
 	menuDef_t	*menuHUD = NULL;
 	itemDef_t	*focusItem = NULL;
-	const char *scoreStr = NULL;
-	int	scoreBias;
-	char scoreBiasStr[16];
 
 	if (cg_hudFiles.integer)
 	{
@@ -1389,6 +1747,20 @@ void CG_DrawHUD(centity_t	*cent)
 					focusItem->window.background
 					);
 			}
+			// [Jedi Knight: Unlimited]
+			// [Barbox Rendering]
+			focusItem = Menu_FindItemByName(menuHUD, "barbox");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
 
 			CG_DrawArmor(menuHUD);
 			CG_DrawHealth(menuHUD);
@@ -1398,65 +1770,11 @@ void CG_DrawHUD(centity_t	*cent)
 			//trap->Error( ERR_DROP, "CG_ChatBox_ArrayInsert: unable to locate HUD menu file ");
 		}
 
-		//scoreStr = va("Score: %i", cgs.clientinfo[cg.snap->ps.clientNum].score);
-		if ( cgs.gametype == GT_DUEL )
-		{//A duel that requires more than one kill to knock the current enemy back to the queue
-			//show current kills out of how many needed
-			scoreStr = va("%s: %i/%i", CG_GetStringEdString("MP_INGAME", "SCORE"), cg.snap->ps.persistant[PERS_SCORE], cgs.fraglimit);
-		}
-		else if (0 && cgs.gametype < GT_TEAM )
-		{	// This is a teamless mode, draw the score bias.
-			scoreBias = cg.snap->ps.persistant[PERS_SCORE] - cgs.scores1;
-			if (scoreBias == 0)
-			{	// We are the leader!
-				if (cgs.scores2 <= 0)
-				{	// Nobody to be ahead of yet.
-					Com_sprintf(scoreBiasStr, sizeof(scoreBiasStr), "");
-				}
-				else
-				{
-					scoreBias = cg.snap->ps.persistant[PERS_SCORE] - cgs.scores2;
-					if (scoreBias == 0)
-					{
-						Com_sprintf(scoreBiasStr, sizeof(scoreBiasStr), " (Tie)");
-					}
-					else
-					{
-						Com_sprintf(scoreBiasStr, sizeof(scoreBiasStr), " (+%d)", scoreBias);
-					}
-				}
-			}
-			else // if (scoreBias < 0)
-			{	// We are behind!
-				Com_sprintf(scoreBiasStr, sizeof(scoreBiasStr), " (%d)", scoreBias);
-			}
-			scoreStr = va("%s: %i%s", CG_GetStringEdString("MP_INGAME", "SCORE"), cg.snap->ps.persistant[PERS_SCORE], scoreBiasStr);
-		}
-		else
-		{	// Don't draw a bias.
-			scoreStr = va("%s: %i", CG_GetStringEdString("MP_INGAME", "SCORE"), cg.snap->ps.persistant[PERS_SCORE]);
-		}
-
 		menuHUD = Menus_FindByName("righthud");
 		Menu_Paint( menuHUD, qtrue );
 
 		if (menuHUD)
 		{
-			if (cgs.gametype != GT_POWERDUEL)
-			{
-				focusItem = Menu_FindItemByName(menuHUD, "score_line");
-				if (focusItem)
-				{
-					CG_DrawScaledProportionalString(
-						focusItem->window.rect.x,
-						focusItem->window.rect.y,
-						scoreStr,
-						UI_RIGHT|UI_DROPSHADOW,
-						focusItem->window.foreColor,
-						0.7f);
-				}
-			}
-
 			// Print scanline
 			focusItem = Menu_FindItemByName(menuHUD, "scanline");
 			if (focusItem)
@@ -1471,20 +1789,77 @@ void CG_DrawHUD(centity_t	*cent)
 					);
 			}
 
-			focusItem = Menu_FindItemByName(menuHUD, "frame");
+			// focusItem = Menu_FindItemByName(menuHUD, "frame");
+			// if (focusItem)
+			// {
+			// 	trap->R_SetColor( colorTable[CT_WHITE] );
+			// 	CG_DrawPic(
+			// 		focusItem->window.rect.x,
+			// 		focusItem->window.rect.y,
+			// 		focusItem->window.rect.w,
+			// 		focusItem->window.rect.h,
+			// 		focusItem->window.background
+			// 		);
+			// }
+
+			// [Jedi Knight: Unlimited]
+			// [Hexagon Rendering]
+			// Draw hexagon one
+			//focusItem = Menu_FindItemByName(menuHUD, "hexagon_one");
+			//if (focusItem)
+			//{
+			//	trap->R_SetColor(colorTable[CT_WHITE]);
+			//	CG_DrawPic(
+			//		focusItem->window.rect.x,
+			//		focusItem->window.rect.y,
+			//		focusItem->window.rect.w,
+			//		focusItem->window.rect.h,
+			//		focusItem->window.background
+			//	);
+			//}
+			// Draw hexagon two
+			focusItem = Menu_FindItemByName(menuHUD, "hexagon_two");
 			if (focusItem)
 			{
-				trap->R_SetColor( colorTable[CT_WHITE] );
+				trap->R_SetColor(colorTable[CT_WHITE]);
 				CG_DrawPic(
 					focusItem->window.rect.x,
 					focusItem->window.rect.y,
 					focusItem->window.rect.w,
 					focusItem->window.rect.h,
 					focusItem->window.background
-					);
+				);
 			}
+			// Draw hexagon three
+			focusItem = Menu_FindItemByName(menuHUD, "hexagon_three");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			// Draw hexagon three
+			focusItem = Menu_FindItemByName(menuHUD, "hexagon_four");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			// [/Jedi Knight: Unlimited]
 
 			CG_DrawForcePower(menuHUD);
+			JKU_DrawForcePower(cent, menuHUD);
 
 			// Draw ammo tics or saber style
 			if ( cent->currentState.weapon == WP_SABER )
@@ -1571,7 +1946,7 @@ void CG_DrawForceSelect( void )
 		return;
 	}
 
-	sideMax = 3;	// Max number of icons on the side
+	sideMax = 0;	// Max number of icons on the side
 
 	// Calculate how many icons will appear to either side of the center one
 	holdCount = count - 1;	// -1 for the center icon
@@ -1591,12 +1966,12 @@ void CG_DrawForceSelect( void )
 		sideRightIconCnt = holdCount - sideLeftIconCnt;
 	}
 
-	smallIconSize = 30;
-	bigIconSize = 60;
+	smallIconSize = 32;
+	bigIconSize = 32;
 	pad = 12;
 
-	x = 320;
-	y = 425;
+	x = 610;
+	y = 405;
 
 	i = BG_ProperForceIndex(cg.forceSelect) - 1;
 	if (i < 0)
@@ -1623,7 +1998,7 @@ void CG_DrawForceSelect( void )
 
 		if (cgs.media.forcePowerIcons[forcePowerSorted[i]])
 		{
-			CG_DrawPic( holdX, y + yOffset, smallIconSize, smallIconSize, cgs.media.forcePowerIcons[forcePowerSorted[i]] );
+			//CG_DrawPic( holdX, y + yOffset, smallIconSize, smallIconSize, cgs.media.forcePowerIcons[forcePowerSorted[i]] );
 			holdX -= (smallIconSize+pad);
 		}
 	}
@@ -1633,7 +2008,7 @@ void CG_DrawForceSelect( void )
 		// Current Center Icon
 		if (cgs.media.forcePowerIcons[cg.forceSelect])
 		{
-			CG_DrawPic( x-(bigIconSize/2), (y-((bigIconSize-smallIconSize)/2)) + yOffset, bigIconSize, bigIconSize, cgs.media.forcePowerIcons[cg.forceSelect] ); //only cache the icon for display
+			// CG_DrawPic( x-(bigIconSize/2), (y-((bigIconSize-smallIconSize)/2)) + yOffset, bigIconSize, bigIconSize, cgs.media.forcePowerIcons[cg.forceSelect] ); //only cache the icon for display
 		}
 	}
 
@@ -1661,14 +2036,14 @@ void CG_DrawForceSelect( void )
 
 		if (cgs.media.forcePowerIcons[forcePowerSorted[i]])
 		{
-			CG_DrawPic( holdX, y + yOffset, smallIconSize, smallIconSize, cgs.media.forcePowerIcons[forcePowerSorted[i]] ); //only cache the icon for display
+			//CG_DrawPic( holdX, y + yOffset, smallIconSize, smallIconSize, cgs.media.forcePowerIcons[forcePowerSorted[i]] ); //only cache the icon for display
 			holdX += (smallIconSize+pad);
 		}
 	}
 
 	if ( showPowersName[cg.forceSelect] )
 	{
-		CG_DrawProportionalString(320, y + 30 + yOffset, CG_GetStringEdString("SP_INGAME", showPowersName[cg.forceSelect]), UI_CENTER | UI_SMALLFONT, colorTable[CT_ICON_BLUE]);
+		// CG_DrawProportionalString(320, y + 30 + yOffset, CG_GetStringEdString("SP_INGAME", showPowersName[cg.forceSelect]), UI_CENTER | UI_SMALLFONT, colorTable[CT_ICON_BLUE]);
 	}
 }
 
@@ -4095,7 +4470,8 @@ static void CG_DrawUpperRight( void ) {
 		y = CG_DrawRadar ( y );
 	}
 
-	y = CG_DrawEnemyInfo ( y );
+	// [Jedi Knight: Unlimited]
+	// y = CG_DrawEnemyInfo ( y );
 
 	y = CG_DrawMiniScoreboard ( y );
 
