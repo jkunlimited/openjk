@@ -26,6 +26,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "w_saber.h"
 #include "ai_main.h"
 #include "ghoul2/G2.h"
+#include <jku_utils/saber_utils.h>
 
 #define SABER_BOX_SIZE 16.0f
 extern bot_state_t *botstates[MAX_CLIENTS];
@@ -2303,7 +2304,7 @@ static QINLINE qboolean G_ClientIdleInWorld(gentity_t *ent)
 	return qfalse;
 }
 
-static QINLINE qboolean G_G2TraceCollide(trace_t *tr, vec3_t lastValidStart, vec3_t lastValidEnd, vec3_t traceMins, vec3_t traceMaxs)
+QINLINE qboolean G_G2TraceCollide(trace_t *tr, vec3_t lastValidStart, vec3_t lastValidEnd, vec3_t traceMins, vec3_t traceMaxs)
 { //Hit the ent with the normal trace, try the collision trace.
 	G2Trace_t		G2Trace;
 	gentity_t		*g2Hit;
@@ -2817,7 +2818,7 @@ FIXME: subdivide the arc into a consistant increment
 FIXME: test the intersection to see if the sabers really did intersect (weren't going in the same direction and/or passed through same point at different times)?
 */
 extern qboolean tri_tri_intersect(vec3_t V0,vec3_t V1,vec3_t V2,vec3_t U0,vec3_t U1,vec3_t U2);
-#define SABER_EXTRAPOLATE_DIST 16.0f
+
 qboolean WP_SabersIntersect( gentity_t *ent1, int ent1SaberNum, int ent1BladeNum, gentity_t *ent2, qboolean checkDir )
 {
 	vec3_t	saberBase1, saberTip1, saberBaseNext1, saberTipNext1;
@@ -3886,6 +3887,9 @@ static float saberHitFraction = 1.0f;
 //This is a large function. I feel sort of bad inlining it. But it does get called tons of times per frame.
 qboolean BG_SuperBreakWinAnim( int anim );
 
+extern QINLINE void JKU_calculateSaberTrace(gentity_t *self, int rSaberNum, int rBladeNum, vec3_t saberStart, vec3_t saberEnd,
+   qboolean doInterpolate, int trMask, qboolean extrapolate, vec3_t saberTrMins, vec3_t saberTrMaxs, vec3_t lastValidStart, vec3_t lastValidEnd, trace_t* tr);
+
 static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBladeNum, vec3_t saberStart, vec3_t saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate )
 {
 	static trace_t tr;
@@ -3897,7 +3901,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 	static int otherSaberLevel;
 	int dmg = 0;
 	int attackStr = 0;
-	float saberBoxSize = d_saberBoxTraceSize.value;
 	qboolean idleDamage = qfalse;
 	qboolean didHit = qfalse;
 	qboolean sabersClashed = qfalse;
@@ -3917,193 +3920,9 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 
 	selfSaberLevel = G_SaberAttackPower(self, SaberAttacking(self));
 
-	//Add the standard radius into the box size
-	saberBoxSize += (self->client->saber[rSaberNum].blade[rBladeNum].radius*0.5f);
-
-	if (self->client->ps.weaponTime <= 0)
-	{ //if not doing any attacks or anything, just use point traces.
-		VectorClear(saberTrMins);
-		VectorClear(saberTrMaxs);
-	}
-	else if (d_saberGhoul2Collision.integer)
-	{
-		if ( d_saberSPStyleDamage.integer )
-		{//SP-size saber damage traces
-			VectorSet(saberTrMins, -2, -2, -2 );
-			VectorSet(saberTrMaxs, 2, 2, 2 );
-		}
-		else
-		{
-			VectorSet(saberTrMins, -saberBoxSize*3, -saberBoxSize*3, -saberBoxSize*3);
-			VectorSet(saberTrMaxs, saberBoxSize*3, saberBoxSize*3, saberBoxSize*3);
-		}
-	}
-	else if (self->client->ps.fd.saberAnimLevel < FORCE_LEVEL_2)
-	{ //box trace for fast, because it doesn't get updated so often
-		VectorSet(saberTrMins, -saberBoxSize, -saberBoxSize, -saberBoxSize);
-		VectorSet(saberTrMaxs, saberBoxSize, saberBoxSize, saberBoxSize);
-	}
-	else if (d_saberAlwaysBoxTrace.integer)
-	{
-		VectorSet(saberTrMins, -saberBoxSize, -saberBoxSize, -saberBoxSize);
-		VectorSet(saberTrMaxs, saberBoxSize, saberBoxSize, saberBoxSize);
-	}
-	else
-	{ //just trace the minimum blade radius
-		saberBoxSize = (self->client->saber[rSaberNum].blade[rBladeNum].radius*0.4f);
-
-		VectorSet(saberTrMins, -saberBoxSize, -saberBoxSize, -saberBoxSize);
-		VectorSet(saberTrMaxs, saberBoxSize, saberBoxSize, saberBoxSize);
-	}
-
-	while (!saberTraceDone)
-	{
-		if ( doInterpolate
-			&& !d_saberSPStyleDamage.integer )
-		{ //This didn't quite work out like I hoped. But it's better than nothing. Sort of.
-			vec3_t oldSaberStart, oldSaberEnd, saberDif, oldSaberDif;
-			int traceTests = 0;
-			float trDif = 8;
-
-			if ( (level.time-self->client->saber[rSaberNum].blade[rBladeNum].trail.lastTime) > 100 )
-			{//no valid last pos, use current
-				VectorCopy(saberStart, oldSaberStart);
-				VectorCopy(saberEnd, oldSaberEnd);
-			}
-			else
-			{//trace from last pos
-				VectorCopy(self->client->saber[rSaberNum].blade[rBladeNum].trail.base, oldSaberStart);
-				VectorCopy(self->client->saber[rSaberNum].blade[rBladeNum].trail.tip, oldSaberEnd);
-			}
-
-			VectorSubtract(saberStart, saberEnd, saberDif);
-			VectorSubtract(oldSaberStart, oldSaberEnd, oldSaberDif);
-
-			VectorNormalize(saberDif);
-			VectorNormalize(oldSaberDif);
-
-			saberEnd[0] = saberStart[0] - (saberDif[0]*trDif);
-			saberEnd[1] = saberStart[1] - (saberDif[1]*trDif);
-			saberEnd[2] = saberStart[2] - (saberDif[2]*trDif);
-
-			oldSaberEnd[0] = oldSaberStart[0] - (oldSaberDif[0]*trDif);
-			oldSaberEnd[1] = oldSaberStart[1] - (oldSaberDif[1]*trDif);
-			oldSaberEnd[2] = oldSaberStart[2] - (oldSaberDif[2]*trDif);
-
-			trap->Trace(&tr, saberEnd, saberTrMins, saberTrMaxs, saberStart, self->s.number, trMask, qfalse, 0, 0);
-
-			VectorCopy(saberEnd, lastValidStart);
-			VectorCopy(saberStart, lastValidEnd);
-			if (tr.entityNum < MAX_CLIENTS)
-			{
-				G_G2TraceCollide(&tr, lastValidStart, lastValidEnd, saberTrMins, saberTrMaxs);
-			}
-			else if (tr.entityNum < ENTITYNUM_WORLD)
-			{
-				gentity_t *trHit = &g_entities[tr.entityNum];
-
-				if (trHit->inuse && trHit->ghoul2)
-				{ //hit a non-client entity with a g2 instance
-					G_G2TraceCollide(&tr, lastValidStart, lastValidEnd, saberTrMins, saberTrMaxs);
-				}
-			}
-
-			trDif++;
-
-			while (tr.fraction == 1.0 && traceTests < 4 && tr.entityNum >= ENTITYNUM_NONE)
-			{
-				if ( (level.time-self->client->saber[rSaberNum].blade[rBladeNum].trail.lastTime) > 100 )
-				{//no valid last pos, use current
-					VectorCopy(saberStart, oldSaberStart);
-					VectorCopy(saberEnd, oldSaberEnd);
-				}
-				else
-				{//trace from last pos
-					VectorCopy(self->client->saber[rSaberNum].blade[rBladeNum].trail.base, oldSaberStart);
-					VectorCopy(self->client->saber[rSaberNum].blade[rBladeNum].trail.tip, oldSaberEnd);
-				}
-
-				VectorSubtract(saberStart, saberEnd, saberDif);
-				VectorSubtract(oldSaberStart, oldSaberEnd, oldSaberDif);
-
-				VectorNormalize(saberDif);
-				VectorNormalize(oldSaberDif);
-
-				saberEnd[0] = saberStart[0] - (saberDif[0]*trDif);
-				saberEnd[1] = saberStart[1] - (saberDif[1]*trDif);
-				saberEnd[2] = saberStart[2] - (saberDif[2]*trDif);
-
-				oldSaberEnd[0] = oldSaberStart[0] - (oldSaberDif[0]*trDif);
-				oldSaberEnd[1] = oldSaberStart[1] - (oldSaberDif[1]*trDif);
-				oldSaberEnd[2] = oldSaberStart[2] - (oldSaberDif[2]*trDif);
-
-				trap->Trace(&tr, saberEnd, saberTrMins, saberTrMaxs, saberStart, self->s.number, trMask, qfalse, 0, 0);
-
-				VectorCopy(saberEnd, lastValidStart);
-				VectorCopy(saberStart, lastValidEnd);
-				if (tr.entityNum < MAX_CLIENTS)
-				{
-					G_G2TraceCollide(&tr, lastValidStart, lastValidEnd, saberTrMins, saberTrMaxs);
-				}
-				else if (tr.entityNum < ENTITYNUM_WORLD)
-				{
-					gentity_t *trHit = &g_entities[tr.entityNum];
-
-					if (trHit->inuse && trHit->ghoul2)
-					{ //hit a non-client entity with a g2 instance
-						G_G2TraceCollide(&tr, lastValidStart, lastValidEnd, saberTrMins, saberTrMaxs);
-					}
-				}
-
-				traceTests++;
-				trDif += 8;
-			}
-		}
-		else
-		{
-			vec3_t saberEndExtrapolated;
-			if ( extrapolate )
-			{//extrapolate 16
-				vec3_t diff;
-				VectorSubtract( saberEnd, saberStart, diff );
-				VectorNormalize( diff );
-				VectorMA( saberStart, SABER_EXTRAPOLATE_DIST, diff, saberEndExtrapolated );
-			}
-			else
-			{
-				VectorCopy( saberEnd, saberEndExtrapolated );
-			}
-			trap->Trace(&tr, saberStart, saberTrMins, saberTrMaxs, saberEndExtrapolated, self->s.number, trMask, qfalse, 0, 0);
-
-			VectorCopy(saberStart, lastValidStart);
-			VectorCopy(saberEndExtrapolated, lastValidEnd);
-			/*
-			if ( tr.allsolid || tr.startsolid )
-			{
-				if ( tr.entityNum == ENTITYNUM_NONE )
-				{
-					qboolean whah = qtrue;
-				}
-				Com_Printf( "saber trace start/all solid - ent is %d\n", tr.entityNum );
-			}
-			*/
-			if (tr.entityNum < MAX_CLIENTS)
-			{
-				G_G2TraceCollide(&tr, lastValidStart, lastValidEnd, saberTrMins, saberTrMaxs);
-			}
-			else if (tr.entityNum < ENTITYNUM_WORLD)
-			{
-				gentity_t *trHit = &g_entities[tr.entityNum];
-
-				if (trHit->inuse && trHit->ghoul2)
-				{ //hit a non-client entity with a g2 instance
-					G_G2TraceCollide(&tr, lastValidStart, lastValidEnd, saberTrMins, saberTrMaxs);
-				}
-			}
-		}
-
-		saberTraceDone = qtrue;
-	}
+   //JKU: Calculate SaberTrace
+   JKU_calculateSaberTrace(self, rSaberNum, rBladeNum, saberStart, saberEnd, doInterpolate,
+      trMask, extrapolate, saberTrMins, saberTrMaxs, lastValidStart, lastValidEnd, &tr);
 
 	if ( self->client->ps.saberAttackWound < level.time
 		&& (SaberAttacking(self)
