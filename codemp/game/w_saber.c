@@ -4397,6 +4397,118 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 		}
 	}
 
+
+   //JKU: New implementation of collision handling
+
+   gentity_t* hitEntity = &g_entities[tr.entityNum];
+
+   if ((tr.fraction != 1 || tr.startsolid) &&
+      hitEntity &&
+      hitEntity->r.contents != -1 &&
+      hitEntity->inuse)
+   {
+      if (hitEntity->r.contents & CONTENTS_LIGHTSABER)
+      {
+         gentity_t* swordOwner = &g_entities[hitEntity->r.ownerNum];
+
+         if (!swordOwner || !swordOwner->client)
+         {
+            //Since there is no player/npc holding the lightsaber, we dont care
+            return qfalse;
+         }
+
+         if (swordOwner->client->ps.JKU_saberBlocking &&
+            JKU_SaberCanBlock(swordOwner, tr.endpos, 0, MOD_SABER, qfalse))
+         {
+            //Enemy is blocking with the lightsaber
+
+#ifdef DEBUG
+            trap->Print("Enemy blocked our attack with lightsaber\n");
+#endif
+
+            /*self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
+            self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
+
+            //saberDoClashEffect = qtrue;
+            //VectorCopy(tr.endpos, saberClashPos);
+            //VectorCopy(tr.plane.normal, saberClashNorm);
+            //saberClashEventParm = 1;
+
+            WP_SaberBounceSound(self, rSaberNum, rBladeNum);*/
+
+            self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
+            self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
+
+            WP_GetSaberDeflectionAngle(self, swordOwner, tr.fraction);
+
+            //do bounce sound & force feedback
+            WP_SaberBounceSound(self, rSaberNum, rBladeNum);
+
+            return qfalse;
+         }
+         else if (!self->client->ps.JKU_saberBlocking &&
+            G_SaberCollide(self, swordOwner, lastValidStart,
+            lastValidEnd, saberTrMins, saberTrMaxs, tr.endpos))
+         {
+#ifdef DEBUG
+            trap->Print("We are not blocking and the sabers collide. Do clashing animation\n");
+#endif
+
+            //WP_SabersCheckLock2(self, swordOwner, LOCK_RANDOM);
+
+            self->client->ps.saberBlocked = BLOCKED_NONE;
+            swordOwner->client->ps.saberBlocked = BLOCKED_NONE;
+
+            //didHit = qtrue;
+            return qfalse;
+         }
+         else if (self->client->ps.JKU_saberBlocking &&
+            JKU_SaberCanBlock(self, tr.endpos, 0, MOD_SABER, qfalse))
+         {
+            //Aturai: Is this even needed?
+#ifdef DEBUG
+            trap->Print("We are blocking the attack with our lightsaber\n");
+#endif
+
+            WP_GetSaberDeflectionAngle(swordOwner, self, tr.fraction);
+
+            self->client->ps.saberMove = BG_BrokenParryForAttack(swordOwner->client->ps.saberMove);
+            self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
+
+            WP_SaberBounceSound(self, rSaberNum, rBladeNum);
+
+            return qfalse;
+         }
+      }
+      else if (hitEntity->r.contents & CONTENTS_BODY)
+      {
+         if (hitEntity->client &&
+            hitEntity->client->ps.JKU_saberBlocking &&
+            JKU_SaberCanBlock(hitEntity, tr.endpos, 0, MOD_SABER, qfalse))
+         {
+            //Enemy is blocking but we hit the body
+
+            //Aturai: Not working currently
+#ifdef DEBUG
+            trap->Print("Saber blocked by body from client id %i\n", hitEntity->s.number);
+#endif
+
+            self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
+            self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
+
+            hitEntity->client->ps.saberBlocking = BLK_WIDE;
+            hitEntity->client->ps.saberMove = LS_PARRY_UP;
+
+            WP_SaberBounceSound(self, rSaberNum, rBladeNum);
+
+            return qfalse;
+         }
+      }
+   }
+
+
+
+
 	//rww - I'm saying || tr.startsolid here, because otherwise your saber tends to skip positions and go through
 	//people, and the compensation traces start in their bbox too. Which results in the saber passing through people
 	//when you visually cut right through them. Which sucks.
