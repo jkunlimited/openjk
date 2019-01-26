@@ -98,4 +98,4 @@ extern float forcePushPullRadius[NUM_FORCE_POWER_LEVELS];
 //  JKU function prototypes
 //############################
 
-extern QINLINE qboolean G_G2TraceCollide(trace_t *tr, vec3_t lastValidStart, vec3_t lastValidEnd, vec3_t traceMins, vec3_t traceMaxs);
+extern qboolean G_G2TraceCollide(trace_t *tr, vec3_t lastValidStart, vec3_t lastValidEnd, vec3_t traceMins, vec3_t traceMaxs);
