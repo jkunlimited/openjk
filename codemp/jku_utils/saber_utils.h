@@ -26,9 +26,16 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #ifndef _jku_saber_utils
 #define _jku_saber_utils
 
-#ifdef __cplusplus
-extern "C"
-{
+#ifdef _WIN32
+	#ifdef __cplusplus
+	extern "C"
+	{
+	#endif
+#else
+	#ifdef __GNUG__
+	extern "C"
+	{
+	#endif
 #endif
 
    #include <qcommon/q_math.h>
@@ -55,8 +62,14 @@ extern "C"
 
    extern QINLINE float JKU_calculateSaberDamage();
 
+#ifdef _WIN32
 #ifdef __cplusplus
-}
+	}
+#endif
+#else
+#ifdef __GNUG__
+	}
+#endif
 #endif
 
 #endif
