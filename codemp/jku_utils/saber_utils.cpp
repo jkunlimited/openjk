@@ -24,9 +24,16 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "saber_utils.h"
 
 
-#ifdef __cplusplus
-extern "C"
-{
+#ifdef _WIN32
+	#ifdef __cplusplus
+	extern "C"
+	{
+	#endif
+#else
+	#ifdef __GNUG__
+	extern "C"
+	{
+	#endif
 #endif
 
 #include <game/w_saber.h>
@@ -242,6 +249,12 @@ QINLINE float JKU_calculateSaberDamage()
    return 50.0f;
 }
 
+#ifdef _WIN32
 #ifdef __cplusplus
-}
+	}
+#endif
+#else
+#ifdef __GNUG__
+	}
+#endif
 #endif
