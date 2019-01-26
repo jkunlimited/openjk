@@ -3887,7 +3887,7 @@ static float saberHitFraction = 1.0f;
 //This is a large function. I feel sort of bad inlining it. But it does get called tons of times per frame.
 qboolean BG_SuperBreakWinAnim( int anim );
 
-extern QINLINE void JKU_calculateSaberTrace(gentity_t *self, int rSaberNum, int rBladeNum, vec3_t saberStart, vec3_t saberEnd,
+extern void JKU_calculateSaberTrace(gentity_t *self, int rSaberNum, int rBladeNum, vec3_t saberStart, vec3_t saberEnd,
    qboolean doInterpolate, int trMask, qboolean extrapolate, vec3_t saberTrMins, vec3_t saberTrMaxs, vec3_t lastValidStart, vec3_t lastValidEnd, trace_t* tr);
 
 static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBladeNum, vec3_t saberStart, vec3_t saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate )

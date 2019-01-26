@@ -38,7 +38,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include <game/w_saber.h>
 
-QINLINE void JKU_calculateSaberTrace(gentity_t *self,
+void JKU_calculateSaberTrace(gentity_t *self,
    int rSaberNum,
    int rBladeNum,
    vec3_t saberStart,
@@ -244,7 +244,7 @@ QINLINE void JKU_calculateSaberTrace(gentity_t *self,
    }
 }
 
-QINLINE float JKU_calculateSaberDamage()
+float JKU_calculateSaberDamage()
 {
    return 50.0f;
 }
