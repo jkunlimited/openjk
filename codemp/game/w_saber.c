@@ -4444,6 +4444,8 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             //do bounce sound & force feedback
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
 
+			// set the swordOwner animation properly
+			WP_SaberBlockNonRandom(swordOwner, lastValidEnd, qfalse);
             return qfalse;
          }
          else if (!self->client->ps.JKU_saberBlocking &&
@@ -4487,7 +4489,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             JKU_SaberCanBlock(hitEntity, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //Enemy is blocking but we hit the body
-
             //Aturai: Not working currently
 #ifdef DEBUG
             trap->Print("Saber blocked by body from client id %i\n", hitEntity->s.number);
@@ -4499,6 +4500,8 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             hitEntity->client->ps.saberBlocking = BLK_WIDE;
             hitEntity->client->ps.saberMove = LS_PARRY_UP;
 
+			// set the hitEntity animation properly
+			WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
 
             return qfalse;

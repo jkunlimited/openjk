@@ -567,12 +567,12 @@ CG_DrawHealth
 */
 void CG_DrawHealth( menuDef_t *menuHUD )
 {
-	vec4_t			calcColor;
+	//vec4_t			calcColor;
 	playerState_t	*ps;
 	int				healthAmt;
-	int				i,currValue,inc;
+	// int				i,currValue,inc;
 	itemDef_t		*focusItem;
-	float percent;
+	// float percent;
 
 	// Can we find the menu?
 	if (!menuHUD)
@@ -590,43 +590,43 @@ void CG_DrawHealth( menuDef_t *menuHUD )
 	}
 
 
-	inc = (float) ps->stats[STAT_MAX_HEALTH] / MAX_HUD_TICS;
-	currValue = healthAmt;
+	// inc = (float) ps->stats[STAT_MAX_HEALTH] / MAX_HUD_TICS;
+	// currValue = healthAmt;
 
 	// Print the health tics, fading out the one which is partial health
-	for (i=(MAX_HUD_TICS-1);i>=0;i--)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, healthTicName[i]);
-
-		if (!focusItem)	// This is bad
-		{
-			continue;
-		}
-
-		memcpy(calcColor, colorTable[CT_WHITE], sizeof(vec4_t));
-
-		if (currValue <= 0)	// don't show tic
-		{
-			break;
-		}
-		else if (currValue < inc)	// partial tic (alpha it out)
-		{
-			percent = (float) currValue / inc;
-			calcColor[3] *= percent;		// Fade it out
-		}
-
-		trap->R_SetColor( calcColor);
-
-		CG_DrawPic(
-			focusItem->window.rect.x,
-			focusItem->window.rect.y,
-			focusItem->window.rect.w,
-			focusItem->window.rect.h,
-			focusItem->window.background
-			);
-
-		currValue -= inc;
-	}
+	//for (i=(MAX_HUD_TICS-1);i>=0;i--)
+	//{
+	//	focusItem = Menu_FindItemByName(menuHUD, healthTicName[i]);
+	//
+	//	if (!focusItem)	// This is bad
+	//	{
+	//		continue;
+	//	}
+	//
+	//	memcpy(calcColor, colorTable[CT_WHITE], sizeof(vec4_t));
+	//
+	//	if (currValue <= 0)	// don't show tic
+	//	{
+	//		break;
+	//	}
+	//	else if (currValue < inc)	// partial tic (alpha it out)
+	//	{
+	//		percent = (float) currValue / inc;
+	//		calcColor[3] *= percent;		// Fade it out
+	//	}
+	//
+	//	trap->R_SetColor( calcColor);
+	//
+	//	CG_DrawPic(
+	//		focusItem->window.rect.x,
+	//		focusItem->window.rect.y,
+	//		focusItem->window.rect.w,
+	//		focusItem->window.rect.h,
+	//		focusItem->window.background
+	//		);
+	//
+	//	currValue -= inc;
+	//}
 
 	// Print the mueric amount
 	focusItem = Menu_FindItemByName(menuHUD, "healthamount");
@@ -655,12 +655,13 @@ CG_DrawArmor
 */
 void CG_DrawArmor( menuDef_t *menuHUD )
 {
-	vec4_t			calcColor;
+	//vec4_t			calcColor;
 	playerState_t	*ps;
 	int				maxArmor;
 	itemDef_t		*focusItem;
-	float			percent,quarterArmor;
-	int				i,currValue,inc;
+	//float			percent;
+	float			quarterArmor;
+	//int				i,currValue,inc;
 
 	//ps = &cg.snap->ps;
 	ps = &cg.predictedPlayerState;
@@ -673,59 +674,59 @@ void CG_DrawArmor( menuDef_t *menuHUD )
 
 	maxArmor = ps->stats[STAT_MAX_HEALTH];
 
-	currValue = ps->stats[STAT_ARMOR];
-	inc = (float) maxArmor / MAX_HUD_TICS;
+	//currValue = ps->stats[STAT_ARMOR];
+	//inc = (float) maxArmor / MAX_HUD_TICS;
 
-	memcpy(calcColor, colorTable[CT_WHITE], sizeof(vec4_t));
-	for (i=(MAX_HUD_TICS-1);i>=0;i--)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, armorTicName[i]);
-
-		if (!focusItem)	// This is bad
-		{
-			continue;
-		}
-
-		memcpy(calcColor, colorTable[CT_WHITE], sizeof(vec4_t));
-
-		if (currValue <= 0)	// don't show tic
-		{
-			break;
-		}
-		else if (currValue < inc)	// partial tic (alpha it out)
-		{
-			percent = (float) currValue / inc;
-			calcColor[3] *= percent;
-		}
-
-		trap->R_SetColor( calcColor);
-
-		if ((i==(MAX_HUD_TICS-1)) && (currValue < inc))
-		{
-			if (cg.HUDArmorFlag)
-			{
-				CG_DrawPic(
-					focusItem->window.rect.x,
-					focusItem->window.rect.y,
-					focusItem->window.rect.w,
-					focusItem->window.rect.h,
-					focusItem->window.background
-					);
-			}
-		}
-		else
-		{
-				CG_DrawPic(
-					focusItem->window.rect.x,
-					focusItem->window.rect.y,
-					focusItem->window.rect.w,
-					focusItem->window.rect.h,
-					focusItem->window.background
-					);
-		}
-
-		currValue -= inc;
-	}
+	//memcpy(calcColor, colorTable[CT_WHITE], sizeof(vec4_t));
+	//for (i=(MAX_HUD_TICS-1);i>=0;i--)
+	//{
+	//	focusItem = Menu_FindItemByName(menuHUD, armorTicName[i]);
+	//
+	//	if (!focusItem)	// This is bad
+	//	{
+	//		continue;
+	//	}
+	//
+	//	memcpy(calcColor, colorTable[CT_WHITE], sizeof(vec4_t));
+	//
+	//	if (currValue <= 0)	// don't show tic
+	//	{
+	//		break;
+	//	}
+	//	else if (currValue < inc)	// partial tic (alpha it out)
+	//	{
+	//		percent = (float) currValue / inc;
+	//		calcColor[3] *= percent;
+	//	}
+	//
+	//	trap->R_SetColor( calcColor);
+	//
+	//	if ((i==(MAX_HUD_TICS-1)) && (currValue < inc))
+	//	{
+	//		if (cg.HUDArmorFlag)
+	//		{
+	//			CG_DrawPic(
+	//				focusItem->window.rect.x,
+	//				focusItem->window.rect.y,
+	//				focusItem->window.rect.w,
+	//				focusItem->window.rect.h,
+	//				focusItem->window.background
+	//				);
+	//		}
+	//	}
+	//	else
+	//	{
+	//			CG_DrawPic(
+	//				focusItem->window.rect.x,
+	//				focusItem->window.rect.y,
+	//				focusItem->window.rect.w,
+	//				focusItem->window.rect.h,
+	//				focusItem->window.background
+	//				);
+	//	}
+	//
+	//	currValue -= inc;
+	//}
 
 	focusItem = Menu_FindItemByName(menuHUD, "armoramount");
 
@@ -1704,7 +1705,6 @@ void CG_DrawHUD(centity_t	*cent)
 			else
 				CG_DrawSimpleAmmo( cent );
 
-			//TODO Add score line
 		}
 
 		return;
@@ -1720,33 +1720,6 @@ void CG_DrawHUD(centity_t	*cent)
 		{
 			itemDef_t *focusItem;
 
-			// Print scanline
-			focusItem = Menu_FindItemByName(menuHUD, "scanline");
-			if (focusItem)
-			{
-				trap->R_SetColor( colorTable[CT_WHITE] );
-				CG_DrawPic(
-					focusItem->window.rect.x,
-					focusItem->window.rect.y,
-					focusItem->window.rect.w,
-					focusItem->window.rect.h,
-					focusItem->window.background
-					);
-			}
-
-			// Print frame
-			focusItem = Menu_FindItemByName(menuHUD, "frame");
-			if (focusItem)
-			{
-				trap->R_SetColor( colorTable[CT_WHITE] );
-				CG_DrawPic(
-					focusItem->window.rect.x,
-					focusItem->window.rect.y,
-					focusItem->window.rect.w,
-					focusItem->window.rect.h,
-					focusItem->window.background
-					);
-			}
 			// [Jedi Knight: Unlimited]
 			// [Barbox Rendering]
 			focusItem = Menu_FindItemByName(menuHUD, "barbox");
@@ -1764,6 +1737,7 @@ void CG_DrawHUD(centity_t	*cent)
 
 			CG_DrawArmor(menuHUD);
 			CG_DrawHealth(menuHUD);
+			CG_DrawForcePower(menuHUD);
 		}
 		else
 		{
@@ -1775,33 +1749,6 @@ void CG_DrawHUD(centity_t	*cent)
 
 		if (menuHUD)
 		{
-			// Print scanline
-			focusItem = Menu_FindItemByName(menuHUD, "scanline");
-			if (focusItem)
-			{
-				trap->R_SetColor( colorTable[CT_WHITE] );
-				CG_DrawPic(
-					focusItem->window.rect.x,
-					focusItem->window.rect.y,
-					focusItem->window.rect.w,
-					focusItem->window.rect.h,
-					focusItem->window.background
-					);
-			}
-
-			// focusItem = Menu_FindItemByName(menuHUD, "frame");
-			// if (focusItem)
-			// {
-			// 	trap->R_SetColor( colorTable[CT_WHITE] );
-			// 	CG_DrawPic(
-			// 		focusItem->window.rect.x,
-			// 		focusItem->window.rect.y,
-			// 		focusItem->window.rect.w,
-			// 		focusItem->window.rect.h,
-			// 		focusItem->window.background
-			// 		);
-			// }
-
 			// [Jedi Knight: Unlimited]
 			// [Hexagon Rendering]
 			// Draw hexagon one
@@ -1857,8 +1804,6 @@ void CG_DrawHUD(centity_t	*cent)
 				);
 			}
 			// [/Jedi Knight: Unlimited]
-
-			CG_DrawForcePower(menuHUD);
 			JKU_DrawForcePower(cent, menuHUD);
 
 			// Draw ammo tics or saber style
