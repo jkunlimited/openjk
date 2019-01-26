@@ -46,7 +46,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
    #include <game/ai_main.h>
    #include <ghoul2/G2.h>
 
-   extern QINLINE void JKU_calculateSaberTrace(gentity_t *self,
+   extern void JKU_calculateSaberTrace(gentity_t *self,
       int rSaberNum,
       int rBladeNum,
       vec3_t saberStart,
@@ -60,7 +60,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
       vec3_t lastValidEnd,
       trace_t* tr);
 
-   extern QINLINE float JKU_calculateSaberDamage();
+   extern float JKU_calculateSaberDamage();
 
 #ifdef _WIN32
 #ifdef __cplusplus
