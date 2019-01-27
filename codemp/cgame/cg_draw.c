@@ -1228,6 +1228,53 @@ static void JKU_DrawForcePower(centity_t *cent, menuDef_t *menuHUD)
 	}
 }
 
+// [Jedi Knight: Unlimited]
+static void JKU_DrawWeapon(centity_t *cent, menuDef_t *menuHUD)
+{
+	itemDef_t		*focusItem;
+
+	// Don't draw if we can't find the menu entry
+	if (!menuHUD)
+	{
+		return;
+	}
+
+	// Don't draw if dead
+	if (cg.snap->ps.stats[STAT_HEALTH] <= 0)
+	{
+		return;
+	}
+
+	// Don't draw if we don't have a weapon
+	if (!cent->currentState.weapon)
+	{
+		return;
+	}
+
+	// SWITCH CASE INBOUND
+	switch (cent->currentState.weapon) 
+	{
+		case WP_SABER:
+		{
+			// Show saber stuff
+			focusItem = Menu_FindItemByName(menuHUD, "weapon_saber");
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_WHITE]);
+
+				CG_DrawPic(
+					focusItem->window.rect.x,
+					focusItem->window.rect.y,
+					focusItem->window.rect.w,
+					focusItem->window.rect.h,
+					focusItem->window.background
+				);
+			}
+			break;
+		}
+	}
+}
+
 /*
 ================
 CG_DrawAmmo
@@ -1765,18 +1812,18 @@ void CG_DrawHUD(centity_t	*cent)
 			//	);
 			//}
 			// Draw hexagon two
-			focusItem = Menu_FindItemByName(menuHUD, "hexagon_two");
-			if (focusItem)
-			{
-				trap->R_SetColor(colorTable[CT_WHITE]);
-				CG_DrawPic(
-					focusItem->window.rect.x,
-					focusItem->window.rect.y,
-					focusItem->window.rect.w,
-					focusItem->window.rect.h,
-					focusItem->window.background
-				);
-			}
+			// focusItem = Menu_FindItemByName(menuHUD, "hexagon_two");
+			// if (focusItem)
+			// {
+			// 	trap->R_SetColor(colorTable[CT_WHITE]);
+			// 	CG_DrawPic(
+			// 		focusItem->window.rect.x,
+			// 		focusItem->window.rect.y,
+			// 		focusItem->window.rect.w,
+			// 		focusItem->window.rect.h,
+			// 		focusItem->window.background
+			// 	);
+			// }
 			// Draw hexagon three
 			focusItem = Menu_FindItemByName(menuHUD, "hexagon_three");
 			if (focusItem)
@@ -1803,8 +1850,9 @@ void CG_DrawHUD(centity_t	*cent)
 					focusItem->window.background
 				);
 			}
-			// [/Jedi Knight: Unlimited]
 			JKU_DrawForcePower(cent, menuHUD);
+			JKU_DrawWeapon(cent, menuHUD);
+			// [/Jedi Knight: Unlimited]
 
 			// Draw ammo tics or saber style
 			if ( cent->currentState.weapon == WP_SABER )
