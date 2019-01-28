@@ -3816,8 +3816,49 @@ void WP_SaberBounceSound( gentity_t *ent, int saberNum, int bladeNum )
 }
 
 // [Jedi Knight: Unlimited]
+
+
+static QINLINE int JKU_checkSaberBlockForceCost(gentity_t* self, saber_styles_t saberStyleAttacker)
+{
+   if (self && self->client)
+   {
+      if (saberStyleAttacker == SS_FAST &&
+         self->client->ps.fd.forcePower < SABER_BLOCK_FAST_ATTACK_FORCE_COST)
+      {
+         return 0;
+      }
+      else if (saberStyleAttacker == SS_MEDIUM &&
+         self->client->ps.fd.forcePower < SABER_BLOCK_MEDIUM_ATTACK_FORCE_COST)
+      {
+         return 0;
+      }
+      else if (saberStyleAttacker == SS_STRONG &&
+         self->client->ps.fd.forcePower < SABER_BLOCK_STRONG_ATTACK_FORCE_COST)
+      {
+         return 0;
+      }
+      else if (saberStyleAttacker == SS_DUAL &&
+         self->client->ps.fd.forcePower < SABER_BLOCK_DUAL_ATTACK_FORCE_COST)
+      {
+         return 0;
+      }
+      else if (saberStyleAttacker == SS_STAFF &&
+         self->client->ps.fd.forcePower < SABER_BLOCK_STAFF_ATTACK_FORCE_COST)
+      {
+         return 0;
+      }
+      else if (self->client->ps.fd.forcePower < SABER_BLOCK_DEFAULT_FORCE_COST)
+      {
+         return 0;
+      }
+   }
+
+   return 1;
+}
+
+
 // [Custom Saber Can Block Function]
-int JKU_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboolean projectile)
+int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int dflags, int mod, qboolean projectile)
 {
 	if (!self || !self->client || !point)
 	{
@@ -3874,11 +3915,16 @@ int JKU_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboole
 		WP_SaberBlockNonRandom(self, point, projectile);
 	}
 
+   if (!JKU_checkSaberBlockForceCost(self, attacker->client->saber->singleBladeStyle))
+   {
+      return 0;
+   }
+
 	return 1;
 }
 
 // Do saber block effect
-void JKU_saberDoBlockEffect(gentity_t* self, gentity_t* enemy, trace_t* tr, int rSaberNum, int rBladeNum)
+static QINLINE void JKU_saberDoBlockEffect(gentity_t* self, gentity_t* enemy, trace_t* tr, int rSaberNum, int rBladeNum)
 {
    if (self && enemy && tr)
    {
@@ -3894,6 +3940,39 @@ void JKU_saberDoBlockEffect(gentity_t* self, gentity_t* enemy, trace_t* tr, int 
       if (!te->s.angles[0] && !te->s.angles[1] && !te->s.angles[2])
       {
          te->s.angles[1] = 1;
+      }
+   }
+}
+
+static QINLINE void JKU_saberDoBlockForceCost(gentity_t* self, saber_styles_t saberStyleAttacker)
+{
+   if (self && self->client)
+   {
+      int forceCost = SABER_BLOCK_DEFAULT_FORCE_COST;
+
+      switch (saberStyleAttacker)
+      {
+      case SS_FAST:
+         forceCost = SABER_BLOCK_FAST_ATTACK_FORCE_COST;
+         break;
+      case SS_MEDIUM:
+         forceCost = SABER_BLOCK_MEDIUM_ATTACK_FORCE_COST;
+         break;
+      case SS_STRONG:
+         forceCost = SABER_BLOCK_STRONG_ATTACK_FORCE_COST;
+         break;
+      case SS_DUAL:
+         forceCost = SABER_BLOCK_DUAL_ATTACK_FORCE_COST;
+         break;
+      case SS_STAFF:
+         forceCost = SABER_BLOCK_STAFF_ATTACK_FORCE_COST;
+         break;
+      }
+
+      self->client->ps.fd.forcePower -= forceCost;
+      if (self->client->ps.fd.forcePower < 0)
+      {
+         self->client->ps.fd.forcePower = 0;
       }
    }
 }
@@ -4439,7 +4518,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
          }
 
          if (swordOwner->client->ps.JKU_saberBlocking &&
-            JKU_SaberCanBlock(swordOwner, tr.endpos, 0, MOD_SABER, qfalse))
+            JKU_SaberCanBlock(swordOwner, self, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //Enemy is blocking with the lightsaber
 #ifdef DEBUG
@@ -4453,6 +4532,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
             WP_SaberBlockNonRandom(swordOwner, lastValidEnd, qfalse);
             JKU_saberDoBlockEffect(self, swordOwner, &tr, rSaberNum, rBladeNum);
+            JKU_saberDoBlockForceCost(swordOwner, self->client->saber->singleBladeStyle);
 
             return qfalse;
          }
@@ -4472,7 +4552,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             return qfalse;
          }
          else if (self->client->ps.JKU_saberBlocking &&
-            JKU_SaberCanBlock(self, tr.endpos, 0, MOD_SABER, qfalse))
+            JKU_SaberCanBlock(self, swordOwner, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //We are blocking an enemy attack with our lightsaber
 #ifdef DEBUG
@@ -4487,6 +4567,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
             WP_SaberBlockNonRandom(self, lastValidEnd, qfalse);
             JKU_saberDoBlockEffect(self, swordOwner, &tr, rSaberNum, rBladeNum);
+            JKU_saberDoBlockForceCost(self, swordOwner->client->saber->singleBladeStyle);
 
             return qfalse;
          }
@@ -4495,7 +4576,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
       {
          if (hitEntity->client &&
             hitEntity->client->ps.JKU_saberBlocking &&
-            JKU_SaberCanBlock(hitEntity, tr.endpos, 0, MOD_SABER, qfalse))
+            JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //Enemy is blocking but we hit the body
 #ifdef DEBUG
@@ -4511,6 +4592,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
             JKU_saberDoBlockEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
+            JKU_saberDoBlockForceCost(hitEntity, self->client->saber->singleBladeStyle);
 
             return qfalse;
          }
@@ -4558,33 +4640,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 		{//stabdowns only damage people who are actually on the ground...
 			return qfalse;
 		}
-
-		// [Jedi Knight: Unlimited]
-		// [Block Button Implementation]
-		if (g_entities[tr.entityNum].client 
-			&& g_entities[tr.entityNum].client->ps.JKU_saberBlocking
-			&& JKU_SaberCanBlock(&g_entities[tr.entityNum], tr.endpos, 0, MOD_SABER, qfalse))
-		{
-#ifdef DEBUG
-			trap->Print("Saber block detected from client id %i\n", g_entities[tr.entityNum].s.number);
-#endif // DEBUG
-			self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
-			self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-
-			saberDoClashEffect = qtrue;
-			VectorCopy(tr.endpos, saberClashPos);
-			VectorCopy(tr.plane.normal, saberClashNorm);
-			saberClashEventParm = 1;
-
-			didHit = qfalse;
-			return qfalse; // Stop processing further logic if they block for now
-		}
-		else 
-		{
-			self->client->ps.saberIdleWound = level.time + g_saberDmgDelay_Idle.integer;
-			didHit = qtrue;
-		}
-		// [/Jedi Knight: Unlimited]
 
 		if ( !d_saberSPStyleDamage.integer//let's trying making blocks have to be blocked by a saber
 			&& g_entities[tr.entityNum].client

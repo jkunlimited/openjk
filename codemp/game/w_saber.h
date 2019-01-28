@@ -95,6 +95,18 @@ extern float forceJumpStrength[NUM_FORCE_POWER_LEVELS];
 extern float forcePushPullRadius[NUM_FORCE_POWER_LEVELS];
 
 //############################
+//  JKU defines
+//############################
+
+#define SABER_BLOCK_DEFAULT_FORCE_COST 25
+
+#define SABER_BLOCK_FAST_ATTACK_FORCE_COST 20
+#define SABER_BLOCK_MEDIUM_ATTACK_FORCE_COST 25
+#define SABER_BLOCK_STRONG_ATTACK_FORCE_COST 35
+#define SABER_BLOCK_DUAL_ATTACK_FORCE_COST 25
+#define SABER_BLOCK_STAFF_ATTACK_FORCE_COST 25
+
+//############################
 //  JKU function prototypes
 //############################
 
