@@ -3876,6 +3876,27 @@ int JKU_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboole
 
 	return 1;
 }
+
+// Do saber block effect
+void JKU_saberDoBlockEffect(gentity_t* self, gentity_t* enemy, trace_t* tr, int rSaberNum, int rBladeNum)
+{
+   if (self && enemy && tr)
+   {
+      gentity_t *te = NULL;
+      te = G_TempEntity(tr->endpos, EV_SABER_BLOCK);
+      te->s.otherEntityNum = enemy->s.number;
+      te->s.otherEntityNum2 = self->s.number;
+      te->s.weapon = rSaberNum;
+      te->s.legsAnim = rBladeNum;
+      VectorCopy(tr->endpos, te->s.origin);
+      VectorCopy(tr->plane.normal, te->s.angles);
+
+      if (!te->s.angles[0] && !te->s.angles[1] && !te->s.angles[2])
+      {
+         te->s.angles[1] = 1;
+      }
+   }
+}
 // [/Jedi Knight: Unlimited]
 
 static qboolean saberHitWall = qfalse;
@@ -4421,31 +4442,18 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             JKU_SaberCanBlock(swordOwner, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //Enemy is blocking with the lightsaber
-
 #ifdef DEBUG
             trap->Print("Enemy blocked our attack with lightsaber\n");
 #endif
-
-            /*self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
-            self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-
-            //saberDoClashEffect = qtrue;
-            //VectorCopy(tr.endpos, saberClashPos);
-            //VectorCopy(tr.plane.normal, saberClashNorm);
-            //saberClashEventParm = 1;
-
-            WP_SaberBounceSound(self, rSaberNum, rBladeNum);*/
-
             self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
             self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
 
-            WP_GetSaberDeflectionAngle(self, swordOwner, tr.fraction);
+            //WP_GetSaberDeflectionAngle(self, swordOwner, tr.fraction);
 
-            //do bounce sound & force feedback
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
+            WP_SaberBlockNonRandom(swordOwner, lastValidEnd, qfalse);
+            JKU_saberDoBlockEffect(self, swordOwner, &tr, rSaberNum, rBladeNum);
 
-			// set the swordOwner animation properly
-			WP_SaberBlockNonRandom(swordOwner, lastValidEnd, qfalse);
             return qfalse;
          }
          else if (!self->client->ps.JKU_saberBlocking &&
@@ -4461,23 +4469,24 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             self->client->ps.saberBlocked = BLOCKED_NONE;
             swordOwner->client->ps.saberBlocked = BLOCKED_NONE;
 
-            //didHit = qtrue;
             return qfalse;
          }
          else if (self->client->ps.JKU_saberBlocking &&
             JKU_SaberCanBlock(self, tr.endpos, 0, MOD_SABER, qfalse))
          {
-            //Aturai: Is this even needed?
+            //We are blocking an enemy attack with our lightsaber
 #ifdef DEBUG
             trap->Print("We are blocking the attack with our lightsaber\n");
 #endif
-
-            WP_GetSaberDeflectionAngle(swordOwner, self, tr.fraction);
+            //WP_GetSaberDeflectionAngle(swordOwner, self, tr.fraction);
 
             self->client->ps.saberMove = BG_BrokenParryForAttack(swordOwner->client->ps.saberMove);
             self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
 
+            // set animations, play sound, and do saber effect
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
+            WP_SaberBlockNonRandom(self, lastValidEnd, qfalse);
+            JKU_saberDoBlockEffect(self, swordOwner, &tr, rSaberNum, rBladeNum);
 
             return qfalse;
          }
@@ -4489,20 +4498,19 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             JKU_SaberCanBlock(hitEntity, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //Enemy is blocking but we hit the body
-            //Aturai: Not working currently
 #ifdef DEBUG
             trap->Print("Saber blocked by body from client id %i\n", hitEntity->s.number);
 #endif
 
             self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
             self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-
             hitEntity->client->ps.saberBlocking = BLK_WIDE;
             hitEntity->client->ps.saberMove = LS_PARRY_UP;
 
-			// set the hitEntity animation properly
-			WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
+            // set animations, play sound, and do saber effect
+            WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
+            JKU_saberDoBlockEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
 
             return qfalse;
          }
