@@ -44,7 +44,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"OpenJK"
+#define	GAMEVERSION	"JK:Unlimited 1.0 Alpha (Unreleased)"
 
 #define SECURITY_LOG "security.log"
 
