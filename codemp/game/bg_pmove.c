@@ -5511,6 +5511,14 @@ static void PM_Footsteps( void ) {
 							desiredAnim = BOTH_RUN_STAFF;
 						}
 					}
+					// [JKU Bugfix]
+					if (pm->ps->weapon != WP_SABER)
+					{
+						// Fix animation issue where wielding a gunnery weapon while having staff stance selected results in a weird walking animation
+						// This animation should be set to BOTH_RUN1.
+						desiredAnim = BOTH_RUN1;
+					}
+					// [JKU Bugfix]
 					break;
 				case SS_DUAL:
 					if ( pm->ps->saberHolstered > 1 )
@@ -5525,6 +5533,14 @@ static void PM_Footsteps( void ) {
 					{
 						desiredAnim = BOTH_RUN_DUAL;
 					}
+					// [JKU Bugfix]
+					if (pm->ps->weapon != WP_SABER)
+					{
+						// Fix animation issue where wielding a gunnery weapon while having dual stance selected results in a weird walking animation
+						// This animation should be set to BOTH_RUN1.
+						desiredAnim = BOTH_RUN1;
+					}
+					// [JKU Bugfix]
 					break;
 				default:
 					if ( pm->ps->saberHolstered )
@@ -5570,6 +5586,14 @@ static void PM_Footsteps( void ) {
 					{
 						desiredAnim = BOTH_WALKBACK_STAFF;
 					}
+					// [JKU Bugfix]
+					if (pm->ps->weapon != WP_SABER)
+					{
+						// Fix animation issue where wielding a gunnery weapon while having staff stance selected results in a weird walking animation
+						// This animation should be set to BOTH_WALKBACK1.
+						desiredAnim = BOTH_WALKBACK1;
+					}
+					// [JKU Bugfix]
 					break;
 				case SS_DUAL:
 					if ( pm->ps->saberHolstered > 1 )
@@ -5584,6 +5608,14 @@ static void PM_Footsteps( void ) {
 					{
 						desiredAnim = BOTH_WALKBACK_DUAL;
 					}
+					// [JKU Bugfix]
+					if (pm->ps->weapon != WP_SABER)
+					{
+						// Fix animation issue where wielding a gunnery weapon while having dual stance selected results in a weird walking animation
+						// This animation should be set to BOTH_WALKBACK1.
+						desiredAnim = BOTH_WALKBACK1;
+					}
+					// [JKU Bugfix]
 					break;
 				default:
 					if ( pm->ps->saberHolstered )
@@ -5633,6 +5665,14 @@ static void PM_Footsteps( void ) {
 						{
 							desiredAnim = BOTH_WALK_STAFF;
 						}
+						// [JKU Bugfix]
+						if (pm->ps->weapon != WP_SABER)
+						{
+							// Fix animation issue where wielding a gunnery weapon while having staff stance selected results in a weird walking animation
+							// This animation should be set to BOTH_WALK1.
+							desiredAnim = BOTH_WALK1;
+						}
+						// [JKU Bugfix]
 						break;
 					case SS_DUAL:
 						if ( pm->ps->saberHolstered > 1 )
@@ -5647,6 +5687,14 @@ static void PM_Footsteps( void ) {
 						{
 							desiredAnim = BOTH_WALK_DUAL;
 						}
+						// [JKU Bugfix]
+						if (pm->ps->weapon != WP_SABER)
+						{
+							// Fix animation issue where wielding a gunnery weapon while having dual stance selected results in a weird walking animation
+							// This animation should be set to BOTH_WALK1.
+							desiredAnim = BOTH_WALK1;
+						}
+						// [JKU Bugfix]
 						break;
 					default:
 						if ( pm->ps->saberHolstered )

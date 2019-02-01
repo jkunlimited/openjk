@@ -670,17 +670,19 @@ void Con_DrawNotify (void)
 		if (chat_team)
 		{
 			chattext = SE_GetString("MP_SVGAME", "SAY_TEAM");
-			SCR_DrawBigString (8, v, chattext, 1.0f, qfalse );
+			SCR_DrawBigString (6, 350, chattext, 1.0f, qfalse );
 			skip = strlen(chattext)+1;
+			SCR_DrawNamedPic(6, 350, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "gfx/hud/chat");
 		}
 		else
 		{
 			chattext = SE_GetString("MP_SVGAME", "SAY");
-			SCR_DrawBigString (8, v, chattext, 1.0f, qfalse );
+			SCR_DrawBigString (6, 350, chattext, 1.0f, qfalse );
 			skip = strlen(chattext)+1;
+			SCR_DrawNamedPic(6, 350, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "gfx/hud/chat");
 		}
 
-		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, v,
+		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, 350,
 			SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, qtrue, qtrue );
 
 		v += BIGCHAR_HEIGHT;
