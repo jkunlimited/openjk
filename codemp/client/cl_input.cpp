@@ -168,10 +168,12 @@ void IN_MLookUp( void ) {
 // [Jedi Knight: Unlimited]
 // [Blocking Button]
 void IN_Button16Down(void) {
+   cl.JKU_clientIsBlocking = qtrue;
 	cl.gcmdSendValue = qtrue;
 	cl.gcmdValue = GENCMD_BLOCK;
 }
 void IN_Button16Up(void) {
+   cl.JKU_clientIsBlocking = qfalse;
 	cl.gcmdSendValue = qtrue;
 	cl.gcmdValue = GENCMD_BLOCK_STOP;
 }
@@ -898,7 +900,9 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	// the walking flag is to keep animations consistant
 	// even during acceleration and develeration
 	//
-	if ( in_speed.active ^ cl_run->integer ) {
+   //JKU: Force player to walk if blocking with saber
+	if ((cl.snap.ps.weapon != WP_SABER || !cl.JKU_clientIsBlocking) && (in_speed.active ^ cl_run->integer ))
+   {
 		movespeed = 127;
 		cmd->buttons &= ~BUTTON_WALKING;
 	} else {
