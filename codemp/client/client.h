@@ -151,6 +151,10 @@ typedef struct clientActive_s {
 
 	entityState_t	parseEntities[MAX_PARSE_ENTITIES];
 
+   //JKU: Added persistant client state to identify if the client is blocking
+   //This is used to enforce walking instead of running
+   qboolean JKU_clientIsBlocking;
+
 	char			*mSharedMemory;
 } clientActive_t;
 
