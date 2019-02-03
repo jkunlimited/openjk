@@ -3929,7 +3929,7 @@ static QINLINE void JKU_saberDoBlockEffect(gentity_t* self, gentity_t* enemy, tr
    if (self && enemy && tr)
    {
       gentity_t *te = NULL;
-      te = G_TempEntity(tr->endpos, EV_SABER_BLOCK);
+      te = G_TempEntity(tr->endpos, EV_SABER_CLASHFLARE);
       te->s.otherEntityNum = enemy->s.number;
       te->s.otherEntityNum2 = self->s.number;
       te->s.weapon = rSaberNum;
