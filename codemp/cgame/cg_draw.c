@@ -8138,7 +8138,7 @@ static QINLINE void CG_ChatBox_DrawStrings(void)
 	int i = 0;
 	int x = 6;
 	float y = cg.scoreBoardShowing ? 475 : cg_chatBoxHeight.integer;
-	float fontScale = 0.65f;
+	float fontScale = 0.5f;
 
 	if (!cg_chatBox.integer)
 	{
