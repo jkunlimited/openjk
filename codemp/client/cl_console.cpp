@@ -579,9 +579,9 @@ void Con_DrawNotify (void)
 	short	*text;
 	int		i;
 	int		time;
-	int		skip;
+	//int		skip;
 	int		currentColor;
-	const char* chattext;
+	//const char* chattext;
 
 	currentColor = 7;
 	re->SetColor( g_color_table[currentColor] );
@@ -669,22 +669,14 @@ void Con_DrawNotify (void)
 	{
 		if (chat_team)
 		{
-			chattext = SE_GetString("MP_SVGAME", "SAY_TEAM");
-			SCR_DrawBigString (6, 350, chattext, 1.0f, qfalse );
-			skip = strlen(chattext)+1;
-			SCR_DrawNamedPic(6, 350, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "gfx/hud/chat");
+			SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/jku_chatbar_icon");
 		}
 		else
 		{
-			chattext = SE_GetString("MP_SVGAME", "SAY");
-			SCR_DrawBigString (6, 350, chattext, 1.0f, qfalse );
-			skip = strlen(chattext)+1;
-			SCR_DrawNamedPic(6, 350, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, "gfx/hud/chat");
+			SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/jku_chatbar_icon");
 		}
 
-		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, 350,
-			SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, qtrue, qtrue );
-
+		Field_Draw( &chatField, 65, 1015, 400, qtrue, qtrue);
 		v += BIGCHAR_HEIGHT;
 	}
 
