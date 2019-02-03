@@ -8016,7 +8016,7 @@ static void CG_DrawSiegeHUDItem(void)
 /*====================================
 chatbox functionality -rww
 ====================================*/
-#define	CHATBOX_CUTOFF_LEN	550
+#define	CHATBOX_CUTOFF_LEN	375
 #define	CHATBOX_FONT_HEIGHT	20
 
 //utility func, insert a string into a string at the specified
