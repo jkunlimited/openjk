@@ -907,53 +907,12 @@ static void JKU_DrawForcePower(centity_t *cent, menuDef_t *menuHUD)
 		return;
 	}
 
-	if (!cg.snap->ps.fd.forcePowerSelected)
-	{
-		// Set default force power selected to avoid NPE
-		cg.snap->ps.fd.forcePowerSelected = FP_SEE;
-	}
-
-
 	// draw the current selected force power in this menu
 	switch (cg.snap->ps.fd.forcePowerSelected)
 	{
-		default:
-		{
-			focusItem = Menu_FindItemByName(menuHUD, "forcepower_see");
-			if (focusItem)
-			{
-				trap->R_SetColor(colorTable[CT_WHITE]);
-
-				CG_DrawPic(
-					focusItem->window.rect.x,
-					focusItem->window.rect.y,
-					focusItem->window.rect.w,
-					focusItem->window.rect.h,
-					focusItem->window.background
-				);
-			}
-			break;
-		}
 		case FP_HEAL:
 		{
 			focusItem = Menu_FindItemByName(menuHUD, "forcepower_heal");
-			if (focusItem)
-			{
-				trap->R_SetColor(colorTable[CT_WHITE]);
-
-				CG_DrawPic(
-					focusItem->window.rect.x,
-					focusItem->window.rect.y,
-					focusItem->window.rect.w,
-					focusItem->window.rect.h,
-					focusItem->window.background
-				);
-			}
-			break;
-		}
-		case FP_LEVITATION:
-		{
-			focusItem = Menu_FindItemByName(menuHUD, "forcepower_levitation");
 			if (focusItem)
 			{
 				trap->R_SetColor(colorTable[CT_WHITE]);
@@ -1189,9 +1148,9 @@ static void JKU_DrawForcePower(centity_t *cent, menuDef_t *menuHUD)
 			}
 			break;
 		}
-		case FP_SABERTHROW:
+		default:
 		{
-			focusItem = Menu_FindItemByName(menuHUD, "forcepower_saberthrow");
+			focusItem = Menu_FindItemByName(menuHUD, "forcepower_see");
 			if (focusItem)
 			{
 				trap->R_SetColor(colorTable[CT_WHITE]);
@@ -2187,150 +2146,47 @@ qboolean ForcePower_Valid(int i)
 /*
 ===================
 CG_DrawForceSelect
+[Jedi Knight: Unlimited - Redesigned]
 ===================
 */
 void CG_DrawForceSelect( void )
 {
-	int		i;
-	int		count;
-	int		smallIconSize,bigIconSize;
-	int		holdX, x, y, pad;
-	int		sideLeftIconCnt,sideRightIconCnt;
-	int		sideMax,holdCount,iconCnt;
-	int		yOffset = 0;
+	// Initialize variables
+	int i;
+	int selectedforcepower;
 
-	// don't display if dead
-	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 )
+	// Link selectedforcepower to cg.snap var
+	selectedforcepower = cg.snap->ps.fd.forcePowerSelected;
+
+	// If no force power is selected default to force sense
+	if (!cg.snap->ps.fd.forcePowerSelected)
 	{
+		selectedforcepower = FP_SEE;
+		cg.snap->ps.fd.forcePowerSelected = selectedforcepower;
 		return;
 	}
 
-	if ((cg.forceSelectTime+WEAPON_SELECT_TIME)<cg.time)	// Time is up for the HUD to display
+	// Iterate through all force powers
+	for (i = 0; i < NUM_FORCE_POWERS; i++)
 	{
-		cg.forceSelect = cg.snap->ps.fd.forcePowerSelected;
-		return;
-	}
-
-	if (!cg.snap->ps.fd.forcePowersKnown)
-	{
-		return;
-	}
-
-	// count the number of powers owned
-	count = 0;
-
-	for (i=0;i < NUM_FORCE_POWERS;++i)
-	{
-		if (ForcePower_Valid(i))
+		// Is the selected force power the current one?
+		if (selectedforcepower == i)
 		{
-			count++;
+			// Advance by one force power
+			selectedforcepower = i + 1;
+			break;
+		}
+
+		// Is the selected force power the final one?
+		if (selectedforcepower >= NUM_FORCE_POWERS)
+		{
+			selectedforcepower = 0;
+			break;
 		}
 	}
 
-	if (count == 0)	// If no force powers, don't display
-	{
-		return;
-	}
-
-	sideMax = 0;	// Max number of icons on the side
-
-	// Calculate how many icons will appear to either side of the center one
-	holdCount = count - 1;	// -1 for the center icon
-	if (holdCount == 0)			// No icons to either side
-	{
-		sideLeftIconCnt = 0;
-		sideRightIconCnt = 0;
-	}
-	else if (count > (2*sideMax))	// Go to the max on each side
-	{
-		sideLeftIconCnt = sideMax;
-		sideRightIconCnt = sideMax;
-	}
-	else							// Less than max, so do the calc
-	{
-		sideLeftIconCnt = holdCount/2;
-		sideRightIconCnt = holdCount - sideLeftIconCnt;
-	}
-
-	smallIconSize = 32;
-	bigIconSize = 32;
-	pad = 12;
-
-	x = 610;
-	y = 405;
-
-	i = BG_ProperForceIndex(cg.forceSelect) - 1;
-	if (i < 0)
-	{
-		i = MAX_SHOWPOWERS - 1;
-	}
-
-	trap->R_SetColor(NULL);
-	// Work backwards from current icon
-	holdX = x - ((bigIconSize/2) + pad + smallIconSize);
-	for (iconCnt=1;iconCnt<(sideLeftIconCnt+1);i--)
-	{
-		if (i < 0)
-		{
-			i = MAX_SHOWPOWERS - 1;
-		}
-
-		if (!ForcePower_Valid(forcePowerSorted[i]))	// Does he have this power?
-		{
-			continue;
-		}
-
-		++iconCnt;					// Good icon
-
-		if (cgs.media.forcePowerIcons[forcePowerSorted[i]])
-		{
-			//CG_DrawPic( holdX, y + yOffset, smallIconSize, smallIconSize, cgs.media.forcePowerIcons[forcePowerSorted[i]] );
-			holdX -= (smallIconSize+pad);
-		}
-	}
-
-	if (ForcePower_Valid(cg.forceSelect))
-	{
-		// Current Center Icon
-		if (cgs.media.forcePowerIcons[cg.forceSelect])
-		{
-			// CG_DrawPic( x-(bigIconSize/2), (y-((bigIconSize-smallIconSize)/2)) + yOffset, bigIconSize, bigIconSize, cgs.media.forcePowerIcons[cg.forceSelect] ); //only cache the icon for display
-		}
-	}
-
-	i = BG_ProperForceIndex(cg.forceSelect) + 1;
-	if (i>=MAX_SHOWPOWERS)
-	{
-		i = 0;
-	}
-
-	// Work forwards from current icon
-	holdX = x + (bigIconSize/2) + pad;
-	for (iconCnt=1;iconCnt<(sideRightIconCnt+1);i++)
-	{
-		if (i>=MAX_SHOWPOWERS)
-		{
-			i = 0;
-		}
-
-		if (!ForcePower_Valid(forcePowerSorted[i]))	// Does he have this power?
-		{
-			continue;
-		}
-
-		++iconCnt;					// Good icon
-
-		if (cgs.media.forcePowerIcons[forcePowerSorted[i]])
-		{
-			//CG_DrawPic( holdX, y + yOffset, smallIconSize, smallIconSize, cgs.media.forcePowerIcons[forcePowerSorted[i]] ); //only cache the icon for display
-			holdX += (smallIconSize+pad);
-		}
-	}
-
-	if ( showPowersName[cg.forceSelect] )
-	{
-		// CG_DrawProportionalString(320, y + 30 + yOffset, CG_GetStringEdString("SP_INGAME", showPowersName[cg.forceSelect]), UI_CENTER | UI_SMALLFONT, colorTable[CT_ICON_BLUE]);
-	}
+	// Set the force power to render and apply
+	cg.snap->ps.fd.forcePowerSelected = selectedforcepower;
 }
 
 /*
@@ -8732,11 +8588,6 @@ static void CG_Draw2D( void ) {
 				bestTime = cg.weaponSelectTime;
 			}
 
-			if (cg.forceSelectTime > bestTime)
-			{
-				drawSelect = 3;
-			}
-
 			switch(drawSelect)
 			{
 			case 1:
@@ -8744,9 +8595,6 @@ static void CG_Draw2D( void ) {
 				break;
 			case 2:
 				CG_DrawWeaponSelect();
-				break;
-			case 3:
-				CG_DrawForceSelect();
 				break;
 			default:
 				break;
