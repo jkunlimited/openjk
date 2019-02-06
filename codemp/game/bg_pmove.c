@@ -5589,7 +5589,14 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						desiredAnim = BOTH_WALKBACK_STAFF;
+						if (pm->ps->JKU_saberBlocking)
+						{
+							desiredAnim = BOTH_WALKBACK_STAFF;
+						}
+						else
+						{
+							desiredAnim = BOTH_WALKBACK1;
+						}
 					}
 					// [JKU Bugfix]
 					if (pm->ps->weapon != WP_SABER)
@@ -5611,7 +5618,14 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						desiredAnim = BOTH_WALKBACK_DUAL;
+						if (pm->ps->JKU_saberBlocking)
+						{
+							desiredAnim = BOTH_WALKBACK_DUAL;
+						}
+						else
+						{
+							desiredAnim = BOTH_WALKBACK_DUAL; // Need new anim for this
+						}
 					}
 					// [JKU Bugfix]
 					if (pm->ps->weapon != WP_SABER)
@@ -5629,7 +5643,14 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						desiredAnim = BOTH_WALKBACK1;
+						if (pm->ps->JKU_saberBlocking)
+						{
+							desiredAnim = BOTH_WALKBACK1; // We need to introduce a new anim for this...
+						}
+						else
+						{
+							desiredAnim = BOTH_WALKBACK1;
+						}
 					}
 					break;
 				}
@@ -5668,7 +5689,14 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							desiredAnim = BOTH_WALK_STAFF;
+							if (pm->ps->JKU_saberBlocking)
+							{
+								desiredAnim = BOTH_WALK_STAFF;
+							}
+							else
+							{
+								desiredAnim = BOTH_WALK1;
+							}
 						}
 						// [JKU Bugfix]
 						if (pm->ps->weapon != WP_SABER)
@@ -5690,7 +5718,14 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							desiredAnim = BOTH_WALK_DUAL;
+							if (pm->ps->JKU_saberBlocking)
+							{
+								desiredAnim = BOTH_WALK_DUAL;
+							}
+							else
+							{
+								desiredAnim = BOTH_WALK1;
+							}
 						}
 						// [JKU Bugfix]
 						if (pm->ps->weapon != WP_SABER)
@@ -5708,7 +5743,14 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							desiredAnim = BOTH_WALK2;
+							if (pm->ps->JKU_saberBlocking)
+							{
+								desiredAnim = BOTH_WALK2;
+							}
+							else
+							{
+								desiredAnim = BOTH_WALK1;
+							}
 						}
 						break;
 					}
