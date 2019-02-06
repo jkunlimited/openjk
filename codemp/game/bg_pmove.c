@@ -5629,7 +5629,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						desiredAnim = BOTH_WALKBACK2;
+						desiredAnim = BOTH_WALKBACK1;
 					}
 					break;
 				}
