@@ -279,12 +279,17 @@ int PM_GetSaberStance(void)
 	saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
 	saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
 
+   if (!pm->ps->JKU_saberBlocking)
+   {
+      return BOTH_STAND1;
+   }
+
 	if (!pm->ps->saberEntityNum)
 	{ //lost it
 		return BOTH_STAND1;
 	}
 
-	if ( BG_SabersOff( pm->ps ) )
+	if ( BG_SabersOff( pm->ps ))
 	{
 		return BOTH_STAND1;
 	}
