@@ -3855,10 +3855,15 @@ void PM_SetSaberMove(short newMove)
 			anim = PM_GetSaberStance();
 		}
 
+		/*
+		[Jedi Knight: Unlimited]
+		[Removed... ]
+		
 		if (anim == BOTH_WALKBACK1 || anim == BOTH_WALKBACK2 || anim == BOTH_WALK1)
 		{ //normal stance when walking backward so saber doesn't look like it's cutting through leg
 			anim = PM_GetSaberStance();
 		}
+		*/
 
 		if (BG_InSlopeAnim( anim ))
 		{
