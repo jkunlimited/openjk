@@ -276,13 +276,57 @@ static QINLINE qboolean PM_IsRocketTrooper(void)
 int PM_GetSaberStance(void)
 {
 	int anim = BOTH_STAND2;
+
 	saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
 	saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
-
-   if (!pm->ps->JKU_saberBlocking)
-   {
-      return BOTH_STAND1;
-   }
+	
+	if (!pm->ps->JKU_saberBlocking)
+	{
+		if (pm->ps->pm_flags & PMF_DUCKED)
+		{
+			switch (pm->ps->fd.saberAnimLevel)
+			{
+				case SS_DUAL:
+					// This anim looks horrible when crouching...
+					if (pm->ps->saberHolstered != 1)
+					{
+						pm->ps->saberHolstered = 1;
+						return BOTH_SABERFAST_STANCE;
+					}
+					else
+					{
+						return BOTH_SABERDUAL_STANCE;
+					}
+				case SS_STAFF:
+					// This anim looks horrible when crouching as well...
+					if (pm->ps->saberHolstered != 1)
+					{
+						pm->ps->saberHolstered = 1;
+						return BOTH_STAND2;
+					}
+					else
+					{
+						return BOTH_SABERSTAFF_STANCE;
+					}
+				case SS_FAST:
+					return BOTH_SABERFAST_STANCE;
+				case SS_TAVION:
+					return BOTH_SABERFAST_STANCE;
+				case SS_STRONG:
+					return BOTH_SABERSLOW_STANCE;
+				case SS_MEDIUM:
+					return BOTH_STAND2;
+				case SS_DESANN:
+					return BOTH_SABERSLOW_STANCE;
+				default:
+					return BOTH_STAND2;
+			}
+		}
+		else
+		{
+			return BOTH_STAND1;
+		}
+	}
 
 	if (!pm->ps->saberEntityNum)
 	{ //lost it
