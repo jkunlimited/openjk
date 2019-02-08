@@ -279,8 +279,8 @@ int PM_GetSaberStance(void)
 
 	saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
 	saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
-	
-	if (!pm->ps->JKU_saberBlocking)
+
+	if (!(pm->cmd.buttons & BUTTON_JKU_BLOCK))
 	{
 		if (pm->ps->pm_flags & PMF_DUCKED)
 		{
@@ -5633,7 +5633,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						if (pm->ps->JKU_saberBlocking)
+						if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
 						{
 							desiredAnim = BOTH_WALKBACK_STAFF;
 						}
@@ -5662,7 +5662,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						if (pm->ps->JKU_saberBlocking)
+						if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
 						{
 							desiredAnim = BOTH_WALKBACK_DUAL;
 						}
@@ -5687,7 +5687,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						if (pm->ps->JKU_saberBlocking)
+						if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
 						{
 							desiredAnim = BOTH_WALKBACK1; // We need to introduce a new anim for this...
 						}
@@ -5733,7 +5733,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							if (pm->ps->JKU_saberBlocking)
+							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
 							{
 								desiredAnim = BOTH_WALK_STAFF;
 							}
@@ -5762,7 +5762,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							if (pm->ps->JKU_saberBlocking)
+							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
 							{
 								desiredAnim = BOTH_WALK_DUAL;
 							}
@@ -5787,7 +5787,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							if (pm->ps->JKU_saberBlocking)
+							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
 							{
 								desiredAnim = BOTH_WALK2;
 							}

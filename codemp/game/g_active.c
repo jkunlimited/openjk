@@ -1870,7 +1870,7 @@ void JKU_ActivateBlockButton(gentity_t *ent)
 		return;
 	}
 	else {
-		ent->client->ps.JKU_saberBlocking = qtrue;
+      ent->client->buttons |= BUTTON_JKU_BLOCK;
 #ifdef DEBUG
 		trap->Print("Saber block activated for client %s\n", ent->client->pers.netname);
 #endif // DEBUG
@@ -1882,7 +1882,7 @@ void JKU_DisableBlockButton(gentity_t *ent)
 		return;
 	}
 	else {
-		ent->client->ps.JKU_saberBlocking = qfalse;
+		ent->client->buttons &= ~BUTTON_JKU_BLOCK;
 #ifdef DEBUG
 		trap->Print("Saber block disabled for client %s\n", ent->client->pers.netname);
 #endif // DEBUG

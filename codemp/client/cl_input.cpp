@@ -70,7 +70,7 @@ kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
 kbutton_t	in_strafe, in_speed;
 kbutton_t	in_up, in_down;
 
-#define MAX_KBUTTONS 17
+#define MAX_KBUTTONS 16
 
 kbutton_t	in_buttons[MAX_KBUTTONS];
 
@@ -164,20 +164,6 @@ void IN_MLookUp( void ) {
 		IN_CenterView ();
 	}
 }
-
-// [Jedi Knight: Unlimited]
-// [Blocking Button]
-void IN_Button16Down(void) {
-   cl.JKU_clientIsBlocking = qtrue;
-	cl.gcmdSendValue = qtrue;
-	cl.gcmdValue = GENCMD_BLOCK;
-}
-void IN_Button16Up(void) {
-   cl.JKU_clientIsBlocking = qfalse;
-	cl.gcmdSendValue = qtrue;
-	cl.gcmdValue = GENCMD_BLOCK_STOP;
-}
-// [/Jedi Knight Unlimited]
 
 void IN_GenCMD1( void )
 {
@@ -803,8 +789,19 @@ void IN_Button11Down(void) {IN_KeyDown(&in_buttons[11]);}
 void IN_Button11Up(void) {IN_KeyUp(&in_buttons[11]);}
 void IN_Button12Down(void) {IN_KeyDown(&in_buttons[12]);}
 void IN_Button12Up(void) {IN_KeyUp(&in_buttons[12]);}
-void IN_Button13Down(void) {IN_KeyDown(&in_buttons[13]);}
-void IN_Button13Up(void) {IN_KeyUp(&in_buttons[13]);}
+void IN_Button13Down(void)
+{
+   cl.gcmdSendValue = qtrue;
+   cl.gcmdValue = GENCMD_BLOCK;
+   IN_KeyDown(&in_buttons[13]);
+}
+void IN_Button13Up(void)
+{
+   cl.gcmdSendValue = qtrue;
+   cl.gcmdValue = GENCMD_BLOCK_STOP;
+   IN_KeyUp(&in_buttons[13]);
+}
+
 void IN_Button14Down(void) {IN_KeyDown(&in_buttons[14]);}
 void IN_Button14Up(void) {IN_KeyUp(&in_buttons[14]);}
 void IN_Button15Down(void) {IN_KeyDown(&in_buttons[15]);}
@@ -901,7 +898,7 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	// even during acceleration and develeration
 	//
    //JKU: Force player to walk if blocking with saber
-	if ((cl.snap.ps.weapon != WP_SABER || !cl.JKU_clientIsBlocking) && (in_speed.active ^ cl_run->integer ))
+	if ((cl.snap.ps.weapon != WP_SABER || !(cmd->buttons & BUTTON_JKU_BLOCK)) && (in_speed.active ^ cl_run->integer ))
    {
 		movespeed = 127;
 		cmd->buttons &= ~BUTTON_WALKING;
@@ -1730,10 +1727,6 @@ static const cmdList_t inputCmds[] =
 	{ "-button14", NULL, IN_Button14Up, NULL },
 	{ "+button15", "Button 15", IN_Button15Down, NULL },
 	{ "-button15", NULL, IN_Button15Up, NULL },
-	// [Jedi Knight: Unlimited]
-	{ "+button16", "Button 16", IN_Button16Down, NULL},
-	{ "-button16", NULL, IN_Button16Up, NULL},
-	// [/Jedi Knight: Unlimited]
 	{ "+mlook", "Hold to use mouse look", IN_MLookDown, NULL },
 	{ "-mlook", NULL, IN_MLookUp, NULL },
 	{ "sv_saberswitch", "Holster/activate lightsaber", IN_GenCMD1, NULL },
