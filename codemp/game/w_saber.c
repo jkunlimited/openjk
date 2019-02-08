@@ -4517,7 +4517,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             return qfalse;
          }
 
-         if (swordOwner->client->ps.JKU_saberBlocking &&
+         if ((swordOwner->client->buttons & BUTTON_JKU_BLOCK) &&
             JKU_SaberCanBlock(swordOwner, self, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //Enemy is blocking with the lightsaber
@@ -4536,7 +4536,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 
             return qfalse;
          }
-         else if (!self->client->ps.JKU_saberBlocking &&
+         else if (!(self->client->buttons & BUTTON_JKU_BLOCK) &&
             G_SaberCollide(self, swordOwner, lastValidStart,
             lastValidEnd, saberTrMins, saberTrMaxs, tr.endpos))
          {
@@ -4551,7 +4551,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 
             return qfalse;
          }
-         else if (self->client->ps.JKU_saberBlocking &&
+         else if ((self->client->buttons & BUTTON_JKU_BLOCK) &&
             JKU_SaberCanBlock(self, swordOwner, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //We are blocking an enemy attack with our lightsaber
@@ -4575,7 +4575,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
       else if (hitEntity->r.contents & CONTENTS_BODY)
       {
          if (hitEntity->client &&
-            hitEntity->client->ps.JKU_saberBlocking &&
+            (hitEntity->client->buttons & BUTTON_JKU_BLOCK) &&
             JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //Enemy is blocking but we hit the body

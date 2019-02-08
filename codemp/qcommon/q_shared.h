@@ -1333,10 +1333,6 @@ typedef struct playerState_s {
 	vec3_t		userVec1;
 	vec3_t		userVec2;
 
-	// [Jedi Knight: Unlimited]
-	qboolean	JKU_saberBlocking;
-	// [/Jedi Knight: Unlimited]
-
 #ifdef _ONEBIT_COMBO
 	int			deltaOneBits;
 	int			deltaNumBits;
@@ -1377,6 +1373,8 @@ typedef struct siegePers_s
 #define BUTTON_FORCE_LIGHTNING	1024
 
 #define BUTTON_FORCE_DRAIN		2048
+
+#define BUTTON_JKU_BLOCK 8192
 
 // Here's an interesting bit.  The bots in TA used buttons to do additional gestures.
 // I ripped them out because I didn't want too many buttons given the fact that I was already adding some for JK2.
