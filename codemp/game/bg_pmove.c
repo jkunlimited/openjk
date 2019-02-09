@@ -287,27 +287,9 @@ int PM_GetSaberStance(void)
 			switch (pm->ps->fd.saberAnimLevel)
 			{
 				case SS_DUAL:
-					// This anim looks horrible when crouching...
-					if (pm->ps->saberHolstered != 1)
-					{
-						pm->ps->saberHolstered = 1;
-						return BOTH_SABERFAST_STANCE;
-					}
-					else
-					{
-						return BOTH_SABERDUAL_STANCE;
-					}
+					return BOTH_SABERDUAL_STANCE;
 				case SS_STAFF:
-					// This anim looks horrible when crouching as well...
-					if (pm->ps->saberHolstered != 1)
-					{
-						pm->ps->saberHolstered = 1;
-						return BOTH_STAND2;
-					}
-					else
-					{
-						return BOTH_SABERSTAFF_STANCE;
-					}
+					return BOTH_SABERSTAFF_STANCE;
 				case SS_FAST:
 					return BOTH_SABERFAST_STANCE;
 				case SS_TAVION:
@@ -5542,11 +5524,11 @@ static void PM_Footsteps( void ) {
 				{
 				case SS_STAFF:
 					if ( pm->ps->saberHolstered > 1 )
-					{//blades off
+					{
 						desiredAnim = BOTH_RUN1;
 					}
 					else if ( pm->ps->saberHolstered == 1 )
-					{//1 blade on
+					{
 						desiredAnim = BOTH_RUN2;
 					}
 					else
@@ -5560,14 +5542,10 @@ static void PM_Footsteps( void ) {
 							desiredAnim = BOTH_RUN_STAFF;
 						}
 					}
-					// [JKU Bugfix]
 					if (pm->ps->weapon != WP_SABER)
 					{
-						// Fix animation issue where wielding a gunnery weapon while having staff stance selected results in a weird walking animation
-						// This animation should be set to BOTH_RUN1.
 						desiredAnim = BOTH_RUN1;
 					}
-					// [JKU Bugfix]
 					break;
 				case SS_DUAL:
 					if ( pm->ps->saberHolstered > 1 )
@@ -5582,14 +5560,10 @@ static void PM_Footsteps( void ) {
 					{
 						desiredAnim = BOTH_RUN_DUAL;
 					}
-					// [JKU Bugfix]
 					if (pm->ps->weapon != WP_SABER)
 					{
-						// Fix animation issue where wielding a gunnery weapon while having dual stance selected results in a weird walking animation
-						// This animation should be set to BOTH_RUN1.
 						desiredAnim = BOTH_RUN1;
 					}
-					// [JKU Bugfix]
 					break;
 				default:
 					if ( pm->ps->saberHolstered )
@@ -5642,14 +5616,10 @@ static void PM_Footsteps( void ) {
 							desiredAnim = BOTH_WALKBACK1;
 						}
 					}
-					// [JKU Bugfix]
 					if (pm->ps->weapon != WP_SABER)
 					{
-						// Fix animation issue where wielding a gunnery weapon while having staff stance selected results in a weird walking animation
-						// This animation should be set to BOTH_WALKBACK1.
 						desiredAnim = BOTH_WALKBACK1;
 					}
-					// [JKU Bugfix]
 					break;
 				case SS_DUAL:
 					if ( pm->ps->saberHolstered > 1 )
@@ -5671,14 +5641,10 @@ static void PM_Footsteps( void ) {
 							desiredAnim = BOTH_WALKBACK_DUAL; // Need new anim for this
 						}
 					}
-					// [JKU Bugfix]
 					if (pm->ps->weapon != WP_SABER)
 					{
-						// Fix animation issue where wielding a gunnery weapon while having dual stance selected results in a weird walking animation
-						// This animation should be set to BOTH_WALKBACK1.
 						desiredAnim = BOTH_WALKBACK1;
 					}
-					// [JKU Bugfix]
 					break;
 				default:
 					if ( pm->ps->saberHolstered )
@@ -5742,14 +5708,10 @@ static void PM_Footsteps( void ) {
 								desiredAnim = BOTH_WALK1;
 							}
 						}
-						// [JKU Bugfix]
 						if (pm->ps->weapon != WP_SABER)
 						{
-							// Fix animation issue where wielding a gunnery weapon while having staff stance selected results in a weird walking animation
-							// This animation should be set to BOTH_WALK1.
 							desiredAnim = BOTH_WALK1;
 						}
-						// [JKU Bugfix]
 						break;
 					case SS_DUAL:
 						if ( pm->ps->saberHolstered > 1 )
@@ -5771,14 +5733,10 @@ static void PM_Footsteps( void ) {
 								desiredAnim = BOTH_WALK1;
 							}
 						}
-						// [JKU Bugfix]
 						if (pm->ps->weapon != WP_SABER)
 						{
-							// Fix animation issue where wielding a gunnery weapon while having dual stance selected results in a weird walking animation
-							// This animation should be set to BOTH_WALK1.
 							desiredAnim = BOTH_WALK1;
 						}
-						// [JKU Bugfix]
 						break;
 					default:
 						if ( pm->ps->saberHolstered )
