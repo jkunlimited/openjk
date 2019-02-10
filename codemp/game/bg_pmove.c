@@ -5638,7 +5638,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							desiredAnim = BOTH_WALKBACK_DUAL; // Need new anim for this
+							desiredAnim = BOTH_WALKBACK1;
 						}
 					}
 					if (pm->ps->weapon != WP_SABER)
