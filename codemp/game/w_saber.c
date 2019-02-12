@@ -3856,8 +3856,10 @@ static QINLINE int JKU_checkSaberBlockForceCost(gentity_t* self, saber_styles_t 
    return 1;
 }
 
-
 // [Custom Saber Can Block Function]
+extern float JKU_calculateSaberHitAngle(gentity_t* self, gentity_t* other);
+extern float JKU_calculateAttackAngle(gentity_t* self, gentity_t* other);
+extern float JKU_radToDeg(float radians);
 int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int dflags, int mod, qboolean projectile)
 {
 	if (!self || !self->client || !point)
@@ -3914,6 +3916,30 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
 	{
 		WP_SaberBlockNonRandom(self, point, projectile);
 	}
+
+   float cosAngle = JKU_calculateSaberHitAngle(self, attacker);
+   float degAngle = JKU_radToDeg(cosAngle);
+
+   if (degAngle < JKU_UNBLOCKABLE_ANGLE)
+   {
+      return 0;
+   }
+   else if (self->client->pers.cmd.rightmove > 0 &&
+      cosAngle < 0)
+   {  
+      //Blocking right, receiving attack left
+      return 0;
+   }
+   else if (self->client->pers.cmd.rightmove < 0 &&
+      cosAngle > 0)
+   {
+      //Blocking left, receiving attack right
+      return 0;
+   }
+   else if (degAngle < JKU_BLOCKABLE_ANGLE_STATIONARY)
+   {
+      return 0;
+   }
 
    if (!JKU_checkSaberBlockForceCost(self, attacker->client->saber->singleBladeStyle))
    {
