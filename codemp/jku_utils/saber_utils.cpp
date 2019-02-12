@@ -1,8 +1,5 @@
 /*
 ===========================================================================
-Copyright (C) 2000 - 2013, Raven Software, Inc.
-Copyright (C) 2001 - 2013, Activision, Inc.
-Copyright (C) 2013 - 2015, OpenJK contributors
 Copyright (C) 2019 - 2020, Jedi Knight Unlimited contributors
 
 This file is part of the JKU source code.
@@ -22,7 +19,9 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "saber_utils.h"
-
+#include <math.h>
+#include <vector>
+#include <numeric>
 
 #ifdef _WIN32
 	#ifdef __cplusplus
@@ -242,6 +241,63 @@ void JKU_calculateSaberTrace(gentity_t *self,
 
       saberTraceDone = qtrue;
    }
+}
+
+#define MATH_PI 3.14159265
+float JKU_calculateSaberHitAngle(gentity_t* self,
+   gentity_t* other)
+{
+   if (!self->client || !other->client)
+   {
+      return 180.0f;
+   }
+
+   float dotProduct =
+      (self->client->ps.viewangles[0] * other->client->ps.viewangles[0]) +
+      (self->client->ps.viewangles[1] * other->client->ps.viewangles[1]) +
+      (self->client->ps.viewangles[2] * other->client->ps.viewangles[2]);
+
+   float selfAngleLength = std::sqrt(std::powf(self->client->ps.viewangles[0], 2.0f) +
+      std::powf(self->client->ps.viewangles[1], 2.0f) +
+      std::powf(self->client->ps.viewangles[2], 2.0f));
+
+   float otherAngleLength = std::sqrt(std::powf(other->client->ps.viewangles[0], 2.0f) +
+      std::powf(other->client->ps.viewangles[1], 2.0f) +
+      std::powf(other->client->ps.viewangles[2], 2.0f));
+
+   return dotProduct / (selfAngleLength * otherAngleLength);
+
+   //return std::acos(cosAngle) * 180.0 / MATH_PI;
+}
+
+float JKU_calculateAttackAngle(gentity_t* self,
+   gentity_t* other)
+{
+   vec3_t crossProduct;
+   crossProduct[0] = (self->client->ps.viewangles[1] * other->client->ps.viewangles[2]) - (self->client->ps.viewangles[2] * other->client->ps.viewangles[1]);
+   crossProduct[1] = (self->client->ps.viewangles[2] * other->client->ps.viewangles[0]) - (self->client->ps.viewangles[0] * other->client->ps.viewangles[2]);
+   crossProduct[2] = (self->client->ps.viewangles[0] * other->client->ps.viewangles[1]) - (self->client->ps.viewangles[1] * other->client->ps.viewangles[0]);
+
+   float crossProductLength = std::sqrt(std::powf(crossProduct[0], 2.0f) +
+      std::powf(crossProduct[1], 2.0f) +
+      std::powf(crossProduct[2], 2.0f));
+
+   float selfAngleLength = std::sqrt(std::powf(self->client->ps.viewangles[0], 2.0f) +
+      std::powf(self->client->ps.viewangles[1], 2.0f) +
+      std::powf(self->client->ps.viewangles[2], 2.0f));
+
+   float otherAngleLength = std::sqrt(std::powf(other->client->ps.viewangles[0], 2.0f) +
+      std::powf(other->client->ps.viewangles[1], 2.0f) +
+      std::powf(other->client->ps.viewangles[2], 2.0f));
+
+   float sinAngle = crossProductLength / (selfAngleLength * otherAngleLength);
+
+   return std::asin(sinAngle) * 180.0f / MATH_PI;
+}
+
+float JKU_radToDeg(float radians)
+{
+   return std::acos(radians) * 180.0 / MATH_PI;
 }
 
 float JKU_calculateSaberDamage()

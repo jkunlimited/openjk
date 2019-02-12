@@ -304,11 +304,22 @@ int PM_GetSaberStance(void)
 					return BOTH_STAND2;
 			}
 		}
-		else
-		{
-			return BOTH_STAND1;
-		}
+      else
+      {
+         return BOTH_STAND1;
+      }
 	}
+   //We are blocking
+   else if (pm->cmd.rightmove > 0)
+   {
+      //We are going to the right, so block right
+      return BOTH_P1_S1_TR;
+   }
+   else if (pm->cmd.rightmove < 0)
+   {
+      //We are going to the left, so block left
+      return BOTH_P1_S1_TL;
+   }
 
 	if (!pm->ps->saberEntityNum)
 	{ //lost it

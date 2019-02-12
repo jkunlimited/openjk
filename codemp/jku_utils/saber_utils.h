@@ -60,6 +60,14 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
       vec3_t lastValidEnd,
       trace_t* tr);
 
+   extern float JKU_calculateSaberHitAngle(gentity_t* self,
+      gentity_t* other);
+
+   extern float JKU_calculateAttackAngle(gentity_t* self,
+      gentity_t* other);
+
+   extern float JKU_radToDeg(float radians);
+
    extern float JKU_calculateSaberDamage();
 
 #ifdef _WIN32
