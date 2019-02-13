@@ -257,13 +257,13 @@ float JKU_calculateSaberHitAngle(gentity_t* self,
       (self->client->ps.viewangles[1] * other->client->ps.viewangles[1]) +
       (self->client->ps.viewangles[2] * other->client->ps.viewangles[2]);
 
-   float selfAngleLength = std::sqrt(std::powf(self->client->ps.viewangles[0], 2.0f) +
-      std::powf(self->client->ps.viewangles[1], 2.0f) +
-      std::powf(self->client->ps.viewangles[2], 2.0f));
+   float selfAngleLength = std::sqrt(std::pow(self->client->ps.viewangles[0], 2.0f) +
+      std::pow(self->client->ps.viewangles[1], 2.0f) +
+      std::pow(self->client->ps.viewangles[2], 2.0f));
 
-   float otherAngleLength = std::sqrt(std::powf(other->client->ps.viewangles[0], 2.0f) +
-      std::powf(other->client->ps.viewangles[1], 2.0f) +
-      std::powf(other->client->ps.viewangles[2], 2.0f));
+   float otherAngleLength = std::sqrt(std::pow(other->client->ps.viewangles[0], 2.0f) +
+      std::pow(other->client->ps.viewangles[1], 2.0f) +
+      std::pow(other->client->ps.viewangles[2], 2.0f));
 
    return dotProduct / (selfAngleLength * otherAngleLength);
 
@@ -278,17 +278,17 @@ float JKU_calculateAttackAngle(gentity_t* self,
    crossProduct[1] = (self->client->ps.viewangles[2] * other->client->ps.viewangles[0]) - (self->client->ps.viewangles[0] * other->client->ps.viewangles[2]);
    crossProduct[2] = (self->client->ps.viewangles[0] * other->client->ps.viewangles[1]) - (self->client->ps.viewangles[1] * other->client->ps.viewangles[0]);
 
-   float crossProductLength = std::sqrt(std::powf(crossProduct[0], 2.0f) +
-      std::powf(crossProduct[1], 2.0f) +
-      std::powf(crossProduct[2], 2.0f));
+   float crossProductLength = std::sqrt(std::pow(crossProduct[0], 2.0f) +
+      std::pow(crossProduct[1], 2.0f) +
+      std::pow(crossProduct[2], 2.0f));
 
-   float selfAngleLength = std::sqrt(std::powf(self->client->ps.viewangles[0], 2.0f) +
-      std::powf(self->client->ps.viewangles[1], 2.0f) +
-      std::powf(self->client->ps.viewangles[2], 2.0f));
+   float selfAngleLength = std::sqrt(std::pow(self->client->ps.viewangles[0], 2.0f) +
+      std::pow(self->client->ps.viewangles[1], 2.0f) +
+      std::pow(self->client->ps.viewangles[2], 2.0f));
 
-   float otherAngleLength = std::sqrt(std::powf(other->client->ps.viewangles[0], 2.0f) +
-      std::powf(other->client->ps.viewangles[1], 2.0f) +
-      std::powf(other->client->ps.viewangles[2], 2.0f));
+   float otherAngleLength = std::sqrt(std::pow(other->client->ps.viewangles[0], 2.0f) +
+      std::pow(other->client->ps.viewangles[1], 2.0f) +
+      std::pow(other->client->ps.viewangles[2], 2.0f));
 
    float sinAngle = crossProductLength / (selfAngleLength * otherAngleLength);
 
