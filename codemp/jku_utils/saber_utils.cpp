@@ -19,7 +19,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "saber_utils.h"
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <numeric>
 
