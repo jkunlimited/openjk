@@ -4570,7 +4570,9 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             trap->Print("Enemy blocked our attack with lightsaber\n");
 #endif
             self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
-            self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
+            self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
+            self->client->ps.saberBlockTime = level.time + 300;
+            self->client->ps.saberAttackWound = level.time + 300;
 
             //WP_GetSaberDeflectionAngle(self, swordOwner, tr.fraction);
 
@@ -4619,15 +4621,34 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
       }
       else if (hitEntity->r.contents & CONTENTS_BODY)
       {
+         if (hitEntity->client)
+         {
+            // They're blocking but we hit their body - penalty issued
+            if (hitEntity->client->buttons & BUTTON_JKU_BLOCK)
+            {
+               hitEntity->client->ps.fd.forcePower = hitEntity->client->ps.fd.forcePower - 30;
+               self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
+               self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
+               self->client->ps.saberBlockTime = level.time + 300;
+               self->client->ps.saberAttackWound = level.time + 300;
+               return qfalse;
+            }
+            else
+            // They're not blocking - take damage instantly
+            {
+               didHit = qtrue;
+            }
+         }
+         
          /*
          if (hitEntity->client &&
             (hitEntity->client->buttons & BUTTON_JKU_BLOCK) &&
             JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse))
          {
             //Enemy is blocking but we hit the body
-#ifdef DEBUG
+            #ifdef DEBUG
             trap->Print("Saber blocked by body from client id %i\n", hitEntity->s.number);
-#endif
+            #endif
 
             self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
             self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
@@ -4643,7 +4664,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             return qfalse;
          }
          */
-         return qtrue;
       }
    }
 
