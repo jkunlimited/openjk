@@ -4619,6 +4619,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
       }
       else if (hitEntity->r.contents & CONTENTS_BODY)
       {
+         /*
          if (hitEntity->client &&
             (hitEntity->client->buttons & BUTTON_JKU_BLOCK) &&
             JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse))
@@ -4641,6 +4642,8 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 
             return qfalse;
          }
+         */
+         return qtrue;
       }
    }
 
