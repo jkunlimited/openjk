@@ -4571,8 +4571,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 #endif
             self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
             self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
-            self->client->ps.saberBlockTime = level.time + 300;
-            self->client->ps.saberAttackWound = level.time + 300;
+            self->client->ps.saberBlockTime = (level.time + 300);
 
             //WP_GetSaberDeflectionAngle(self, swordOwner, tr.fraction);
 
@@ -4626,12 +4625,20 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             // They're blocking but we hit their body - penalty issued
             if (hitEntity->client->buttons & BUTTON_JKU_BLOCK)
             {
-               hitEntity->client->ps.fd.forcePower = hitEntity->client->ps.fd.forcePower - 30;
-               self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
-               self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
-               self->client->ps.saberBlockTime = level.time + 300;
-               self->client->ps.saberAttackWound = level.time + 300;
-               return qfalse;
+               // Their force power points are below 30 - so they will take damage
+               if (hitEntity->client->ps.fd.forcePower < 30)
+               {
+                  didHit = qtrue;
+               }
+               // Their force power points are above or equal to 30 - so they will do a body-block costing 30 force power points
+               else if (hitEntity->client->ps.fd.forcePower >= 30)
+               {
+                  hitEntity->client->ps.fd.forcePower = (hitEntity->client->ps.fd.forcePower - 30);
+                  self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
+                  self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
+                  self->client->ps.saberBlockTime = (level.time + 300);
+                  return qfalse;
+               }
             }
             else
             // They're not blocking - take damage instantly
