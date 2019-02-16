@@ -3920,7 +3920,7 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
    float cosAngle = JKU_calculateSaberHitAngle(self, attacker);
    float degAngle = JKU_radToDeg(cosAngle);
 
-   if (cosAngle > 0)
+   /*if (cosAngle > 0)
    {
       degAngle -= 180.0f;
 
@@ -3930,10 +3930,10 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
 
    //trap->Print("CosineAngle: %f, Degrees: %f\n", cosAngle, degAngle);
 
-   if (degAngle < JKU_UNBLOCKABLE_ANGLE)
+   /*if (degAngle < JKU_UNBLOCKABLE_ANGLE)
    {
       return 0;
-   }
+   }*/
 
    // else if (self->client->pers.cmd.rightmove > 0 &&
    //    cosAngle < 0)
@@ -3948,7 +3948,7 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
    //    return 0;
    // }
 
-   else if (degAngle < JKU_BLOCKABLE_ANGLE_STATIONARY)
+   if (degAngle < JKU_BLOCKABLE_ANGLE_STATIONARY)
    {
       return 0;
    }
