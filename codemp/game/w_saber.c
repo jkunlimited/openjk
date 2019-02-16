@@ -3934,28 +3934,31 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
    {
       return 0;
    }
-   else if (self->client->pers.cmd.rightmove > 0 &&
-      cosAngle < 0)
-   {  
-      //Blocking right, receiving attack left
-      return 0;
-   }
-   else if (self->client->pers.cmd.rightmove < 0 &&
-      cosAngle >= 0)
-   {
-      //Blocking left, receiving attack right
-      return 0;
-   }
+
+   // else if (self->client->pers.cmd.rightmove > 0 &&
+   //    cosAngle < 0)
+   // {  
+   //    //Blocking right, receiving attack left
+   //    return 0;
+   // }
+   // else if (self->client->pers.cmd.rightmove < 0 &&
+   //    cosAngle >= 0)
+   // {
+   //    //Blocking left, receiving attack right
+   //    return 0;
+   // }
+
    else if (degAngle < JKU_BLOCKABLE_ANGLE_STATIONARY)
    {
       return 0;
    }
-   else if (!projectile && self->client->pers.cmd.rightmove == 0 &&
-      self->client->pers.cmd.forwardmove == 0)
-   {
-      //Cant block sabers standing still
-      return 0;
-   }
+
+   // else if (!projectile && self->client->pers.cmd.rightmove == 0 &&
+   //    self->client->pers.cmd.forwardmove == 0)
+   // {
+   //    //Cant block sabers standing still
+   //    return 0;
+   // }
 
    if (!JKU_checkSaberBlockForceCost(self, attacker->client->saber->singleBladeStyle))
    {
