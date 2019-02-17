@@ -4571,7 +4571,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 #endif
             self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
             self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
-            self->client->ps.saberBlockTime = (level.time + 300);
+            self->client->ps.saberBlockTime = (level.time + 150);
 
             //WP_GetSaberDeflectionAngle(self, swordOwner, tr.fraction);
 
@@ -4636,7 +4636,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
                   hitEntity->client->ps.fd.forcePower = (hitEntity->client->ps.fd.forcePower - 30);
                   self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
                   self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
-                  self->client->ps.saberBlockTime = (level.time + 300);
+                  self->client->ps.saberBlockTime = (level.time + 150);
                   return qfalse;
                }
             }
