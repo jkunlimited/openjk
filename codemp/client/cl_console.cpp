@@ -667,17 +667,17 @@ void Con_DrawNotify (void)
 	// draw the chat line
 	if ( Key_GetCatcher( ) & KEYCATCH_MESSAGE )
 	{
-		if (chat_team)
-		{
-			SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/jku_chatbar_icon");
-		}
-		else
-		{
-			SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/jku_chatbar_icon");
-		}
-
-		Field_Draw( &chatField, 65, 1015, 400, qtrue, qtrue);
-		v += BIGCHAR_HEIGHT;
+      if (chat_team)
+      {
+         SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/jku_chatbar_icon");
+         Field_SmallDraw(&chatField, 20, 451, TINYCHAR_WIDTH, qtrue, qtrue);
+      }
+      else
+      {
+         SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/jku_chatbar_icon");
+         Field_SmallDraw(&chatField, 20, 451, TINYCHAR_WIDTH, qtrue, qtrue);
+      }
+		v += TINYCHAR_HEIGHT;
 	}
 
 }

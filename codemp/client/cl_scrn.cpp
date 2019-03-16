@@ -178,20 +178,20 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, float *set
 	int			xx;
 
 	// draw the drop shadow
-	color[0] = color[1] = color[2] = 0;
-	color[3] = setColor[3];
-	re->SetColor( color );
-	s = string;
-	xx = x;
-	while ( *s ) {
-		if ( !noColorEscape && Q_IsColorString( s ) ) {
-			s += 2;
-			continue;
-		}
-		SCR_DrawChar( xx+2, y+2, size, *s );
-		xx += size;
-		s++;
-	}
+	//color[0] = color[1] = color[2] = 0;
+	//color[3] = setColor[3];
+	//re->SetColor( color );
+	//s = string;
+	//xx = x;
+	//while ( *s ) {
+	//	if ( !noColorEscape && Q_IsColorString( s ) ) {
+	//		s += 2;
+	//		continue;
+	//	}
+	//	SCR_DrawChar( xx+2, y+2, size, *s );
+	//	xx += size;
+	//	s++;
+	//}
 
 
 	// draw the colored text
@@ -268,8 +268,6 @@ void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, 
 	}
 	re->SetColor( NULL );
 }
-
-
 
 /*
 ** SCR_Strlen -- skips color escape codes
