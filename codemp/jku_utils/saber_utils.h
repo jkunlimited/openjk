@@ -68,7 +68,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
    extern float JKU_radToDeg(float radians);
 
-   extern float JKU_calculateSaberDamage();
+   extern int JKU_calculateSaberDamage(gentity_t *self);
 
 #ifdef _WIN32
 #ifdef __cplusplus

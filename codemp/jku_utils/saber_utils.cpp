@@ -300,9 +300,11 @@ float JKU_radToDeg(float radians)
    return std::acos(radians) * 180.0 / MATH_PI;
 }
 
-float JKU_calculateSaberDamage()
+int JKU_calculateSaberDamage(gentity_t *self)
 {
-   return 50.0f;
+   //Fnuki: According to the specification, we just want to insta-blap anyone we hit:
+   //G: "Direct lightsaber hits will be instant kill. blocking will not work if the character runs out of force points."
+   return 100;
 }
 
 #ifdef _WIN32

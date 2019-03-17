@@ -514,9 +514,9 @@ float CL_KeyState( kbutton_t *key ) {
 }
 
 #define		AUTOMAP_KEY_FORWARD			1
-#define		AUTOMAP_KEY_BACK			2
+#define		AUTOMAP_KEY_BACK           2
 #define		AUTOMAP_KEY_YAWLEFT			3
-#define		AUTOMAP_KEY_YAWRIGHT		4
+#define		AUTOMAP_KEY_YAWRIGHT       4
 #define		AUTOMAP_KEY_PITCHUP			5
 #define		AUTOMAP_KEY_PITCHDOWN		6
 #define		AUTOMAP_KEY_DEFAULTVIEW		7
@@ -778,7 +778,7 @@ void IN_Button5Up(void) {IN_KeyUp(&in_buttons[5]);}
 void IN_Button6Down(void) {IN_KeyDown(&in_buttons[6]);}
 void IN_Button6Up(void) {IN_KeyUp(&in_buttons[6]);}
 void IN_Button7Down(void) {IN_KeyDown(&in_buttons[7]);}
-void IN_Button7Up(void){IN_KeyUp(&in_buttons[7]);}
+void IN_Button7Up(void) {IN_KeyUp(&in_buttons[7]);}
 void IN_Button8Down(void) {IN_KeyDown(&in_buttons[8]);}
 void IN_Button8Up(void) {IN_KeyUp(&in_buttons[8]);}
 void IN_Button9Down(void) {IN_KeyDown(&in_buttons[9]);}
@@ -1687,8 +1687,8 @@ static const cmdList_t inputCmds[] =
 	{ "-use", NULL, IN_Button5Up, NULL },
 	{ "+force_grip", "Hold to use grip force power", IN_Button6Down, NULL },
 	{ "-force_grip", NULL, IN_Button6Up, NULL },
-	{ "+altattack", "Alternate Attack", IN_Button7Down, NULL },
-	{ "-altattack", NULL, IN_Button7Up, NULL },
+	{ "+altattack", "Manual block", IN_Button13Down, NULL },
+	{ "-altattack", NULL, IN_Button13Up, NULL },
 	{ "+useforce", "Use selected force power", IN_Button9Down, NULL },
 	{ "-useforce", NULL, IN_Button9Up, NULL },
 	{ "+force_lightning", "Hold to use lightning force power", IN_Button10Down, NULL },
