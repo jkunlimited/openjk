@@ -3989,7 +3989,7 @@ static QINLINE void JKU_saberDoBlockEffect(gentity_t* self, gentity_t* enemy, tr
    }
 }
 
-static QINLINE void JKU_saberDoBlockForceCost(gentity_t* self, saber_styles_t saberStyleAttacker)
+static QINLINE void JKU_saberDoBlockForceCost(gentity_t* self, saber_styles_t saberStyleAttacker, float blockCostFactor)
 {
    if (self && self->client)
    {
@@ -4014,7 +4014,7 @@ static QINLINE void JKU_saberDoBlockForceCost(gentity_t* self, saber_styles_t sa
          break;
       }
 
-      self->client->ps.fd.forcePower -= forceCost;
+      self->client->ps.fd.forcePower -= (int)(forceCost * blockCostFactor);
       if (self->client->ps.fd.forcePower < 0)
       {
          self->client->ps.fd.forcePower = 0;
@@ -4034,6 +4034,8 @@ qboolean BG_SuperBreakWinAnim(int anim);
 
 extern void JKU_calculateSaberTrace(gentity_t *self, int rSaberNum, int rBladeNum, vec3_t saberStart, vec3_t saberEnd,
    qboolean doInterpolate, int trMask, qboolean extrapolate, vec3_t saberTrMins, vec3_t saberTrMaxs, vec3_t lastValidStart, vec3_t lastValidEnd, trace_t* tr);
+
+extern int JKU_calculateSaberDamage(gentity_t *self);
 
 static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBladeNum, vec3_t saberStart, vec3_t saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate)
 {
@@ -4056,7 +4058,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
    qboolean otherUnblockable = qfalse;
    qboolean tryDeflectAgain = qfalse;
 
-   gentity_t *otherOwner;
+   //gentity_t *otherOwner;
 
    if (BG_SabersOff(&self->client->ps))
    {
@@ -4069,6 +4071,9 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
    JKU_calculateSaberTrace(self, rSaberNum, rBladeNum, saberStart, saberEnd, doInterpolate,
       trMask, extrapolate, saberTrMins, saberTrMaxs, lastValidStart, lastValidEnd, &tr);
 
+   //JKU-Fnuki: Removing old damage calculation as this is now obsolete
+#pragma region old_openjk_damage_calculation
+   /*
    if (self->client->ps.saberAttackWound < level.time
       && (SaberAttacking(self)
          || BG_SuperBreakWinAnim(self->client->ps.torsoAnim)
@@ -4154,7 +4159,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
          dmg *= 0.5f;
          }
          }
-         */
+         <insert * / here>
          if (level.gametype != GT_DUEL
             && level.gametype != GT_POWERDUEL
             && level.gametype != GT_SIEGE)
@@ -4185,7 +4190,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
          {
          Com_Printf("CL %i SABER DMG: %i, anim %s, torsoTimer %i\n", self->s.number, dmg, animTable[self->client->ps.torsoAnim].name, self->client->ps.torsoTimer );
          }
-         */
+         <insert * / here>
          if (self->client->ps.torsoAnim == BOTH_A1_SPECIAL
             || self->client->ps.torsoAnim == BOTH_A2_SPECIAL
             || self->client->ps.torsoAnim == BOTH_A3_SPECIAL)
@@ -4456,6 +4461,11 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
       Com_Printf("CL %i SABER DMG: %i\n", self->s.number, dmg);
    }
 #endif
+*/
+#pragma endregion
+
+   //JKU-Fnuki: New damage calculation
+   dmg = JKU_calculateSaberDamage(self);
 
    VectorSubtract(saberEnd, saberStart, dir);
    VectorNormalize(dir);
@@ -4577,7 +4587,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
             WP_SaberBlockNonRandom(swordOwner, lastValidEnd, qfalse);
             JKU_saberDoBlockEffect(self, swordOwner, &tr, rSaberNum, rBladeNum);
-            JKU_saberDoBlockForceCost(swordOwner, self->client->saber->singleBladeStyle);
+            JKU_saberDoBlockForceCost(swordOwner, self->client->saber->singleBladeStyle, SABER_BLADE_BLOCK_COST_FACTOR);
 
             return qfalse;
          }
@@ -4612,9 +4622,13 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
             WP_SaberBlockNonRandom(self, lastValidEnd, qfalse);
             JKU_saberDoBlockEffect(self, swordOwner, &tr, rSaberNum, rBladeNum);
-            JKU_saberDoBlockForceCost(self, swordOwner->client->saber->singleBladeStyle);
+            JKU_saberDoBlockForceCost(self, swordOwner->client->saber->singleBladeStyle, SABER_BLADE_BLOCK_COST_FACTOR);
 
             return qfalse;
+         }
+         else
+         {
+            didHit = qtrue;
          }
       }
       else if (hitEntity->r.contents & CONTENTS_BODY)
@@ -4637,16 +4651,82 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
             JKU_saberDoBlockEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
-            JKU_saberDoBlockForceCost(hitEntity, self->client->saber->singleBladeStyle);
+            JKU_saberDoBlockForceCost(hitEntity, self->client->saber->singleBladeStyle, SABER_CONE_BLOCK_COST_FACTOR);
 
             return qfalse;
+         }
+         else
+         {
+            didHit = qtrue;
          }
       }
    }
 
+   if (didHit)
+   {
+      //JKU-Fnuki: Apply the damage to the target
+      int knockbackFlags = 0;
 
+      if (self->s.eType == ET_NPC &&
+         g_entities[tr.entityNum].client &&
+         self->client->playerTeam == g_entities[tr.entityNum].client->playerTeam)
+      { //Oops. Since he's an NPC, we'll be forgiving and cut the damage down.
+         dmg *= 0.2f;
+      }
 
+      if (!WP_SaberBladeUseSecondBladeStyle(&self->client->saber[rSaberNum], rBladeNum)
+         && self->client->saber[rSaberNum].knockbackScale > 0.0f)
+      {
+         if (rSaberNum < 1)
+         {
+            knockbackFlags = DAMAGE_SABER_KNOCKBACK1;
+         }
+         else
+         {
+            knockbackFlags = DAMAGE_SABER_KNOCKBACK2;
+         }
+      }
 
+      if (WP_SaberBladeUseSecondBladeStyle(&self->client->saber[rSaberNum], rBladeNum)
+         && self->client->saber[rSaberNum].knockbackScale > 0.0f)
+      {
+         if (rSaberNum < 1)
+         {
+            knockbackFlags = DAMAGE_SABER_KNOCKBACK1_B2;
+         }
+         else
+         {
+            knockbackFlags = DAMAGE_SABER_KNOCKBACK2_B2;
+         }
+      }
+
+      //Disable dismemberment
+      WP_SaberDamageAdd(tr.entityNum, dir, tr.endpos, dmg, qfalse, knockbackFlags);
+
+      if (g_entities[tr.entityNum].client)
+      {
+         //Let jedi AI know if it hit an enemy
+         if (self->enemy && self->enemy == &g_entities[tr.entityNum])
+         {
+            self->client->ps.saberEventFlags |= SEF_HITENEMY;
+         }
+         else
+         {
+            self->client->ps.saberEventFlags |= SEF_HITOBJECT;
+         }
+      }
+
+      if (d_saberSPStyleDamage.integer)
+      {
+      }
+      else
+      {
+         self->client->ps.saberAttackWound = level.time + 100;
+      }
+   }
+
+#pragma region old_openjk_damage_application
+   /*
    //rww - I'm saying || tr.startsolid here, because otherwise your saber tends to skip positions and go through
    //people, and the compensation traces start in their bbox too. Which results in the saber passing through people
    //when you visually cut right through them. Which sucks.
@@ -4739,6 +4819,29 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
          qboolean doDismemberment = qfalse;
          int	knockbackFlags = 0;
 
+         WP_SaberDamageAdd(tr.entityNum, dir, tr.endpos, dmg, doDismemberment, knockbackFlags);
+
+         if (g_entities[tr.entityNum].client)
+         {
+            //Let jedi AI know if it hit an enemy
+            if (self->enemy && self->enemy == &g_entities[tr.entityNum])
+            {
+               self->client->ps.saberEventFlags |= SEF_HITENEMY;
+            }
+            else
+            {
+               self->client->ps.saberEventFlags |= SEF_HITOBJECT;
+            }
+         }
+
+         if (d_saberSPStyleDamage.integer)
+         {
+         }
+         else
+         {
+            self->client->ps.saberAttackWound = level.time + 100;
+         }
+
          if (g_entities[tr.entityNum].client)
          { //not a "jedi", so make them suffer more
             if (dmg > SABER_NONATTACK_DAMAGE)
@@ -4755,7 +4858,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
          dmg *= 1.5;
          }
          }
-         */
+         <insert * / here>
 
          if (!d_saberSPStyleDamage.integer)
          {
@@ -4944,6 +5047,9 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
          return qfalse;
       }
    }
+   */
+#pragma endregion
+
    return didHit;
 }
 
