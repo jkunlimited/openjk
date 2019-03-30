@@ -670,12 +670,12 @@ void Con_DrawNotify (void)
       if (chat_team)
       {
          SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/jku_chatbar_icon");
-         Field_SmallDraw(&chatField, 20, 451, TINYCHAR_WIDTH, qtrue, qtrue);
+         Field_SmallDraw(&chatField, 22, 451, TINYCHAR_WIDTH, qfalse, qtrue);
       }
       else
       {
          SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/jku_chatbar_icon");
-         Field_SmallDraw(&chatField, 20, 451, TINYCHAR_WIDTH, qtrue, qtrue);
+         Field_SmallDraw(&chatField, 22, 451, TINYCHAR_WIDTH, qfalse, qtrue);
       }
 		v += TINYCHAR_HEIGHT;
 	}
