@@ -304,11 +304,40 @@ int PM_GetSaberStance(void)
 					return BOTH_STAND2;
 			}
 		}
-      else
-      {
-         return BOTH_STAND1;
-      }
+		else
+		{
+			return BOTH_STAND1;
+		}
 	}
+
+	switch (pm->ps->fd.saberAnimLevel)
+	{
+		case SS_DUAL:
+			anim = BOTH_SABERDUAL_STANCE;
+			break;
+		case SS_STAFF:
+			anim = BOTH_SABERSTAFF_STANCE;
+			break;
+		case SS_FAST:
+			anim = BOTH_SABERFAST_STANCE;
+			break;
+		case SS_TAVION:
+			anim = BOTH_SABERFAST_STANCE;
+			break;
+		case SS_STRONG:
+			anim = BOTH_SABERSLOW_STANCE;
+			break;
+		case SS_MEDIUM:
+			anim = BOTH_STAND2;
+			break;
+		case SS_DESANN:
+			anim = BOTH_SABERSLOW_STANCE;
+			break;
+		default:
+			anim = BOTH_STAND2;
+			break;
+	}
+
    // We are blocking
    // else if (pm->cmd.rightmove > 0)
    // {
@@ -350,28 +379,9 @@ int PM_GetSaberStance(void)
 		return BOTH_SABERDUAL_STANCE;
 	}
 
-	switch ( pm->ps->fd.saberAnimLevel )
-	{
-	case SS_DUAL:
-		anim = BOTH_SABERDUAL_STANCE;
-		break;
-	case SS_STAFF:
-		anim = BOTH_SABERSTAFF_STANCE;
-		break;
-	case SS_FAST:
-	case SS_TAVION:
-		anim = BOTH_SABERFAST_STANCE;
-		break;
-	case SS_STRONG:
-		anim = BOTH_SABERSLOW_STANCE;
-		break;
-	case SS_NONE:
-	case SS_MEDIUM:
-	case SS_DESANN:
-	default:
-		anim = BOTH_STAND2;
-		break;
-	}
+
+	// JKU/Mikkel: Debug
+	// Com_Printf("Client %d is using anim %d", pm->ps->clientNum, anim);
 	return anim;
 }
 

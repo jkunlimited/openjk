@@ -71,23 +71,33 @@ typedef struct vidmode_s
 } vidmode_t;
 
 const vidmode_t r_vidModes[] = {
-    { "Mode  0: 320x240",		320,	240 },
-    { "Mode  1: 400x300",		400,	300 },
-    { "Mode  2: 512x384",		512,	384 },
-    { "Mode  3: 640x480",		640,	480 },
-    { "Mode  4: 800x600",		800,	600 },
-    { "Mode  5: 960x720",		960,	720 },
-    { "Mode  6: 1024x768",		1024,	768 },
-    { "Mode  7: 1152x864",		1152,	864 },
-    { "Mode  8: 1280x1024",		1280,	1024 },
-    { "Mode  9: 1600x1200",		1600,	1200 },
-    { "Mode 10: 2048x1536",		2048,	1536 },
-    { "Mode 11: 856x480 (wide)", 856,	 480 },
-    { "Mode 12: 2400x600(surround)",2400,600 }
+    { "Mode 0: 640x480",		640,	480 }, // Other 
+	{ "Mode 1: 800x600",		800,	600 }, // SVGA
+	{ "Mode 2: 1024x768",		1024,	768 }, // XGA
+	{ "Mode 3: 1152x864",		1152,	864 }, // Other
+	{ "Mode 4: 1280x720",		1280,	720 }, // WXGA
+	{ "Mode 5: 1280x768",		1280,	768 }, // Other
+	{ "Mode 6: 1280x800",		1280,	800 }, // WXGA
+	{ "Mode 7: 1280x960",		1280,	960 }, // // Other
+	{ "Mode 8: 1280x1024",		1280,	1024 }, // SXGA
+	{ "Mode 9: 1360x768",		1360,	768 }, // HD
+	{ "Mode 10: 1366x768",		1366,	768 }, // HD
+	{ "Mode 11: 1400x1050",		1400,	1050 }, // Other
+	{ "Mode 12: 1440x900",		1440,	900 }, // WXGA+
+	{ "Mode 13: 1600x900",		1600,	900 }, // HD+
+	{ "Mode 14: 1680x1050",		1680,	1050 }, // WSXGA+
+	{ "Mode 15: 1920x1080",		1920,	1080 },  // FHD
+	{ "Mode 16: 1920x1200",		1920,	1200 }, // WUXGA
+	{ "Mode 17: 2048x1152",		2048,	1152}, // QWXGA
+	{ "Mode 18: 2560x1080",		2560,	1080}, // Other
+	{ "Mode 19: 2560x1440",		2560,	1440}, // Other
+	{ "Mode 20: 3440x1440",		3440,	1440}, // Other
+	{ "Mode 21: 3840x2160",		3840,	2160} // 4K UHD
+
 };
 static const int	s_numVidModes = ARRAY_LEN( r_vidModes );
 
-#define R_MODE_FALLBACK (4) // 640x480
+#define R_MODE_FALLBACK (15) // FHD
 
 qboolean R_GetModeInfo( int *width, int *height, int mode ) {
 	const vidmode_t	*vm;

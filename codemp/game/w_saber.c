@@ -4065,6 +4065,13 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
       return qfalse;
    }
 
+   // JKU-Mikkel: Don't even begin calculating damage when you're not attacking.
+   // JKU-Mikkel: This disables poke/area of effect damage when walking around with your saber ignited. 
+   if (!SaberAttacking(self))
+   {
+	   return qfalse;
+   }
+
    selfSaberLevel = G_SaberAttackPower(self, SaberAttacking(self));
 
    //JKU: Calculate SaberTrace
@@ -4539,6 +4546,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             te->s.angles[1] = 1;
          }
          //do radius damage/knockback, if any
+		 
          if (!WP_SaberBladeUseSecondBladeStyle(&self->client->saber[rSaberNum], rBladeNum))
          {
             WP_SaberRadiusDamage(self, tr.endpos, self->client->saber[rSaberNum].splashRadius, self->client->saber[rSaberNum].splashDamage, self->client->saber[rSaberNum].splashKnockback);
@@ -4631,6 +4639,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             didHit = qtrue;
          }
       }
+	  
       else if (hitEntity->r.contents & CONTENTS_BODY)
       {
          if (hitEntity->client &&
