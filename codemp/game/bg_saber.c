@@ -26,6 +26,17 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "bg_local.h"
 #include "w_saber.h"
 
+/*
+	[Jedi Knight: Unlimited]
+*/
+
+#define SABER_SWING_DEFAULT_FORCE_COST 10
+#define SABER_SWING_FAST_ATTACK_FORCE_COST 5
+#define SABER_SWING_MEDIUM_ATTACK_FORCE_COST 10
+#define SABER_SWING_STRONG_ATTACK_FORCE_COST 15
+#define SABER_SWING_DUAL_ATTACK_FORCE_COST 20
+#define SABER_SWING_STAFF_ATTACK_FORCE_COST 20
+
 extern qboolean BG_SabersOff( playerState_t *ps );
 saberInfo_t *BG_MySaber( int clientNum, int saberNum );
 
@@ -2728,6 +2739,53 @@ qboolean PM_CanDoRollStab( void )
 	}
 	return qtrue;
 }
+
+
+/*
+
+qboolean JKU_CanSwingBlade()
+{
+int forcePoints = pm->ps->fd.forcePower;
+if (forcePoints < 80)
+{
+return qfalse;
+}
+else
+{
+return qtrue;
+}
+}
+
+void JKU_RemoveFPFromBladeSwing()
+{
+int forceCost = SABER_SWING_DEFAULT_FORCE_COST;
+switch (pm->ps->fd.saberAnimLevel)
+{
+case SS_FAST:
+forceCost = SABER_SWING_FAST_ATTACK_FORCE_COST;
+break;
+case SS_MEDIUM:
+forceCost = SABER_SWING_MEDIUM_ATTACK_FORCE_COST;
+break;
+case SS_STRONG:
+forceCost = SABER_SWING_STRONG_ATTACK_FORCE_COST;
+break;
+case SS_DUAL:
+forceCost = SABER_SWING_DUAL_ATTACK_FORCE_COST;
+break;
+case SS_STAFF:
+forceCost = SABER_SWING_STAFF_ATTACK_FORCE_COST;
+break;
+}
+pm->ps->fd.forcePower -= (int)(forceCost);
+if (pm->ps->fd.forcePower < 5)
+{
+pm->ps->fd.forcePower = 5;
+}
+}
+
+*/
+
 /*
 =================
 PM_WeaponLightsaber
@@ -3531,6 +3589,14 @@ weapChecks:
 
 		// ***************************************************
 		// Pressing attack, so we must look up the proper attack move.
+		
+		// [ Jedi Knight Unlimited ]
+		if (pm->ps->fd.forcePower < 15)
+		{
+			anim = LS_NONE;
+			PM_AddEvent(EV_FORCE_DRAINED); // This is too dramatic, but we need something to provide tactical feedback when attacking is no longer possible
+		}
+		// [ Jedi Knight Unlimited ]
 
 		if ( pm->ps->weaponTime > 0 )
 		{	// Last attack is not yet complete.
@@ -3944,8 +4010,11 @@ void PM_SetSaberMove(short newMove)
 	{//successfully changed anims
 	//special check for *starting* a saber swing
 		//playing at attack
-		if ( BG_SaberInAttack( newMove ) || BG_SaberInSpecialAttack( anim ) )
+		if ( BG_SaberInAttack( newMove ) || BG_SaberInSpecialAttack( anim ))
 		{
+			// Subtract force power points by 15
+			pm->ps->fd.forcePower = pm->ps->fd.forcePower - 15;
+
 			if ( pm->ps->saberMove != newMove )
 			{//wasn't playing that attack before
 				if ( newMove != LS_KICK_F

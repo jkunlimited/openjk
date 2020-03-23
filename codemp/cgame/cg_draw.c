@@ -1791,7 +1791,7 @@ void CG_DrawForcePower( menuDef_t *menuHUD )
 	if (focusItem)
 	{
 		// Print force amount
-		if ( flash )
+		if ( value < 15 )
 		{
 			trap->R_SetColor( colorTable[CT_RED] );
 		}
@@ -8594,7 +8594,7 @@ static void CG_Draw2D( void ) {
 				CG_DrawInvenSelect();
 				break;
 			case 2:
-				CG_DrawWeaponSelect();
+				//CG_DrawWeaponSelect();
 				break;
 			default:
 				break;
