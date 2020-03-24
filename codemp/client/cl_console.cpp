@@ -575,7 +575,7 @@ Draws the last few lines of output transparently over the game top
 */
 void Con_DrawNotify (void)
 {
-	int		x, v;
+	int		x, v, xv;
 	short	*text;
 	int		i;
 	int		time;
@@ -586,7 +586,14 @@ void Con_DrawNotify (void)
 	currentColor = 7;
 	re->SetColor( g_color_table[currentColor] );
 
-	v = 0;
+	// Jedi Knight: Unlimited
+	// Vertical and horizontal alignment offset ((TODO: Move this outside of function scope))
+	#define JKU_VERTICAL_OFFSET 1020;
+	#define JKU_HORIZONTAL_OFFSET 105;
+
+	v = JKU_VERTICAL_OFFSET;
+	xv = JKU_HORIZONTAL_OFFSET;
+
 	for (i= con.current-NUM_CON_TIMES+1 ; i<=con.current ; i++)
 	{
 		if (i < 0)
@@ -651,7 +658,10 @@ void Con_DrawNotify (void)
 				{
 					cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
 				}
-				SCR_DrawSmallChar( (int)(cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH), v, text[x] & 0xff );
+				// Base JKA console message reference
+				// SCR_DrawSmallChar( (int)(cl_conXOffset->integer + con.xadjust + (x+1+xv)*SMALLCHAR_WIDTH), v, text[x] & 0xff );
+				// This breaks the xl_conXOffset functionality irreversibly... need to figure out alternative approach
+				SCR_DrawSmallChar((int)(cl_conXOffset->integer + con.xadjust + (x+xv)*SMALLCHAR_WIDTH), v, text[x] & 0xff);
 			}
 
 			v += SMALLCHAR_HEIGHT;
