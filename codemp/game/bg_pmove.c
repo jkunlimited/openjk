@@ -280,108 +280,69 @@ int PM_GetSaberStance(void)
 	saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
 	saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
 
+	if (!pm->ps->saberEntityNum)
+	{
+		return BOTH_STAND1;
+	}
+
+	if (BG_SabersOff(pm->ps))
+	{
+		return BOTH_STAND1;
+	}
+
 	if (!(pm->cmd.buttons & BUTTON_JKU_BLOCK))
 	{
-		if (pm->ps->pm_flags & PMF_DUCKED)
+		switch (pm->ps->fd.saberAnimLevel)
 		{
-			switch (pm->ps->fd.saberAnimLevel)
-			{
-				case SS_DUAL:
-					return BOTH_SABERDUAL_STANCE;
-				case SS_STAFF:
-					return BOTH_SABERSTAFF_STANCE;
-				case SS_FAST:
-					return BOTH_SABERFAST_STANCE;
-				case SS_TAVION:
-					return BOTH_SABERFAST_STANCE;
-				case SS_STRONG:
-					return BOTH_SABERSLOW_STANCE;
-				case SS_MEDIUM:
-					return BOTH_STAND2;
-				case SS_DESANN:
-					return BOTH_SABERSLOW_STANCE;
-				default:
-					return BOTH_STAND2;
-			}
-		}
-		else
-		{
-			return BOTH_STAND1;
+		case SS_DUAL:
+			return BOTH_SABERDUAL_STANCE;
+		case SS_STAFF:
+			return BOTH_SABERSTAFF_STANCE;
+		case SS_FAST:
+			return BOTH_SABERFAST_STANCE;
+		case SS_TAVION:
+			return BOTH_SABERFAST_STANCE;
+		case SS_STRONG:
+			return BOTH_SABERSLOW_STANCE;
+		case SS_MEDIUM:
+			return BOTH_STAND2;
+		case SS_DESANN:
+			return BOTH_SABERSLOW_STANCE;
+		default:
+			return BOTH_STAND2;
 		}
 	}
-
-	switch (pm->ps->fd.saberAnimLevel)
+	else
 	{
+		switch (pm->ps->fd.saberAnimLevel)
+		{
 		case SS_DUAL:
-			anim = BOTH_SABERDUAL_STANCE;
+			anim = BOTH_P6_S6_T_;
 			break;
 		case SS_STAFF:
-			anim = BOTH_SABERSTAFF_STANCE;
+			anim = BOTH_P7_S7_T_;
 			break;
 		case SS_FAST:
-			anim = BOTH_SABERFAST_STANCE;
+			anim = BOTH_P1_S1_T_;
 			break;
 		case SS_TAVION:
-			anim = BOTH_SABERFAST_STANCE;
+			anim = BOTH_P1_S1_T_;
 			break;
 		case SS_STRONG:
-			anim = BOTH_SABERSLOW_STANCE;
+			anim = BOTH_P1_S1_T_;
 			break;
 		case SS_MEDIUM:
-			anim = BOTH_STAND2;
+			anim = BOTH_P1_S1_T_;
 			break;
 		case SS_DESANN:
-			anim = BOTH_SABERSLOW_STANCE;
+			anim = BOTH_P1_S1_T_;
 			break;
 		default:
-			anim = BOTH_STAND2;
+			anim = BOTH_P1_S1_T_;
 			break;
+		}
 	}
 
-   // We are blocking
-   // else if (pm->cmd.rightmove > 0)
-   // {
-   //    //We are going to the right, so block right
-   //    return BOTH_P1_S1_TR;
-   // }
-   // else if (pm->cmd.rightmove < 0)
-   // {
-   //    //We are going to the left, so block left
-   //    return BOTH_P1_S1_TL;
-   // }
-
-	if (!pm->ps->saberEntityNum)
-	{ //lost it
-		return BOTH_STAND1;
-	}
-
-	if ( BG_SabersOff( pm->ps ))
-	{
-		return BOTH_STAND1;
-	}
-
-	if ( saber1
-		&& saber1->readyAnim != -1 )
-	{
-		return saber1->readyAnim;
-	}
-
-	if ( saber2
-		&& saber2->readyAnim != -1 )
-	{
-		return saber2->readyAnim;
-	}
-
-	if ( saber1
-		&& saber2
-		&& !pm->ps->saberHolstered )
-	{//dual sabers, both on
-		return BOTH_SABERDUAL_STANCE;
-	}
-
-
-	// JKU/Mikkel: Debug
-	// Com_Printf("Client %d is using anim %d", pm->ps->clientNum, anim);
 	return anim;
 }
 
@@ -5634,7 +5595,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							desiredAnim = BOTH_WALKBACK1;
+							desiredAnim = BOTH_WALKBACK_STAFF;
 						}
 					}
 					if (pm->ps->weapon != WP_SABER)
@@ -5659,7 +5620,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							desiredAnim = BOTH_WALKBACK1;
+							desiredAnim = BOTH_WALKBACK_DUAL;
 						}
 					}
 					if (pm->ps->weapon != WP_SABER)
@@ -5726,7 +5687,7 @@ static void PM_Footsteps( void ) {
 							}
 							else
 							{
-								desiredAnim = BOTH_WALK1;
+								desiredAnim = BOTH_WALK_STAFF;
 							}
 						}
 						if (pm->ps->weapon != WP_SABER)
@@ -5751,7 +5712,7 @@ static void PM_Footsteps( void ) {
 							}
 							else
 							{
-								desiredAnim = BOTH_WALK1;
+								desiredAnim = BOTH_WALK_DUAL;
 							}
 						}
 						if (pm->ps->weapon != WP_SABER)
@@ -5768,11 +5729,11 @@ static void PM_Footsteps( void ) {
 						{
 							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
 							{
-								desiredAnim = BOTH_WALK1;
+								desiredAnim = BOTH_WALK2;
 							}
 							else
 							{
-								desiredAnim = BOTH_WALK1;
+								desiredAnim = BOTH_WALK2;
 							}
 						}
 						break;
