@@ -3594,7 +3594,7 @@ weapChecks:
 		if (pm->ps->fd.forcePower < 15)
 		{
 			anim = LS_NONE;
-			PM_AddEvent(EV_FORCE_DRAINED); // This is too dramatic, but we need something to provide tactical feedback when attacking is no longer possible
+			// PM_AddEvent(EV_FORCE_DRAINED); // This is too dramatic, but we need something to provide tactical feedback when attacking is no longer possible
 		}
 		// [ Jedi Knight Unlimited ]
 
@@ -3916,12 +3916,21 @@ void PM_SetSaberMove(short newMove)
 			anim = PM_GetSaberStance();
 		}
 
-      // [Jedi Knight: Unlimited]
-      if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
-      {
-         anim = PM_GetSaberStance();
-      }
-   
+		if (pm->ps->pm_flags & PMF_DUCKED)
+		{ //Playing torso walk anims while crouched makes you look like a monkey
+			anim = PM_GetSaberStance();
+		}
+
+		if (anim == BOTH_WALKBACK1 || anim == BOTH_WALKBACK2 || anim == BOTH_WALK1)
+		{ //normal stance when walking backward so saber doesn't look like it's cutting through leg
+			anim = PM_GetSaberStance();
+		}
+
+		// [Jedi Knight: Unlimited]
+		if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+		{
+		   anim = PM_GetSaberStance();
+		}
 
 		if (BG_InSlopeAnim( anim ))
 		{
