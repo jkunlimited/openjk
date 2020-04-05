@@ -1337,6 +1337,10 @@ typedef struct playerState_s {
 	int			deltaOneBits;
 	int			deltaNumBits;
 #endif
+
+   //JKU-Fnuki: Add new boolean indicating whether or not you are allowed to enter block animation
+   qboolean canBlock;
+
 } playerState_t;
 
 typedef struct siegePers_s
@@ -1737,6 +1741,10 @@ typedef struct entityState_s {
 	float		userFloat3;
 	vec3_t		userVec1;
 	vec3_t		userVec2;
+
+   //JKU-Fnuki: Add new JKU functionality
+   qboolean canBlock;
+
 } entityState_t;
 
 typedef enum {

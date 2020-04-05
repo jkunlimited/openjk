@@ -290,7 +290,7 @@ int PM_GetSaberStance(void)
 		return BOTH_STAND1;
 	}
 
-	if (!(pm->cmd.buttons & BUTTON_JKU_BLOCK))
+	if (!(pm->cmd.buttons & BUTTON_JKU_BLOCK) || !pm->ps->canBlock)
 	{
 		switch (pm->ps->fd.saberAnimLevel)
 		{
@@ -341,6 +341,18 @@ int PM_GetSaberStance(void)
 			anim = BOTH_P1_S1_T_;
 			break;
 		}
+
+      //JKU-Fnuki: Add directional blocking based on walking direction
+      if (pm->cmd.rightmove < 0)
+      {
+         //block right
+         return BOTH_P1_S1_TR;
+      }
+      else if (pm->cmd.rightmove > 0)
+      {
+         //block left
+         return BOTH_P1_S1_TL;
+      }
 	}
 
 	return anim;
