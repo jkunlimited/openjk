@@ -3738,10 +3738,10 @@ weapChecks:
 					break;
 				}
 
-//				if (PM_RunningAnim(anim) && !pm->cmd.forwardmove && !pm->cmd.rightmove)
-//				{ //semi-hacky (if not moving on x-y and still playing the running anim, force the player out of it)
-//					anim = PM_GetSaberStance();
-//				}
+				//if (pm->cmd.forwardmove || pm->cmd.rightmove > 0 || pm->cmd.rightmove < 0)
+				//{
+				//	anim = PM_GetSaberStance();
+				//}
 				newmove = LS_READY;
 			}
 
@@ -3921,7 +3921,7 @@ void PM_SetSaberMove(short newMove)
 			anim = PM_GetSaberStance();
 		}
 
-		if (anim == BOTH_WALKBACK1 || anim == BOTH_WALKBACK2 || anim == BOTH_WALK1)
+		if (anim == BOTH_WALKBACK1 || anim == BOTH_WALKBACK2 || anim == BOTH_WALK1 || anim == BOTH_WALK2)
 		{ //normal stance when walking backward so saber doesn't look like it's cutting through leg
 			anim = PM_GetSaberStance();
 		}
