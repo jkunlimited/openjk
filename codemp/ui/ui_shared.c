@@ -5390,16 +5390,17 @@ void Item_Model_Paint(itemDef_t *item)
 	{//hack to put saber on it's side
 		if (modelPtr->rotationSpeed)
 		{
-			VectorSet( angles, modelPtr->angle+(float)refdef.time/modelPtr->rotationSpeed, 0, 90 );
+			VectorSet( angles, 0, modelPtr->angle + (float)refdef.time / modelPtr->rotationSpeed, 0 );
 		}
 		else
 		{
-			VectorSet( angles, modelPtr->angle, 0, 90 );
+			//VectorSet( angles, modelPtr->angle, 0, 180 );
+			VectorSet(angles, 0, modelPtr->angle, 0);
 		}
 	}
 	else if (modelPtr->rotationSpeed)
 	{
-		VectorSet( angles, 0, modelPtr->angle + (float)refdef.time/modelPtr->rotationSpeed, 0 );
+		VectorSet(angles, 0, modelPtr->angle + (float)refdef.time / modelPtr->rotationSpeed, 0);
 	}
 	else
 	{

@@ -2457,9 +2457,9 @@ Ghoul2 Insert End
 	cgs.media.charsetShader		= trap->R_RegisterShaderNoMip( "gfx/2d/charsgrid_med" );
 	cgs.media.whiteShader		= trap->R_RegisterShader( "white" );
 
-	cgs.media.loadBarLED		= trap->R_RegisterShaderNoMip( "gfx/hud/load_tick" );
-	cgs.media.loadBarLEDCap		= trap->R_RegisterShaderNoMip( "gfx/hud/load_tick_cap" );
-	cgs.media.loadBarLEDSurround= trap->R_RegisterShaderNoMip( "gfx/hud/mp_levelload" );
+	cgs.media.loadBarLED			= trap->R_RegisterShaderNoMip( "gfx/hud/load_tick" );
+	cgs.media.loadBarLEDCap			= trap->R_RegisterShaderNoMip( "gfx/hud/load_tick_cap" );
+	cgs.media.loadBarLEDSurround	= trap->R_RegisterShaderNoMip( "gfx/hud/mp_levelload" );
 
 	// Force HUD set up
 	cg.forceHUDActive = qtrue;
