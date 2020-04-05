@@ -3917,6 +3917,11 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
       WP_SaberBlockNonRandom(self, point, projectile);
    }
 
+   if (self->client->enableBlockingTimer < level.time)
+   {
+      return 0;
+   }
+
    float cosAngle = JKU_calculateSaberHitAngle(self, attacker);
    float degAngle = JKU_radToDeg(cosAngle);
 
@@ -4063,6 +4068,28 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
    if (BG_SabersOff(&self->client->ps))
    {
       return qfalse;
+   }
+
+   //JKU-Fnuki: Make blocking timing based
+
+   if (!self->client->ps.canBlock &&
+      self->client->disableBlockingTimer <= level.time)
+   {
+      self->client->ps.canBlock = qtrue;
+   }
+   else if (self->client->ps.canBlock &&
+      self->client->disableBlockingTimer > level.time &&
+      self->client->enableBlockingTimer < level.time)
+   {
+      self->client->ps.canBlock = qfalse;
+   }
+
+   if (self->client->buttons & BUTTON_JKU_BLOCK &&
+      self->client->disableBlockingTimer <= level.time)
+   {
+      self->client->enableBlockingTimer = level.time + JKU_ENABLE_BLOCKING_FOR_MSECS;
+      self->client->disableBlockingTimer = level.time + JKU_DISABLE_BLOCKING_FOR_MSECS;
+      self->client->ps.canBlock = qtrue;
    }
 
    // JKU-Mikkel: Don't even begin calculating damage when you're not attacking.

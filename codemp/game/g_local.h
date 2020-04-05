@@ -796,6 +796,10 @@ struct gclient_s {
 		int		drainDebounce;
 		int		lightningDebounce;
 	} force;
+
+   //JKU-Fnuki: Add new timers for enabling/disabling blocking
+   int enableBlockingTimer;
+   int disableBlockingTimer;
 };
 
 //Interest points

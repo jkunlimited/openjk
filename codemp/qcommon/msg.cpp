@@ -987,7 +987,10 @@ netField_t	entityStateFields[] =
 { NETF(userVec1[2]), 1 },
 { NETF(userVec2[0]), 1 },
 { NETF(userVec2[1]), 1 },
-{ NETF(userVec2[2]), 1 }
+{ NETF(userVec2[2]), 1 },
+
+//JKU-Fnuki: Add new JKU functionality
+{ NETF(canBlock), 1 }
 };
 
 // if (int)f == f and (int)f + ( 1<<(FLOAT_INT_BITS-1) ) < ( 1 << FLOAT_INT_BITS )
@@ -1424,7 +1427,10 @@ netField_t	playerStateFields[] =
 { PSF(userVec1[2]), 1 },
 { PSF(userVec2[0]), 1 },
 { PSF(userVec2[1]), 1 },
-{ PSF(userVec2[2]), 1 }
+{ PSF(userVec2[2]), 1 },
+
+//JKU-Fnuki: Add new JKU functionality
+{ PSF(canBlock), 1 }
 };
 
 netField_t	pilotPlayerStateFields[] =
@@ -1588,7 +1594,10 @@ netField_t	pilotPlayerStateFields[] =
 { PSF(userVec1[2]), 1 },
 { PSF(userVec2[0]), 1 },
 { PSF(userVec2[1]), 1 },
-{ PSF(userVec2[2]), 1 }
+{ PSF(userVec2[2]), 1 },
+
+//JKU-Fnuki: Add new JKU functionality
+{ PSF(canBlock), 1 }
 };
 
 netField_t	vehPlayerStateFields[] =
@@ -1674,7 +1683,10 @@ netField_t	vehPlayerStateFields[] =
 { PSF(userVec1[2]), 1 },
 { PSF(userVec2[0]), 1 },
 { PSF(userVec2[1]), 1 },
-{ PSF(userVec2[2]), 1 }
+{ PSF(userVec2[2]), 1 },
+
+//JKU-Fnuki: Add new JKU functionality
+{ PSF(canBlock), 1}
 };
 
 //=====_OPTIMIZED_VEHICLE_NETWORKING=======================================================================
@@ -1837,7 +1849,10 @@ netField_t	playerStateFields[] =
 { PSF(userVec1[2]), 1 },
 { PSF(userVec2[0]), 1 },
 { PSF(userVec2[1]), 1 },
-{ PSF(userVec2[2]), 1 }
+{ PSF(userVec2[2]), 1 },
+
+//JKU-Fnuki: Add new JKU functionality
+{ PSF(canBlock), 1 }
 };
 
 //=====_OPTIMIZED_VEHICLE_NETWORKING=======================================================================

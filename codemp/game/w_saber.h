@@ -114,6 +114,9 @@ extern float forcePushPullRadius[NUM_FORCE_POWER_LEVELS];
 #define JKU_UNBLOCKABLE_ANGLE 45
 #define JKU_BLOCKABLE_ANGLE_STATIONARY 90
 
+#define JKU_ENABLE_BLOCKING_FOR_MSECS 500
+#define JKU_DISABLE_BLOCKING_FOR_MSECS 2000
+
 //############################
 //  JKU function prototypes
 //############################
