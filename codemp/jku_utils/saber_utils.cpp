@@ -302,9 +302,44 @@ float JKU_radToDeg(float radians)
 
 int JKU_calculateSaberDamage(gentity_t *self)
 {
-   //Fnuki: According to the specification, we just want to insta-blap anyone we hit:
-   //G: "Direct lightsaber hits will be instant kill. blocking will not work if the character runs out of force points."
-   return 100;
+   //Fnuki: New specification of damage application:
+
+   /*
+   Change the HP damage of lightsaber styles to the following:
+      --- Fast 15 Damage
+      --- Medium 20 Damage
+      --- Strong 35
+      --- Duals 20
+      --- Staff 25
+   */
+
+   int damage = 20;
+
+   if (self && self->client)
+   {
+      switch (self->client->ps.fd.saberAnimLevel)
+      {
+      case SS_DUAL:
+         damage = 20;
+         break;
+      case SS_STAFF:
+         damage = 25;
+         break;
+      case SS_FAST:
+         damage = 15;
+         break;
+      case SS_STRONG:
+         damage = 35;
+         break;
+      case SS_MEDIUM:
+         damage = 20;
+         break;
+      default:
+         break;
+      }
+   }
+
+   return damage;
 }
 
 #ifdef _WIN32
