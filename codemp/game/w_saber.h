@@ -98,7 +98,7 @@ extern float forcePushPullRadius[NUM_FORCE_POWER_LEVELS];
 //  JKU defines
 //############################
 
-#define JKU_INVULNERABLE_TIMER 250
+#define JKU_INVULNERABLE_TIMER 125
 
 #define JKU_SABER_BLOCK_DEFAULT_FORCE_COST 8
 #define JKU_SABER_ATTACK_DEFAULT_FORCE_COST 1
@@ -107,7 +107,7 @@ extern float forcePushPullRadius[NUM_FORCE_POWER_LEVELS];
 #define JKU_BLOCKABLE_ANGLE_STATIONARY 90
 
 #define JKU_ENABLE_BLOCKING_FOR_MSECS 600
-#define JKU_DISABLE_BLOCKING_FOR_MSECS 2000
+#define JKU_DISABLE_BLOCKING_FOR_MSECS 1800
 #define JKU_EXTEND_BLOCKING_FOR_MSECS 1000
 
 //############################
