@@ -3986,6 +3986,47 @@ static QINLINE void JKU_extendSaberBlockingTimers(gentity_t* ent)
       ent->client->enableBlockingTimer = level.time + JKU_EXTEND_BLOCKING_FOR_MSECS;
    }
 }
+
+static QINLINE int JKU_saberDoParryAnimation(int saberAnim)
+{
+	switch (saberAnim)
+	{
+		case LS_A_TL2BR:
+		{
+			return LS_PARRY_UR;
+		}
+		case LS_A_TR2BL:
+		{
+			return LS_PARRY_UL;
+		}
+		case LS_A_L2R:
+		{
+			return LS_PARRY_UR;
+		}
+		case LS_A_R2L:
+		{
+			return LS_PARRY_UL;
+		}
+		case LS_A_BL2TR:
+		{
+			return LS_PARRY_LR;
+		}
+		case LS_A_BR2TL:
+		{
+			return LS_PARRY_LL;
+		}
+		case LS_A_T2B:
+		{
+			return LS_PARRY_UP;
+		}
+		default:
+		{
+			// We couldn't determine which animation they're attacking with, so we'll assume it's coming from above...
+			return LS_PARRY_UP;
+		}
+	}
+
+}
 // [/Jedi Knight: Unlimited]
 
 static qboolean saberHitWall = qfalse;
@@ -4146,10 +4187,15 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
          if ((swordOwner->client->buttons & BUTTON_JKU_BLOCK) &&
             JKU_SaberCanBlock(swordOwner, self, tr.endpos, 0, MOD_SABER, qfalse))
          {
-            //Enemy is blocking
-
+            //Enemy is blocking, set their animation to corresponding block anim
+			//We are attacking but we were parried, set our animation into a corresponding parried anim
             self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
-            self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
+            swordOwner->client->ps.saberBlocked = JKU_saberDoParryAnimation(self->client->ps.saberMove);
+
+			//Force the attacker (self) into a bounced state...
+			G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, self->client->ps.saberMove, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			self->client->ps.legsTimer += JKU_PARRY_BOUNCE_TIME_IN_MSECS;
+			self->client->ps.weaponTime = self->client->ps.legsTimer;
 
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
             WP_SaberBlockNonRandom(swordOwner, lastValidEnd, qfalse);
@@ -4196,14 +4242,16 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
             (hitEntity->client->buttons & BUTTON_JKU_BLOCK) &&
             JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse))
          {
-            //Enemy is blocking but we hit the body
-
+            //Enemy is blocking but we hit the body, set their animation to corresponding block anim
+			//We are attacking but we were parried, set our animation into a corresponding parried anim
             self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
-            self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-            hitEntity->client->ps.saberBlocking = BLK_WIDE;
-            hitEntity->client->ps.saberMove = LS_PARRY_UP;
+			hitEntity->client->ps.saberBlocked = JKU_saberDoParryAnimation(self->client->ps.saberMove);
 
-            // set animations, play sound, and do saber effect
+			//Force the attacker (self) into a bounced state...
+			G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, self->client->ps.saberMove, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			self->client->ps.legsTimer += JKU_PARRY_BOUNCE_TIME_IN_MSECS;
+			self->client->ps.weaponTime = self->client->ps.legsTimer;
+
             WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
             WP_SaberBounceSound(self, rSaberNum, rBladeNum);
             JKU_saberDoBlockEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
