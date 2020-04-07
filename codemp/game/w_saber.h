@@ -110,6 +110,8 @@ extern float forcePushPullRadius[NUM_FORCE_POWER_LEVELS];
 #define JKU_DISABLE_BLOCKING_FOR_MSECS 1800
 #define JKU_EXTEND_BLOCKING_FOR_MSECS 1000
 
+#define	JKU_PARRY_BOUNCE_TIME_IN_MSECS 1000
+
 //############################
 //  JKU function prototypes
 //############################
