@@ -3594,8 +3594,6 @@ weapChecks:
 		if (pm->ps->fd.forcePower < JKU_SABER_ATTACK_DEFAULT_FORCE_COST)
 		{
 			anim = LS_NONE;
-         return;
-			// PM_AddEvent(EV_FORCE_DRAINED); // This is too dramatic, but we need something to provide tactical feedback when attacking is no longer possible
 		}
 		// [ Jedi Knight Unlimited ]
 
@@ -4023,7 +4021,7 @@ void PM_SetSaberMove(short newMove)
 		if ( BG_SaberInAttack( newMove ) || BG_SaberInSpecialAttack( anim ))
 		{
 			// Subtract force power points for attacking
-			pm->ps->fd.forcePower = pm->ps->fd.forcePower - JKU_SABER_ATTACK_DEFAULT_FORCE_COST;
+			pm->ps->fd.forcePower =- JKU_SABER_ATTACK_DEFAULT_FORCE_COST;
 
 			if ( pm->ps->saberMove != newMove )
 			{//wasn't playing that attack before
