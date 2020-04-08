@@ -4164,107 +4164,43 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 
       return qtrue;
    }
-
-   //JKU: New implementation of collision handling
-
+   
+   //JKU-Fnuki: New implementation of collision handling
    gentity_t* hitEntity = &g_entities[tr.entityNum];
 
-   if ((tr.fraction != 1 || tr.startsolid) &&
-      hitEntity &&
-      hitEntity->r.contents != -1 &&
-      hitEntity->inuse)
+   // JKU-Mikkel: Changing the behavior of tracing with regards to content
+   // There's no guarantee that the client entity is considered solid or not, so we don't use that anymore.
+   if ((tr.fraction != 1 && // Only calculate damage once the tracing is done...
+		tr.contents != -1)) // We want to calculate damage on something that's something... preferably.
    {
-      if (hitEntity->r.contents & CONTENTS_LIGHTSABER)
-      {
-         gentity_t* swordOwner = &g_entities[hitEntity->r.ownerNum];
+		if (hitEntity->client &&
+			(hitEntity->client->buttons & BUTTON_JKU_BLOCK) &&
+			JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse)) {
 
-         if (!swordOwner || !swordOwner->client)
-         {
-            //Since there is no player/npc holding the lightsaber, we dont care
-            return qfalse;
-         }
+			// Blocker is blocking, set attacker's animation to corresponding bounce animation
+			self->client->ps.saberMove = PM_SaberBounceForAttack(self->client->ps.saberMove);
+			// Attacker is attacking, set blocker's animation to corresponding parry animation
+			hitEntity->client->ps.saberMove = JKU_saberDoParryAnimation(self->client->ps.saberMove);
 
-         if ((swordOwner->client->buttons & BUTTON_JKU_BLOCK) &&
-            JKU_SaberCanBlock(swordOwner, self, tr.endpos, 0, MOD_SABER, qfalse))
-         {
-            //Enemy is blocking, set their animation to corresponding block anim
-			//We are attacking but we were parried, set our animation into a corresponding parried anim
-            self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
-            swordOwner->client->ps.saberBlocked = JKU_saberDoParryAnimation(self->client->ps.saberMove);
+			WP_SaberBounceSound(self, rSaberNum, rBladeNum);
+			WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
+			
+			JKU_saberDoBlockEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
+			JKU_saberDoBlockForceCost(hitEntity, self->client->saber->singleBladeStyle);
+			JKU_extendSaberBlockingTimers(hitEntity);
 
-			//Force the attacker (self) into a bounced state...
-			G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, self->client->ps.saberMove, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-			self->client->ps.legsTimer += JKU_PARRY_BOUNCE_TIME_IN_MSECS;
-			self->client->ps.weaponTime = self->client->ps.legsTimer;
+			// G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, self->client->ps.saberMove, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			// self->client->ps.legsTimer += JKU_PARRY_BOUNCE_TIME_IN_MSECS;
+			// self->client->ps.weaponTime = self->client->ps.legsTimer;
 
-            WP_SaberBounceSound(self, rSaberNum, rBladeNum);
-            WP_SaberBlockNonRandom(swordOwner, lastValidEnd, qfalse);
-            JKU_saberDoBlockEffect(self, swordOwner, &tr, rSaberNum, rBladeNum);
-            JKU_saberDoBlockForceCost(swordOwner, self->client->saber->singleBladeStyle);
-            JKU_extendSaberBlockingTimers(swordOwner);
-
-            return qfalse;
-         }
-         /*else if (G_SaberCollide(self, swordOwner, lastValidStart,
-               lastValidEnd, saberTrMins, saberTrMaxs, tr.endpos))
-         {
-            //WP_SabersCheckLock2(self, swordOwner, LOCK_RANDOM);
-
-            self->client->ps.saberBlocked = BLOCKED_NONE;
-            swordOwner->client->ps.saberBlocked = BLOCKED_NONE;
-
-            return qfalse;
-         }
-         /*else if ((self->client->buttons & BUTTON_JKU_BLOCK) &&
-            JKU_SaberCanBlock(self, swordOwner, tr.endpos, 0, MOD_SABER, qfalse))
-         {
-            //We are blocking an enemy attack with our lightsaber
-
-            self->client->ps.saberMove = BG_BrokenParryForAttack(swordOwner->client->ps.saberMove);
-            self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
-
-            // set animations, play sound, and do saber effect
-            WP_SaberBounceSound(self, rSaberNum, rBladeNum);
-            WP_SaberBlockNonRandom(self, lastValidEnd, qfalse);
-            JKU_saberDoBlockEffect(self, swordOwner, &tr, rSaberNum, rBladeNum);
-            JKU_saberDoBlockForceCost(self, swordOwner->client->saber->singleBladeStyle);
-
-            return qfalse;
-         }*/
-         else
-         {
-            didHit = qtrue;
-         }
-      }
-      else if (hitEntity->r.contents & CONTENTS_BODY)
-      {
-         if (hitEntity->client &&
-            (hitEntity->client->buttons & BUTTON_JKU_BLOCK) &&
-            JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse))
-         {
-            //Enemy is blocking but we hit the body, set their animation to corresponding block anim
-			//We are attacking but we were parried, set our animation into a corresponding parried anim
-            self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
-			hitEntity->client->ps.saberBlocked = JKU_saberDoParryAnimation(self->client->ps.saberMove);
-
-			//Force the attacker (self) into a bounced state...
-			G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, self->client->ps.saberMove, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-			self->client->ps.legsTimer += JKU_PARRY_BOUNCE_TIME_IN_MSECS;
-			self->client->ps.weaponTime = self->client->ps.legsTimer;
-
-            WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
-            WP_SaberBounceSound(self, rSaberNum, rBladeNum);
-            JKU_saberDoBlockEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
-            JKU_saberDoBlockForceCost(hitEntity, self->client->saber->singleBladeStyle);
-            JKU_extendSaberBlockingTimers(hitEntity);
-
-            return qfalse;
-         }
-         else
-         {
-            didHit = qtrue;
-         }
-      }
+			// Attack was blocked, do not calculate damage from this interaction
+			return qfalse;
+		}
+		else 
+		{
+			// Attack was not blocked so we apply damage
+			didHit = qtrue;
+		}
    }
 
    if (didHit)
@@ -4325,7 +4261,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
          }
       }
    }
-
    return didHit;
 }
 
