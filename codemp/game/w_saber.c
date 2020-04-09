@@ -3987,7 +3987,7 @@ static QINLINE void JKU_extendSaberBlockingTimers(gentity_t* ent)
    }
 }
 
-static QINLINE int JKU_saberDoParryAnimation(int saberAnim)
+static QINLINE int JKU_saberDoBlockAnim(int saberAnim)
 {
 	switch (saberAnim)
 	{
@@ -4164,23 +4164,31 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 
       return qtrue;
    }
-   
+
+   //rww - I'm saying || tr.startsolid here, because otherwise your saber tends to skip positions and go through
+   //people, and the compensation traces start in their bbox too. Which results in the saber passing through people
+   //when you visually cut right through them. Which sucks.
+
    //JKU-Fnuki: New implementation of collision handling
    gentity_t* hitEntity = &g_entities[tr.entityNum];
 
-   // JKU-Mikkel: Changing the behavior of tracing with regards to content
-   // There's no guarantee that the client entity is considered solid or not, so we don't use that anymore.
-   if ((tr.fraction != 1 && // Only calculate damage once the tracing is done...
-		tr.contents != -1)) // We want to calculate damage on something that's something... preferably.
+   if ((tr.fraction != 1 || tr.startsolid) &&
+	   hitEntity->takedamage &&
+	   (hitEntity->health > 0 || !(hitEntity->s.eFlags & EF_DISINTEGRATION)) &&
+	   hitEntity->s.number != self->s.number &&
+	   hitEntity->inuse)
    {
 		if (hitEntity->client &&
 			(hitEntity->client->buttons & BUTTON_JKU_BLOCK) &&
 			JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse)) {
+			
+			self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
+			self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
 
-			// Blocker is blocking, set attacker's animation to corresponding bounce animation
-			self->client->ps.saberMove = PM_SaberBounceForAttack(self->client->ps.saberMove);
-			// Attacker is attacking, set blocker's animation to corresponding parry animation
-			hitEntity->client->ps.saberMove = JKU_saberDoParryAnimation(self->client->ps.saberMove);
+			if (self->client->ps.torsoAnim == self->client->ps.legsAnim) {
+				int anim = saberMoveData[self->client->ps.saberMove].animToUse;
+				G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, anim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+			}
 
 			WP_SaberBounceSound(self, rSaberNum, rBladeNum);
 			WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
@@ -4189,16 +4197,10 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 			JKU_saberDoBlockForceCost(hitEntity, self->client->saber->singleBladeStyle);
 			JKU_extendSaberBlockingTimers(hitEntity);
 
-			// G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, self->client->ps.saberMove, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-			// self->client->ps.legsTimer += JKU_PARRY_BOUNCE_TIME_IN_MSECS;
-			// self->client->ps.weaponTime = self->client->ps.legsTimer;
-
-			// Attack was blocked, do not calculate damage from this interaction
 			return qfalse;
 		}
 		else 
 		{
-			// Attack was not blocked so we apply damage
 			didHit = qtrue;
 		}
    }
