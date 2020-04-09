@@ -900,7 +900,7 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	// even during acceleration and develeration
 	//
 
-   //JKU: Force player to walk if blocking with saber
+   //JKU-Fnuki: Force player to walk if blocking with saber
    //JKU-Fnuki: Reduce forward movement speed by 20%
    //           Reduce strafe movement speed by 40%
 

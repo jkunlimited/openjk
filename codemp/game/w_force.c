@@ -854,11 +854,13 @@ void WP_ForcePowerRegenerate( gentity_t *self, int overrideAmt )
 		return;
 	}
 
-   //JKU disable force power regeneration if you are blocking
-   /*if (self->client->ps.JKU_saberBlocking)
+   // JKU-Fnuki: disable force power regeneration if you are blocking
+   /*
+   if (self->client->ps.JKU_saberBlocking)
    {
       return;
-   }*/
+   }
+   */
 
 	if ( overrideAmt )
 	{ //custom regen amount
