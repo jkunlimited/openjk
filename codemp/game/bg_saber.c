@@ -3690,11 +3690,6 @@ weapChecks:
 					anim = PM_GetSaberStance();
 					break;
 				}
-
-				//if (pm->cmd.forwardmove || pm->cmd.rightmove > 0 || pm->cmd.rightmove < 0)
-				//{
-				//	anim = PM_GetSaberStance();
-				//}
 				newmove = LS_READY;
 			}
 
@@ -3734,6 +3729,9 @@ void PM_SetSaberMove(short newMove)
 
 	if ( newMove == LS_READY || newMove == LS_A_FLIP_STAB || newMove == LS_A_FLIP_SLASH )
 	{//finished with a kata (or in a special move) reset attack counter
+		// JKU-Mikkel: Below is bugged atm, so disabling it...
+		// JKU-Mikkel: Subtract force power points for attacking
+		// pm->ps->fd.forcePower =- JKU_SABER_ATTACK_DEFAULT_FORCE_COST;
 		pm->ps->saberAttackChainCount = 0;
 	}
 	else if ( BG_SaberInAttack( newMove ) )
@@ -3874,8 +3872,14 @@ void PM_SetSaberMove(short newMove)
 			anim = PM_GetSaberStance();
 		}
 
-		if (anim == BOTH_WALKBACK1 || anim == BOTH_WALKBACK2 || anim == BOTH_WALK1 || anim == BOTH_WALK2 || anim == BOTH_WALKBACK_DUAL)
-		{ //normal stance when walking backward so saber doesn't look like it's cutting through leg
+		if (anim == BOTH_WALKBACK1 || 
+			anim == BOTH_WALKBACK2 || 
+			anim == BOTH_WALK1 || 
+			anim == BOTH_WALK2 || 
+			anim == BOTH_WALKBACK_DUAL || 
+			anim == BOTH_WALK_DUAL)
+		{ 
+			//normal stance when walking backward so saber doesn't look like it's cutting through leg
 			anim = PM_GetSaberStance();
 		}
 
@@ -3974,9 +3978,6 @@ void PM_SetSaberMove(short newMove)
 		//playing at attack
 		if ( BG_SaberInAttack( newMove ) || BG_SaberInSpecialAttack( anim ))
 		{
-			// Subtract force power points for attacking
-			pm->ps->fd.forcePower =- JKU_SABER_ATTACK_DEFAULT_FORCE_COST;
-
 			if ( pm->ps->saberMove != newMove )
 			{//wasn't playing that attack before
 				if ( newMove != LS_KICK_F
