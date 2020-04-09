@@ -3987,46 +3987,6 @@ static QINLINE void JKU_extendSaberBlockingTimers(gentity_t* ent)
    }
 }
 
-static QINLINE int JKU_saberDoBlockAnim(int saberAnim)
-{
-	switch (saberAnim)
-	{
-		case LS_A_TL2BR:
-		{
-			return LS_PARRY_UR;
-		}
-		case LS_A_TR2BL:
-		{
-			return LS_PARRY_UL;
-		}
-		case LS_A_L2R:
-		{
-			return LS_PARRY_UR;
-		}
-		case LS_A_R2L:
-		{
-			return LS_PARRY_UL;
-		}
-		case LS_A_BL2TR:
-		{
-			return LS_PARRY_LR;
-		}
-		case LS_A_BR2TL:
-		{
-			return LS_PARRY_LL;
-		}
-		case LS_A_T2B:
-		{
-			return LS_PARRY_UP;
-		}
-		default:
-		{
-			// We couldn't determine which animation they're attacking with, so we'll assume it's coming from above...
-			return LS_PARRY_UP;
-		}
-	}
-
-}
 // [/Jedi Knight: Unlimited]
 
 static qboolean saberHitWall = qfalse;
@@ -4064,13 +4024,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
    qboolean otherUnblockable = qfalse;
    qboolean tryDeflectAgain = qfalse;
 
-   //gentity_t *otherOwner;
-
-   if (BG_SabersOff(&self->client->ps))
-   {
-      return qfalse;
-   }
-
    //JKU-Fnuki: Make blocking timing based
 
    if (!self->client->ps.canBlock &&
@@ -4096,14 +4049,20 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 
    // JKU-Mikkel: Don't even begin calculating damage when you're not attacking.
    // JKU-Mikkel: This disables poke/area of effect damage when walking around with your saber ignited. 
-   if (!SaberAttacking(self))
+   if (!SaberAttacking(self)) {
+	   return qfalse;
+   }
+
+   // JKU-Mikkel: Don't begin calculating damage when your saber isn't on.
+   // JKU-Mikkel: There's no purpose. 
+   if (BG_SabersOff(&self->client->ps))
    {
 	   return qfalse;
    }
 
    selfSaberLevel = G_SaberAttackPower(self, SaberAttacking(self));
 
-   //JKU: Calculate SaberTrace
+   //JKU-Fnuki: Calculate SaberTrace
    JKU_calculateSaberTrace(self, rSaberNum, rBladeNum, saberStart, saberEnd, doInterpolate,
       trMask, extrapolate, saberTrMins, saberTrMaxs, lastValidStart, lastValidEnd, &tr);
 

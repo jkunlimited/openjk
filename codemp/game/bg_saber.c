@@ -2740,52 +2740,6 @@ qboolean PM_CanDoRollStab( void )
 	return qtrue;
 }
 
-
-/*
-
-qboolean JKU_CanSwingBlade()
-{
-int forcePoints = pm->ps->fd.forcePower;
-if (forcePoints < 80)
-{
-return qfalse;
-}
-else
-{
-return qtrue;
-}
-}
-
-void JKU_RemoveFPFromBladeSwing()
-{
-int forceCost = SABER_SWING_DEFAULT_FORCE_COST;
-switch (pm->ps->fd.saberAnimLevel)
-{
-case SS_FAST:
-forceCost = SABER_SWING_FAST_ATTACK_FORCE_COST;
-break;
-case SS_MEDIUM:
-forceCost = SABER_SWING_MEDIUM_ATTACK_FORCE_COST;
-break;
-case SS_STRONG:
-forceCost = SABER_SWING_STRONG_ATTACK_FORCE_COST;
-break;
-case SS_DUAL:
-forceCost = SABER_SWING_DUAL_ATTACK_FORCE_COST;
-break;
-case SS_STAFF:
-forceCost = SABER_SWING_STAFF_ATTACK_FORCE_COST;
-break;
-}
-pm->ps->fd.forcePower -= (int)(forceCost);
-if (pm->ps->fd.forcePower < 5)
-{
-pm->ps->fd.forcePower = 5;
-}
-}
-
-*/
-
 /*
 =================
 PM_WeaponLightsaber
