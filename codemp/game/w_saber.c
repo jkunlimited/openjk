@@ -3972,7 +3972,7 @@ static QINLINE void JKU_saberDoBlockForceCost(gentity_t* self, saber_styles_t sa
    if (self && self->client)
    {
       self->client->ps.fd.forcePower -= JKU_SABER_BLOCK_DEFAULT_FORCE_COST;
-      if (self->client->ps.fd.forcePower < 0)
+      if (self->client->ps.fd.forcePower <= 0)
       {
          self->client->ps.fd.forcePower = 0;
       }
@@ -4010,8 +4010,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
    static vec3_t saberTrMins, saberTrMaxs;
    static vec3_t lastValidStart;
    static vec3_t lastValidEnd;
-   static int selfSaberLevel;
-   static int otherSaberLevel;
    int dmg = 0;
    int attackStr = 0;
    qboolean idleDamage = qfalse;
@@ -4059,8 +4057,6 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
    {
 	   return qfalse;
    }
-
-   selfSaberLevel = G_SaberAttackPower(self, SaberAttacking(self));
 
    //JKU-Fnuki: Calculate SaberTrace
    JKU_calculateSaberTrace(self, rSaberNum, rBladeNum, saberStart, saberEnd, doInterpolate,
@@ -4156,7 +4152,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 			JKU_saberDoBlockForceCost(hitEntity, self->client->saber->singleBladeStyle);
 			JKU_extendSaberBlockingTimers(hitEntity);
 
-			return qfalse;
+			didHit = qfalse;
 		}
 		else 
 		{
