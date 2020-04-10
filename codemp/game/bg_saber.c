@@ -3145,19 +3145,20 @@ void PM_WeaponLightsaber(void)
 
 					if ( PM_SaberInBounce( pm->ps->saberMove ) || !BG_SaberInAttack( pm->ps->saberMove ) )
 					{
-						if ( pm->cmd.buttons & BUTTON_ATTACK )
-						{//transition to a new attack
-							int newQuad = PM_SaberMoveQuadrantForMovement( &pm->cmd );
-							while ( newQuad == saberMoveData[pm->ps->saberMove].startQuad )
-							{//player is still in same attack quad, don't repeat that attack because it looks bad,
-								//FIXME: try to pick one that might look cool?
-								//newQuad = Q_irand( Q_BR, Q_BL );
-								newQuad = PM_irand_timesync( Q_BR, Q_BL );
-								//FIXME: sanity check, just in case?
-							}//else player is switching up anyway, take the new attack dir
-							bounceMove = transitionMove[saberMoveData[pm->ps->saberMove].startQuad][newQuad];
-						}
-						else
+						// JKU-Mikkel: Disabling this to prevent players from transitioning within bounce.
+						//if ( pm->cmd.buttons & BUTTON_ATTACK )
+						//{//transition to a new attack
+						//	int newQuad = PM_SaberMoveQuadrantForMovement( &pm->cmd );
+						//	while ( newQuad == saberMoveData[pm->ps->saberMove].startQuad )
+						//	{//player is still in same attack quad, don't repeat that attack because it looks bad,
+						//		//FIXME: try to pick one that might look cool?
+						//		//newQuad = Q_irand( Q_BR, Q_BL );
+						//		newQuad = PM_irand_timesync( Q_BR, Q_BL );
+						//		//FIXME: sanity check, just in case?
+						//	}//else player is switching up anyway, take the new attack dir
+						//	bounceMove = transitionMove[saberMoveData[pm->ps->saberMove].startQuad][newQuad];
+						//}
+						//else
 						{//return to ready
 							if ( saberMoveData[pm->ps->saberMove].startQuad == Q_T )
 							{
