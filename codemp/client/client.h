@@ -539,7 +539,7 @@ void	SCR_DrawSmallChar(int x, int y, int ch);
 
 // JKU-Mikkel: New Draw Client Functions
 void	JKU_DrawBigString(int x, int y, const char *s, float alpha, qboolean noColorEscape);			// draws a string with embedded color control characters with fade
-void    JKU_DrawStringExt(int x, int y, float size, const char *string, float *setColor, qboolean forceColor, qboolean noColorEscape);
+void    JKU_DrawStringExt(int x, int y, float size, const char *string, float *setColor, qboolean forceColor, qboolean noColorEscape, qboolean dropShadow);
 
 
 //

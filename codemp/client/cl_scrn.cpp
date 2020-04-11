@@ -218,27 +218,28 @@ void SCR_DrawStringExt(int x, int y, float size, const char *string, float *setC
 }
 
 // JKU-Mikkel: New JKU_DrawStringExt
-void JKU_DrawStringExt(int x, int y, float size, const char *string, float *setColor, qboolean forceColor, qboolean noColorEscape) {
+void JKU_DrawStringExt(int x, int y, float size, const char *string, float *setColor, qboolean forceColor, qboolean noColorEscape, qboolean dropShadow) {
 	vec4_t		color;
 	const char	*s;
 	int			xx;
 
-	// draw the drop shadow
-	color[0] = color[1] = color[2] = 0;
-	color[3] = setColor[3];
-	re->SetColor(color);
-	s = string;
-	xx = x;
-	while (*s) {
-		if (!noColorEscape && Q_IsColorString(s)) {
-			s += 2;
-			continue;
+	if (dropShadow) {
+		// draw the drop shadow
+		color[0] = color[1] = color[2] = 0;
+		color[3] = setColor[3];
+		re->SetColor(color);
+		s = string;
+		xx = x;
+		while (*s) {
+			if (!noColorEscape && Q_IsColorString(s)) {
+				s += 2;
+				continue;
+			}
+			SCR_DrawSmallChar(xx + 2, y + 2, *s);
+			xx += size;
+			s++;
 		}
-		SCR_DrawSmallChar(xx + 2, y + 2, *s);
-		xx += size;
-		s++;
 	}
-
 
 	// draw the colored text
 	s = string;
@@ -269,7 +270,7 @@ void JKU_DrawBigString(int x, int y, const char *s, float alpha, qboolean noColo
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	JKU_DrawStringExt(x, y, SMALLCHAR_WIDTH, s, color, qfalse, noColorEscape);
+	JKU_DrawStringExt(x, y, SMALLCHAR_WIDTH, s, color, qfalse, noColorEscape, qfalse);
 }
 
 void SCR_DrawBigString( int x, int y, const char *s, float alpha, qboolean noColorEscape ) {
