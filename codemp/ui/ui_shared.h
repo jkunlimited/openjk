@@ -153,7 +153,6 @@ typedef struct windowDef_s {
   vec4_t borderColor;             // border color
   vec4_t outlineColor;            // border color
   qhandle_t background;           // background asset
-  float textScale;				  // Jedi Knight Unlimited - textScale (0-9f)
 } windowDef_t;
 
 typedef struct colorRangeDef_s {

@@ -7551,7 +7551,7 @@ static void CG_DrawSiegeHUDItem(void)
 
 	if (handle)
 	{
-		trap->R_ModelBounds( handle, mins, maxs );
+		trap->R_ModelBounds(handle, mins, maxs);
 	}
 	else
 	{
@@ -7559,15 +7559,15 @@ static void CG_DrawSiegeHUDItem(void)
 		VectorSet(maxs, 16, 16, 32);
 	}
 
-	origin[2] = -0.5 * ( mins[2] + maxs[2] );
-	origin[1] = 0.5 * ( mins[1] + maxs[1] );
-	len = 0.5 * ( maxs[2] - mins[2] );
+	origin[2] = -0.5 * (mins[2] + maxs[2]);
+	origin[1] = 0.5 * (mins[1] + maxs[1]);
+	len = 0.5 * (maxs[2] - mins[2]);
 	origin[0] = len / 0.268;
 
 	VectorClear(angles);
 	angles[YAW] = cg.autoAngles[YAW];
 
-	CG_Draw3DModel( 8, 8, 64, 64, handle, g2, cent->currentState.g2radius, 0, origin, angles );
+	CG_Draw3DModel(8, 8, 64, 64, handle, g2, cent->currentState.g2radius, 0, origin, angles);
 
 	cgSiegeEntityRender = 0; //reset for next frame
 }
@@ -7695,9 +7695,9 @@ static QINLINE void CG_ChatBox_DrawStrings(void)
 	int numToDraw = 0;
 	int linesToDraw = 0;
 	int i = 0;
-	int x = 6;
+	int x = 30;
 	float y = cg.scoreBoardShowing ? 475 : cg_chatBoxHeight.integer;
-	float fontScale = 0.5f;
+	float fontScale = 0.65f;
 
 	if (!cg_chatBox.integer)
 	{
@@ -7735,14 +7735,13 @@ static QINLINE void CG_ChatBox_DrawStrings(void)
 	}
 
 	//move initial point up so we draw bottom-up (visually)
-	y = 425;
 	y -= (CHATBOX_FONT_HEIGHT*fontScale)*linesToDraw;
 
 	//we have the items we want to draw, just quickly loop through them now
 	i = 0;
 	while (i < numToDraw)
 	{
-		CG_Text_Paint(x, y, fontScale, colorWhite, drawThese[i]->string, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+		CG_Text_Paint(x, y, fontScale, colorWhite, drawThese[i]->string, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL);
 		y += ((CHATBOX_FONT_HEIGHT*fontScale)*drawThese[i]->lines);
 		i++;
 	}
