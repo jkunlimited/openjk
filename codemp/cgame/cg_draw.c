@@ -1325,7 +1325,7 @@ static void JKU_DrawAmmoAndClipReserve(centity_t	*cent, menuDef_t *menuHUD)
 	playerState_t	*ps;
 	itemDef_t		*focusItem;
 	int				ammoValue = 0;
-	int				clipValue = 100; // JKU-Mikkel: Need to re-do this. Hardcoded for now.
+	int				clipValue = 100; // JKU-Bunisher: Need to re-do this. Hardcoded for now.
 
 	ps = &cg.snap->ps;
 
@@ -1770,7 +1770,7 @@ void CG_DrawHUD(centity_t	*cent)
 	if (cg.predictedPlayerState.pm_type != PM_SPECTATOR)
 	{
 
-		// JKU-Mikkel: New JKU HUD
+		// JKU-Bunisher: New JKU HUD
 		menuHUD = Menus_FindByName("jkuhud");
 		Menu_Paint(menuHUD, qtrue);
 
@@ -1804,22 +1804,22 @@ void CG_DrawHUD(centity_t	*cent)
 				);
 			}
 
-			// JKU-Mikkel: Base HUD Menu Defs
+			// JKU-Bunisher: Base HUD Menu Defs
 			CG_DrawArmor(menuHUD);
 			CG_DrawHealth(menuHUD);
 			CG_DrawForcePower(menuHUD);
 
-			// JKU-Mikkel: JKU HUD Menu Defs
+			// JKU-Bunisher: JKU HUD Menu Defs
 			JKU_DrawForceCircle(cent, menuHUD);
 			JKU_DrawForcePower(cent, menuHUD);
 			JKU_DrawWeapon(cent, menuHUD);
 
-			// JKU-Mikkel: Lightsaber Stance / Ammunition Differentiation
+			// JKU-Bunisher: Lightsaber Stance / Ammunition Differentiation
 			if (cent->currentState.weapon == WP_SABER) {
 				CG_DrawSaberStyle(cent, menuHUD);
 			}
 			else {
-				// JKU-Mikkel: New Ammo & Ammo Clip Reserve Indicators
+				// JKU-Bunisher: New Ammo & Ammo Clip Reserve Indicators
 				JKU_DrawAmmoAndClipReserve(cent, menuHUD);
 			}
 		}

@@ -3145,7 +3145,7 @@ void PM_WeaponLightsaber(void)
 
 					if ( PM_SaberInBounce( pm->ps->saberMove ) || !BG_SaberInAttack( pm->ps->saberMove ) )
 					{
-						// JKU-Mikkel: Disabling this to prevent players from transitioning within bounce.
+						// JKU-Bunisher: Disabling this to prevent players from transitioning within bounce.
 						//if ( pm->cmd.buttons & BUTTON_ATTACK )
 						//{//transition to a new attack
 						//	int newQuad = PM_SaberMoveQuadrantForMovement( &pm->cmd );
@@ -3730,8 +3730,8 @@ void PM_SetSaberMove(short newMove)
 
 	if ( newMove == LS_READY || newMove == LS_A_FLIP_STAB || newMove == LS_A_FLIP_SLASH )
 	{//finished with a kata (or in a special move) reset attack counter
-		// JKU-Mikkel: Below is bugged atm, so disabling it...
-		// JKU-Mikkel: Subtract force power points for attacking
+		// JKU-Bunisher: Below is bugged atm, so disabling it...
+		// JKU-Bunisher: Subtract force power points for attacking
 		// pm->ps->fd.forcePower =- JKU_SABER_ATTACK_DEFAULT_FORCE_COST;
 		pm->ps->saberAttackChainCount = 0;
 	}
