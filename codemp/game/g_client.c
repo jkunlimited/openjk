@@ -3701,12 +3701,12 @@ void ClientSpawn(gentity_t *ent) {
 	}
 	else if (client->ps.stats[STAT_MAX_HEALTH] <= 100)
 	{
-		// JKU-Mikkel: Changed this from 1.25 to 1.00
+		// JKU-Bunisher: Changed this from 1.25 to 1.00
 		ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] * 1.00;
 	}
 	else if (client->ps.stats[STAT_MAX_HEALTH] < 125)
 	{
-		// JKU-Mikkel: Changed this from 125 to 100
+		// JKU-Bunisher: Changed this from 125 to 100
 		ent->health = client->ps.stats[STAT_HEALTH] = 100;
 	}
 	else
@@ -3727,7 +3727,7 @@ void ClientSpawn(gentity_t *ent) {
 	}
 	else
 	{
-		// JKU-Mikkel: Adjusting this to 100 from 0.25
+		// JKU-Bunisher: Adjusting this to 100 from 0.25
 		client->ps.stats[STAT_ARMOR] = client->ps.stats[STAT_MAX_HEALTH] * 1.0;
 	}
 

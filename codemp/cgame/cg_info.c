@@ -134,13 +134,13 @@ void CG_DrawInformation( void ) {
 	const char	*info;
 	const char	*sysInfo;
 	int			y;
-	// JKU-Mikkel: Unnecessary and cluttery
+	// JKU-Bunisher: Unnecessary and cluttery
 	// int			value, valueNOFP;
 	qhandle_t	levelshot;
 	qhandle_t	logoshot;
 	char		buf[1024];
 	int			iPropHeight = 18;	// I know, this is total crap, but as a post release asian-hack....  -Ste
-	// JKU-Mikkel: Easier to manage coords using vars and refs
+	// JKU-Bunisher: Easier to manage coords using vars and refs
 	int			iMessageWidth = 320;
 	int			iMessageHeight = 405;
 
@@ -148,7 +148,7 @@ void CG_DrawInformation( void ) {
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
 
 	s = Info_ValueForKey( info, "mapname" );
-	// JKU-Mikkel: Hardcoding this for consistency in UI
+	// JKU-Bunisher: Hardcoding this for consistency in UI
 	levelshot = trap->R_RegisterShaderNoMip( "menu/art/unknownmap_mp" );
 	logoshot = trap->R_RegisterShaderNoMip("menu/jku_jediacademy_load");
 
@@ -205,7 +205,7 @@ void CG_DrawInformation( void ) {
 		y += 10;
 	}
 
-	// JKU-Mikkel: Unnecessary and cluttery
+	// JKU-Bunisher: Unnecessary and cluttery
 	// map-specific message (long map name)
 	//s = CG_ConfigString( CS_MESSAGE );
 	//if ( s[0] ) {

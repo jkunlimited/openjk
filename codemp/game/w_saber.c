@@ -4045,14 +4045,14 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
       self->client->ps.canBlock = qtrue;
    }
 
-   // JKU-Mikkel: Don't even begin calculating damage when you're not attacking.
-   // JKU-Mikkel: This disables poke/area of effect damage when walking around with your saber ignited. 
+   // JKU-Bunisher: Don't even begin calculating damage when you're not attacking.
+   // JKU-Bunisher: This disables poke/area of effect damage when walking around with your saber ignited. 
    if (!SaberAttacking(self)) {
 	   return qfalse;
    }
 
-   // JKU-Mikkel: Don't begin calculating damage when your saber isn't on.
-   // JKU-Mikkel: There's no purpose. 
+   // JKU-Bunisher: Don't begin calculating damage when your saber isn't on.
+   // JKU-Bunisher: There's no purpose. 
    if (BG_SabersOff(&self->client->ps))
    {
 	   return qfalse;

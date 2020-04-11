@@ -479,7 +479,7 @@ void Field_VariableSizeDraw(field_t *edit, int x, int y, int width, int size, qb
 	}
 }
 
-// JKU-Mikkel: New JKU_VariableSizeDraw
+// JKU-Bunisher: New JKU_VariableSizeDraw
 void JKU_VariableSizeDraw(field_t *edit, int x, int y, int width, int size, qboolean showCursor, qboolean noColorEscape) {
 	int		len;
 	int		drawLen;
@@ -488,8 +488,8 @@ void JKU_VariableSizeDraw(field_t *edit, int x, int y, int width, int size, qboo
 	char	str[MAX_STRING_CHARS];
 	int		i;
 
-	// JKU-Mikkel: Extend by factor 2.5
-	// JKU-Mikkel: This looks better since the chatline has been drastically resized.
+	// JKU-Bunisher: Extend by factor 2.5
+	// JKU-Bunisher: This looks better since the chatline has been drastically resized.
 
 	drawLen = (edit->widthInChars * 2.5) - 1; // - 1 so there is always a space for the cursor
 	len = strlen(edit->buffer);
@@ -576,7 +576,7 @@ void Field_BigDraw( field_t *edit, int x, int y, int width, qboolean showCursor,
 	Field_VariableSizeDraw( edit, x, y, width, BIGCHAR_WIDTH, showCursor, noColorEscape );
 }
 
-// JKU-Mikkel: New JKU_BigDraw
+// JKU-Bunisher: New JKU_BigDraw
 void JKU_BigDraw(field_t *edit, int x, int y, int width, qboolean showCursor, qboolean noColorEscape)
 {
 	JKU_VariableSizeDraw(edit, x, y, width, SMALLCHAR_WIDTH, showCursor, noColorEscape);

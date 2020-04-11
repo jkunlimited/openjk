@@ -66,7 +66,7 @@ void	Field_Draw			( field_t *edit, int x, int y, int width, qboolean showCursor,
 void	Field_SmallDraw(field_t *edit, int x, int y, int width, qboolean showCursor, qboolean noColorEscape);
 void	Field_BigDraw		( field_t *edit, int x, int y, int width, qboolean showCursor, qboolean noColorEscape );
 
-// JKU-Mikkel: New Draw Functions
+// JKU-Bunisher: New Draw Functions
 void	JKU_BigDraw(field_t *edit, int x, int y, int width, qboolean showCursor, qboolean noColorEscape);
 
 void		Key_SetBinding			( int keynum, const char *binding );

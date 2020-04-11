@@ -217,7 +217,7 @@ void SCR_DrawStringExt(int x, int y, float size, const char *string, float *setC
 	re->SetColor(NULL);
 }
 
-// JKU-Mikkel: New JKU_DrawStringExt
+// JKU-Bunisher: New JKU_DrawStringExt
 void JKU_DrawStringExt(int x, int y, float size, const char *string, float *setColor, qboolean forceColor, qboolean noColorEscape, qboolean dropShadow) {
 	vec4_t		color;
 	const char	*s;
@@ -264,7 +264,7 @@ void JKU_DrawStringExt(int x, int y, float size, const char *string, float *setC
 	re->SetColor(NULL);
 }
 
-// JKU-Mikkel: New JKU_DrawBigString
+// JKU-Bunisher: New JKU_DrawBigString
 void JKU_DrawBigString(int x, int y, const char *s, float alpha, qboolean noColorEscape) {
 	float	color[4];
 
