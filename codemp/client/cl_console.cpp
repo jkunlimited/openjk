@@ -573,28 +573,21 @@ Con_DrawNotify
 Draws the last few lines of output transparently over the game top
 ================
 */
-void Con_DrawNotify (void)
+void Con_DrawNotify(void)
 {
-	int		x, v, xv;
+	int		x, v;
 	short	*text;
 	int		i;
 	int		time;
-	//int		skip;
+	int		skip;
 	int		currentColor;
-	//const char* chattext;
+	const char* chattext;
 
 	currentColor = 7;
-	re->SetColor( g_color_table[currentColor] );
+	re->SetColor(g_color_table[currentColor]);
 
-	// Jedi Knight: Unlimited
-	// Vertical and horizontal alignment offset ((TODO: Move this outside of function scope))
-	#define JKU_VERTICAL_OFFSET 1020;
-	#define JKU_HORIZONTAL_OFFSET 105;
-
-	v = JKU_VERTICAL_OFFSET;
-	xv = JKU_HORIZONTAL_OFFSET;
-
-	for (i= con.current-NUM_CON_TIMES+1 ; i<=con.current ; i++)
+	v = 0;
+	for (i = con.current - NUM_CON_TIMES + 1; i <= con.current; i++)
 	{
 		if (i < 0)
 			continue;
@@ -602,18 +595,18 @@ void Con_DrawNotify (void)
 		if (time == 0)
 			continue;
 		time = cls.realtime - time;
-		if (time > con_notifytime->value*1000)
+		if (time > con_notifytime->value * 1000)
 			continue;
 		text = con.text + (i % con.totallines)*con.linewidth;
 
-		if (cl.snap.ps.pm_type != PM_INTERMISSION && Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
+		if (cl.snap.ps.pm_type != PM_INTERMISSION && Key_GetCatcher() & (KEYCATCH_UI | KEYCATCH_CGAME)) {
 			continue;
 		}
 
 
 		if (!cl_conXOffset)
 		{
-			cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
+			cl_conXOffset = Cvar_Get("cl_conXOffset", "0", 0);
 		}
 
 		// asian language needs to use the new font system to print glyphs...
@@ -624,72 +617,74 @@ void Con_DrawNotify (void)
 		{
 			static int iFontIndex = re->RegisterFont("ocr_a");	// this seems naughty
 			const float fFontScale = 0.75f*con.yadjust;
-			const int iPixelHeightToAdvance =   2+(1.3/con.yadjust) * re->Font_HeightPixels(iFontIndex, fFontScale);	// for asian spacing, since we don't want glyphs to touch.
+			const int iPixelHeightToAdvance = 2 + (1.3 / con.yadjust) * re->Font_HeightPixels(iFontIndex, fFontScale);	// for asian spacing, since we don't want glyphs to touch.
 
-			// concat the text to be printed...
-			//
-			char sTemp[4096]={0};	// ott
-			for (x = 0 ; x < con.linewidth ; x++)
+																														// concat the text to be printed...
+																														//
+			char sTemp[4096] = { 0 };	// ott
+			for (x = 0; x < con.linewidth; x++)
 			{
-				if ( ( (text[x]>>8)&Q_COLOR_BITS ) != currentColor ) {
-					currentColor = (text[x]>>8)&Q_COLOR_BITS;
-					strcat(sTemp,va("^%i", (text[x]>>8)&Q_COLOR_BITS) );
+				if (((text[x] >> 8)&Q_COLOR_BITS) != currentColor) {
+					currentColor = (text[x] >> 8)&Q_COLOR_BITS;
+					strcat(sTemp, va("^%i", (text[x] >> 8)&Q_COLOR_BITS));
 				}
-				strcat(sTemp,va("%c",text[x] & 0xFF));
+				strcat(sTemp, va("%c", text[x] & 0xFF));
 			}
 			//
 			// and print...
 			//
-			re->Font_DrawString(cl_conXOffset->integer + con.xadjust*(con.xadjust + (1*SMALLCHAR_WIDTH/*aesthetics*/)), con.yadjust*(v), sTemp, g_color_table[currentColor], iFontIndex, -1, fFontScale);
+			re->Font_DrawString(cl_conXOffset->integer + con.xadjust*(con.xadjust + (1 * SMALLCHAR_WIDTH/*aesthetics*/)), con.yadjust*(v), sTemp, g_color_table[currentColor], iFontIndex, -1, fFontScale);
 
-			v +=  iPixelHeightToAdvance;
+			v += iPixelHeightToAdvance;
 		}
 		else
 		{
-			for (x = 0 ; x < con.linewidth ; x++) {
-				if ( ( text[x] & 0xff ) == ' ' ) {
+			for (x = 0; x < con.linewidth; x++) {
+				if ((text[x] & 0xff) == ' ') {
 					continue;
 				}
-				if ( ( (text[x]>>8)&Q_COLOR_BITS ) != currentColor ) {
-					currentColor = (text[x]>>8)&Q_COLOR_BITS;
-					re->SetColor( g_color_table[currentColor] );
+				if (((text[x] >> 8)&Q_COLOR_BITS) != currentColor) {
+					currentColor = (text[x] >> 8)&Q_COLOR_BITS;
+					re->SetColor(g_color_table[currentColor]);
 				}
 				if (!cl_conXOffset)
 				{
-					cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
+					cl_conXOffset = Cvar_Get("cl_conXOffset", "0", 0);
 				}
-				// Base JKA console message reference
-				// SCR_DrawSmallChar( (int)(cl_conXOffset->integer + con.xadjust + (x+1+xv)*SMALLCHAR_WIDTH), v, text[x] & 0xff );
-				// This breaks the xl_conXOffset functionality irreversibly... need to figure out alternative approach
-				SCR_DrawSmallChar((int)(cl_conXOffset->integer + con.xadjust + (x+xv)*SMALLCHAR_WIDTH), v, text[x] & 0xff);
+				SCR_DrawSmallChar((int)(cl_conXOffset->integer + con.xadjust + (x + 1)*SMALLCHAR_WIDTH), v, text[x] & 0xff);
 			}
 
 			v += SMALLCHAR_HEIGHT;
 		}
 	}
 
-	re->SetColor( NULL );
+	re->SetColor(NULL);
 
-	if (Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
+	if (Key_GetCatcher() & (KEYCATCH_UI | KEYCATCH_CGAME)) {
 		return;
 	}
 
 	// draw the chat line
-	if ( Key_GetCatcher( ) & KEYCATCH_MESSAGE )
+	if (Key_GetCatcher() & KEYCATCH_MESSAGE)
 	{
-      if (chat_team)
-      {
-         SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/chat/jku_chatbar_icon");
-         Field_SmallDraw(&chatField, 22, 451, TINYCHAR_WIDTH, qfalse, qtrue);
-      }
-      else
-      {
-         SCR_DrawNamedPic(8, 450, 10, 10, "gfx/hud/chat/jku_chatbar_icon");
-         Field_SmallDraw(&chatField, 22, 451, TINYCHAR_WIDTH, qfalse, qtrue);
-      }
-		v += TINYCHAR_HEIGHT;
-	}
+		if (chat_team)
+		{
+			chattext = SE_GetString("MP_SVGAME", "SAY_TEAM");
+			JKU_DrawBigString(8, v, chattext, 1.0f, qfalse);
+			skip = strlen(chattext) + 1;
+		}
+		else
+		{
+			chattext = SE_GetString("MP_SVGAME", "SAY");
+			JKU_DrawBigString(8, v, chattext, 1.0f, qfalse);
+			skip = strlen(chattext) + 1;
+		}
 
+		JKU_BigDraw(&chatField, skip * SMALLCHAR_WIDTH, v,
+			SCREEN_WIDTH - (skip + 1) * SMALLCHAR_WIDTH, qtrue, qtrue);
+		
+		v += SMALLCHAR_WIDTH;
+	}
 }
 
 /*
