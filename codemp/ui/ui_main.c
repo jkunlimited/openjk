@@ -2310,7 +2310,7 @@ void UpdateForceStatus()
 static void UI_DrawNetSource(rectDef_t *rect, float scale, vec4_t color, int textStyle, int iMenuFont)
 {
 	if (ui_netSource.integer < 0 || ui_netSource.integer >= numNetSources) {
-		trap->Cvar_Set("ui_netSource", "0");
+		trap->Cvar_Set("ui_netSource", "1");
 		trap->Cvar_Update(&ui_netSource);
 	}
 
@@ -2757,7 +2757,7 @@ static int UI_OwnerDrawWidth(int ownerDraw, float scale) {
       break;
 		case UI_NETSOURCE:
 			if (ui_netSource.integer < 0 || ui_netSource.integer >= numNetSources) {
-				trap->Cvar_Set("ui_netSource", "0");
+				trap->Cvar_Set("ui_netSource", "1");
 				trap->Cvar_Update(&ui_netSource);
 			}
 			trap->SE_GetStringTextString("MENUS_SOURCE", holdSPString, sizeof(holdSPString));
@@ -5466,6 +5466,45 @@ void UI_UpdateCharacterSkin( void )
 	ItemParse_model_g2skin_go( item, skin );
 }
 
+void UI_UpdateCharacterPresetSkin(void)
+{
+	menuDef_t *menu;
+	itemDef_t *item;
+	char skin[MAX_QPATH];
+	char model[MAX_QPATH];
+	char head[MAX_QPATH];
+	char torso[MAX_QPATH];
+	char legs[MAX_QPATH];
+
+	menu = Menu_GetFocused();	// Get current menu
+
+	if (!menu)
+	{
+		return;
+	}
+
+	item = (itemDef_t *)Menu_FindItemByName(menu, "presetcharacter");
+
+	if (!item)
+	{
+		Com_Error(ERR_FATAL, "UI_UpdateCharacterSkin: Could not find item (presetcharacter) in menu (%s)", menu->window.name);
+	}
+
+	trap->Cvar_VariableStringBuffer("ui_char_model", model, sizeof(model));
+	trap->Cvar_VariableStringBuffer("ui_char_skin_head", head, sizeof(head));
+	trap->Cvar_VariableStringBuffer("ui_char_skin_torso", torso, sizeof(torso));
+	trap->Cvar_VariableStringBuffer("ui_char_skin_legs", legs, sizeof(legs));
+
+	Com_sprintf(skin, sizeof(skin), "models/players/%s/|%s|%s|%s",
+		model,
+		head,
+		torso,
+		legs
+	);
+
+	ItemParse_model_g2skin_go(item, skin);
+}
+
 static void UI_ResetCharacterListBoxes( void )
 {
 
@@ -5564,6 +5603,43 @@ static void UI_UpdateCharacter( qboolean changedModel )
 		UI_FeederSelection(FEEDER_COLORCHOICES, 0, item);
 	}
 	UI_UpdateCharacterSkin();
+}
+
+static void UI_UpdatePresetCharacter(qboolean changedModel)
+{
+	menuDef_t *menu;
+	itemDef_t *item;
+	char modelPath[MAX_QPATH];
+	int	animRunLength;
+
+	menu = Menu_GetFocused();	// Get current menu
+
+	if (!menu)
+	{
+		return;
+	}
+
+	item = (itemDef_t *)Menu_FindItemByName(menu, "presetcharacter");
+
+	if (!item)
+	{
+		Com_Error(ERR_FATAL, "UI_UpdateCharacter: Could not find item (presetcharacter) in menu (%s)", menu->window.name);
+	}
+
+	ItemParse_model_g2anim_go(item, ui_char_anim.string);
+
+	Com_sprintf(modelPath, sizeof(modelPath), "models/players/%s/model.glm", UI_Cvar_VariableString("model"));
+	ItemParse_asset_model_go(item, modelPath, &animRunLength);
+
+	if (changedModel)
+	{//set all skins to first skin since we don't know you always have all skins
+	 //FIXME: could try to keep the same spot in each list as you swtich models
+		UI_FeederSelection(FEEDER_PLAYER_SKIN_HEAD, 0, item);	//fixme, this is not really the right item!!
+		UI_FeederSelection(FEEDER_PLAYER_SKIN_TORSO, 0, item);
+		UI_FeederSelection(FEEDER_PLAYER_SKIN_LEGS, 0, item);
+		UI_FeederSelection(FEEDER_COLORCHOICES, 0, item);
+	}
+	UI_UpdateCharacterPresetSkin();
 }
 
 /*
@@ -6481,9 +6557,95 @@ static void UI_RunMenuScript(char **args)
 				}
 			}
 		}
+		else if (Q_stricmp(name, "char_attach_saber_single") == 0)
+		{
+			itemDef_t *item;
+			menuDef_t *menu;
+			modelDef_t *modelPtr;
+
+			UI_GetCharacterCvars();
+
+			// 1 = Single
+			uiInfo.movesTitleIndex = 1;
+
+			menu = Menus_FindByName("playermenu_jku");
+
+			if (menu)
+			{
+				item = (itemDef_t *)Menu_FindItemByName((menuDef_t *)menu, "character");
+				if (item)
+				{
+					modelPtr = item->typeData.model;
+					if (modelPtr)
+					{
+						UI_UpdateCharacterSkin();
+						UI_SaberAttachToChar(item);
+					}
+				}
+			}
+		}
+		else if (Q_stricmp(name, "char_attach_saber_duals") == 0)
+		{
+			itemDef_t *item;
+			menuDef_t *menu;
+			modelDef_t *modelPtr;
+
+			UI_GetCharacterCvars();
+
+			// 4 = Duals
+			uiInfo.movesTitleIndex = 4;
+
+			menu = Menus_FindByName("playermenu_jku");
+
+			if (menu)
+			{
+				item = (itemDef_t *)Menu_FindItemByName((menuDef_t *)menu, "character");
+				if (item)
+				{
+					modelPtr = item->typeData.model;
+					if (modelPtr)
+					{
+						UI_UpdateCharacterSkin();
+						UI_SaberAttachToChar(item);
+					}
+				}
+			}
+		}
+
+		else if (Q_stricmp(name, "char_attach_saber_staff") == 0)
+		{
+			itemDef_t *item;
+			menuDef_t *menu;
+			modelDef_t *modelPtr;
+
+			UI_GetCharacterCvars();
+
+			// 5 = Staff
+			uiInfo.movesTitleIndex = 5;
+
+			menu = Menus_FindByName("playermenu_jku");
+
+			if (menu)
+			{
+				item = (itemDef_t *)Menu_FindItemByName((menuDef_t *)menu, "character");
+				if (item)
+				{
+					modelPtr = item->typeData.model;
+					if (modelPtr)
+					{
+						UI_UpdateCharacterSkin();
+						UI_SaberAttachToChar(item);
+					}
+				}
+			}
+		}
 		else if (Q_stricmp(name, "character") == 0)
 		{
-			UI_UpdateCharacter( qfalse );
+			UI_UpdateCharacter(qfalse);
+		}
+		else if (Q_stricmp(name, "presetcharacter") == 0)
+		{
+			UI_UpdatePresetCharacter(qfalse);
 		}
 		else if (Q_stricmp(name, "characterchanged") == 0)
 		{

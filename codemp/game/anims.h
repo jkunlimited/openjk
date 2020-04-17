@@ -1638,6 +1638,9 @@ typedef enum //# animNumber_e
 	BOTH_SIT6,
 	BOTH_SIT7,
 
+	// JKU Animations
+	BOTH_MENU_IDLE,
+
 	//=================================================
 	//ANIMS IN WHICH ONLY THE UPPER OBJECTS ARE IN MD3
 	//=================================================
