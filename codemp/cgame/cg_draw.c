@@ -755,139 +755,6 @@ static void CG_DrawSaberStyle( centity_t *cent, menuDef_t *menuHUD)
 	}
 }
 
-// [Jedi Knight: Unlimited]
-static void JKU_DrawWeapon(centity_t *cent, menuDef_t *menuHUD)
-{
-	itemDef_t		*focusItem;
-
-	if (!menuHUD) {
-		return;
-	}
-
-	if (cg.snap->ps.stats[STAT_HEALTH] <= 0) {
-		return;
-	}
-
-	if (!cent->currentState.weapon) {
-		return;
-	}
-
-	// JKU-Bunisher: WP_DUALSABER & WP_STAFF does not exist
-	// JKU-Bunisher: Rely on the animations as an additional step to determine which HUD elements to show
-
-	if (cg.snap->ps.fd.saberAnimLevel == SS_DUAL &&
-		cent->currentState.weapon == WP_SABER) 
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "weapon_dualsaber");
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-		return;
-	}
-
-	if (cg.snap->ps.fd.saberAnimLevel == SS_STAFF &&
-		cent->currentState.weapon == WP_SABER) 
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "weapon_staff");
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-		return;
-	}
-
-	// JKU-Bunisher: The current weapon should always be highlighted
-	switch (cent->currentState.weapon) 
-	{
-		case WP_SABER: 
-		{
-			focusItem = Menu_FindItemByName(menuHUD, "weapon_saber_highlighted");
-			if (focusItem)
-			{
-				trap->R_SetColor(colorTable[CT_WHITE]);
-				CG_DrawPic( focusItem->window.rect.x, focusItem->window.rect.y, focusItem->window.rect.w, focusItem->window.rect.h, focusItem->window.background);
-			}
-			break;
-		}
-		case WP_THERMAL:
-		{
-			focusItem = Menu_FindItemByName(menuHUD, "weapon_thermald_highlighted");
-			if (focusItem)
-			{
-				trap->R_SetColor(colorTable[CT_WHITE]);
-				CG_DrawPic(focusItem->window.rect.x, focusItem->window.rect.y, focusItem->window.rect.w, focusItem->window.rect.h, focusItem->window.background);
-			}
-			break;
-		}
-		case WP_BRYAR_PISTOL:
-		{
-			focusItem = Menu_FindItemByName(menuHUD, "weapon_dl44_highlighted");
-			if (focusItem)
-			{
-				trap->R_SetColor(colorTable[CT_WHITE]);
-				CG_DrawPic(focusItem->window.rect.x, focusItem->window.rect.y, focusItem->window.rect.w, focusItem->window.rect.h, focusItem->window.background);
-			}
-			break;
-		}
-		case WP_DISRUPTOR:
-		{
-			focusItem = Menu_FindItemByName(menuHUD, "weapon_disruptor_highlighted");
-			if (focusItem)
-			{
-				trap->R_SetColor(colorTable[CT_WHITE]);
-				CG_DrawPic(focusItem->window.rect.x, focusItem->window.rect.y, focusItem->window.rect.w, focusItem->window.rect.h, focusItem->window.background);
-			}
-			break;
-		}
-	}
-	
-	// JKU-Bunisher: Draw everything else non-highlighted
-	focusItem = Menu_FindItemByName(menuHUD, "weapon_saber");
-	if (focusItem)
-	{
-		trap->R_SetColor(colorTable[CT_WHITE]);
-		CG_DrawPic(focusItem->window.rect.x, focusItem->window.rect.y, focusItem->window.rect.w, focusItem->window.rect.h, focusItem->window.background);
-	}
-
-	focusItem = Menu_FindItemByName(menuHUD, "weapon_thermald");
-	if (focusItem)
-	{
-		trap->R_SetColor(colorTable[CT_WHITE]);
-		CG_DrawPic(focusItem->window.rect.x, focusItem->window.rect.y, focusItem->window.rect.w, focusItem->window.rect.h, focusItem->window.background);
-	}
-
-	focusItem = Menu_FindItemByName(menuHUD, "weapon_dl44");
-	if (focusItem)
-	{
-		trap->R_SetColor(colorTable[CT_WHITE]);
-		CG_DrawPic(focusItem->window.rect.x, focusItem->window.rect.y, focusItem->window.rect.w, focusItem->window.rect.h, focusItem->window.background);
-	}
-
-	focusItem = Menu_FindItemByName(menuHUD, "weapon_disruptor");
-	if (focusItem)
-	{
-		trap->R_SetColor(colorTable[CT_WHITE]);
-		CG_DrawPic(focusItem->window.rect.x, focusItem->window.rect.y, focusItem->window.rect.w, focusItem->window.rect.h, focusItem->window.background);
-	}
-}
-
 /*
 ================
 CG_DrawAmmo
@@ -1506,10 +1373,10 @@ static void CG_DrawSimpleForcePower(const centity_t *cent)
 // JKU-Bunisher: CG_DrawForceSelect was based on a timer. We needed something to stick post-selection.
 void JKU_DrawForcePower(centity_t *cent, menuDef_t *menuHUD)
 {
-	int x = 288;
-	int y = 400;
-	int w = 64;
-	int h = 64;
+	float x = 287.5;
+	float y = 400;
+	float w = 64;
+	float h = 64;
 
 	int	i;
 	int	count = 0;
@@ -1624,7 +1491,8 @@ void CG_DrawHUD(centity_t	*cent)
 			// JKU-Bunisher: JKU HUD Menu Defs
 			JKU_DrawForceCircle(cent, menuHUD);
 			JKU_DrawForcePower(cent, menuHUD);
-			JKU_DrawWeapon(cent, menuHUD);
+			JKU_DrawWeaponry();
+			//JKU_DrawWeapon();
 
 			// JKU-Bunisher: Lightsaber Stance / Ammunition Differentiation
 			if (cent->currentState.weapon == WP_SABER) {

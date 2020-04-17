@@ -32,6 +32,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 //static qhandle_t	loadingPlayerIcons[MAX_LOADING_PLAYER_ICONS];
 
 void CG_LoadBar(void);
+void JKU_LoadBar(void);
 
 
 /*
@@ -140,30 +141,36 @@ void CG_DrawInformation( void ) {
 	qhandle_t	logoshot;
 	char		buf[1024];
 	int			iPropHeight = 18;	// I know, this is total crap, but as a post release asian-hack....  -Ste
+	
 	// JKU-Bunisher: Easier to manage coords using vars and refs
-	int			iMessageWidth = 320;
-	int			iMessageHeight = 405;
+	int			loadMsgX = 320; // Loading... X-coord
+	int			loadMsgY = 430; // Loading... Y-coord
+	int			logoX = 192; // Logo X-coord
+	int			logoY = 45; // Logo Y-coord
+	int			logoW = 256; // Logo width
+	int			logoH = 64; // Logo height
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
 
 	s = Info_ValueForKey( info, "mapname" );
-	// JKU-Bunisher: Hardcoding this for consistency in UI
-	levelshot = trap->R_RegisterShaderNoMip( "menu/art/unknownmap_mp" );
+	
+	levelshot = trap->R_RegisterShaderNoMip("menu/art/unknownmap_mp");
 	logoshot = trap->R_RegisterShaderNoMip("menu/jku_jediacademy_load");
 
-	trap->R_SetColor( NULL );
-	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, levelshot );
-	CG_DrawPic(192, 45, 256, 64, logoshot); // TODO: Move this to a separate .menu file.
-	CG_LoadBar();
+	CG_DrawPic(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, levelshot);
+	CG_DrawPic(logoX, logoY, logoW, logoH, logoshot);
 
-	// draw the icons of things as they are loaded
-	//	CG_DrawLoadingIcons();
+	trap->R_SetColor( NULL );
+	JKU_LoadBar();
 
 	// the first 150 rows are reserved for the client connection
 	// screen to write into
 	const char *psLoading = CG_GetStringEdString("MENUS", "LOADING_MAPNAME");
-	CG_DrawProportionalString( iMessageWidth, iMessageHeight, "Loading...", UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
+	
+	// JKU-Bunisher: Need to use CG_DrawScaledProportionalString to avoid pixelation
+	//CG_DrawProportionalString( iMessageWidth, iMessageHeight, "Loading...", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+	CG_DrawScaledProportionalString(loadMsgX, loadMsgY, "Loading...", UI_CENTER | UI_BIGFONT | UI_DROPSHADOW, colorWhite, 0.7f);
 
 	y = 180-32;
 
@@ -408,4 +415,19 @@ void CG_LoadBar(void)
 
 	// Draw right cap
 	CG_DrawPic(tickleft + tickwidth*cg.loadLCARSStage, ticktop, capwidth + numstretch, tickheight, cgs.media.loadBarLEDCap);
+}
+
+void JKU_LoadBar(void)
+{
+	// JKU-Bunisher: New JKU_LoadBar
+	// JKU-Bunisher: New coordinates
+	float bgX = 207.5, bgY = 450;
+	float bgWidth = 225, bgHeight = 10;
+	float fillerWidth = 25;
+
+	// JKU-Bunisher: 
+	// This'll be the filler dynamically drawn as the cg.loadLCARSStage increases (bgWidth times the LCARSStage, must end with same length as the bg)
+	// The logic behind this being: Draw two 1-pixel wide "fillers" for each stage next to each other. There are 9 stages. 9 times 2 fillers at 1-pixel wide equals 18 (bgWidth)  
+	CG_DrawPic(bgX, bgY, bgWidth, bgHeight, cgs.media.loadBarBackground);
+	CG_DrawPic(bgX, bgY, fillerWidth*cg.loadLCARSStage, bgHeight, cgs.media.loadBarFiller);
 }
