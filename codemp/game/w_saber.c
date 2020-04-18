@@ -5446,8 +5446,6 @@ void DownedSaberThink(gentity_t *saberent)
 
 void saberReactivate(gentity_t *saberent, gentity_t *saberOwner)
 {
-   saberent->s.saberInFlight = qtrue;
-
    saberent->s.apos.trType = TR_LINEAR;
    saberent->s.apos.trDelta[0] = 0;
    saberent->s.apos.trDelta[1] = 800;

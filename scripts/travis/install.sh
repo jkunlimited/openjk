@@ -6,15 +6,6 @@ set -x
 host="$1"
 shift 1
 
-# macOS is special
-if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-	brew upgrade
-	brew install --universal --verbose libpng sdl2
-	exit 0
-fi
-
-sudo apt-get update -yq
-
 # This is what Travis does using the apt-addon. Didn't want to duplicate a load
 # of packages in the .travis.yml file though so we have this script instead.
 APT_INSTALL='sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes install'
@@ -27,7 +18,7 @@ case "${host}" in
 			libsdl2-dev \
 			libjpeg-turbo8-dev \
 			zlib1g-dev \
-			libpng12-dev
+			libpng-dev
 		;;
 
 	(i686-w64-mingw32)
@@ -48,15 +39,12 @@ case "${host}" in
 			libjpeg-turbo8-dev:i386 \
 			zlib1g-dev:i386 \
 			libc6-dev:i386 \
-			libpng12-dev:i386 \
-			g++-multilib \
-			g++-4.8-multilib \
-			gcc-4.8-multilib \
-			g++ \
-			g++-4.8 \
-			gcc \
-			gcc-4.8 \
+			libpng-dev:i386 \
 			cpp \
-			cpp-4.8
+			g++ \
+			g++-multilib \
+			gcc \
+			gcc-multilib \
+			${NULL+}
 		;;
 esac
