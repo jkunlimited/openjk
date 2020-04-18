@@ -26,6 +26,17 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "bg_local.h"
 #include "w_saber.h"
 
+/*
+	[Jedi Knight: Unlimited]
+*/
+
+#define SABER_SWING_DEFAULT_FORCE_COST 10
+#define SABER_SWING_FAST_ATTACK_FORCE_COST 5
+#define SABER_SWING_MEDIUM_ATTACK_FORCE_COST 10
+#define SABER_SWING_STRONG_ATTACK_FORCE_COST 15
+#define SABER_SWING_DUAL_ATTACK_FORCE_COST 20
+#define SABER_SWING_STAFF_ATTACK_FORCE_COST 20
+
 extern qboolean BG_SabersOff( playerState_t *ps );
 saberInfo_t *BG_MySaber( int clientNum, int saberNum );
 
@@ -2728,6 +2739,7 @@ qboolean PM_CanDoRollStab( void )
 	}
 	return qtrue;
 }
+
 /*
 =================
 PM_WeaponLightsaber
@@ -3133,19 +3145,20 @@ void PM_WeaponLightsaber(void)
 
 					if ( PM_SaberInBounce( pm->ps->saberMove ) || !BG_SaberInAttack( pm->ps->saberMove ) )
 					{
-						if ( pm->cmd.buttons & BUTTON_ATTACK )
-						{//transition to a new attack
-							int newQuad = PM_SaberMoveQuadrantForMovement( &pm->cmd );
-							while ( newQuad == saberMoveData[pm->ps->saberMove].startQuad )
-							{//player is still in same attack quad, don't repeat that attack because it looks bad,
-								//FIXME: try to pick one that might look cool?
-								//newQuad = Q_irand( Q_BR, Q_BL );
-								newQuad = PM_irand_timesync( Q_BR, Q_BL );
-								//FIXME: sanity check, just in case?
-							}//else player is switching up anyway, take the new attack dir
-							bounceMove = transitionMove[saberMoveData[pm->ps->saberMove].startQuad][newQuad];
-						}
-						else
+						// JKU-Bunisher: Disabling this to prevent players from transitioning within bounce.
+						//if ( pm->cmd.buttons & BUTTON_ATTACK )
+						//{//transition to a new attack
+						//	int newQuad = PM_SaberMoveQuadrantForMovement( &pm->cmd );
+						//	while ( newQuad == saberMoveData[pm->ps->saberMove].startQuad )
+						//	{//player is still in same attack quad, don't repeat that attack because it looks bad,
+						//		//FIXME: try to pick one that might look cool?
+						//		//newQuad = Q_irand( Q_BR, Q_BL );
+						//		newQuad = PM_irand_timesync( Q_BR, Q_BL );
+						//		//FIXME: sanity check, just in case?
+						//	}//else player is switching up anyway, take the new attack dir
+						//	bounceMove = transitionMove[saberMoveData[pm->ps->saberMove].startQuad][newQuad];
+						//}
+						//else
 						{//return to ready
 							if ( saberMoveData[pm->ps->saberMove].startQuad == Q_T )
 							{
@@ -3531,6 +3544,13 @@ weapChecks:
 
 		// ***************************************************
 		// Pressing attack, so we must look up the proper attack move.
+		
+		// [ Jedi Knight Unlimited ]
+		if (pm->ps->fd.forcePower < JKU_SABER_ATTACK_DEFAULT_FORCE_COST)
+		{
+			anim = LS_NONE;
+		}
+		// [ Jedi Knight Unlimited ]
 
 		if ( pm->ps->weaponTime > 0 )
 		{	// Last attack is not yet complete.
@@ -3671,11 +3691,6 @@ weapChecks:
 					anim = PM_GetSaberStance();
 					break;
 				}
-
-//				if (PM_RunningAnim(anim) && !pm->cmd.forwardmove && !pm->cmd.rightmove)
-//				{ //semi-hacky (if not moving on x-y and still playing the running anim, force the player out of it)
-//					anim = PM_GetSaberStance();
-//				}
 				newmove = LS_READY;
 			}
 
@@ -3715,6 +3730,9 @@ void PM_SetSaberMove(short newMove)
 
 	if ( newMove == LS_READY || newMove == LS_A_FLIP_STAB || newMove == LS_A_FLIP_SLASH )
 	{//finished with a kata (or in a special move) reset attack counter
+		// JKU-Bunisher: Below is bugged atm, so disabling it...
+		// JKU-Bunisher: Subtract force power points for attacking
+		// pm->ps->fd.forcePower =- JKU_SABER_ATTACK_DEFAULT_FORCE_COST;
 		pm->ps->saberAttackChainCount = 0;
 	}
 	else if ( BG_SaberInAttack( newMove ) )
@@ -3855,9 +3873,21 @@ void PM_SetSaberMove(short newMove)
 			anim = PM_GetSaberStance();
 		}
 
-		if (anim == BOTH_WALKBACK1 || anim == BOTH_WALKBACK2 || anim == BOTH_WALK1)
-		{ //normal stance when walking backward so saber doesn't look like it's cutting through leg
+		if (anim == BOTH_WALKBACK1 || 
+			anim == BOTH_WALKBACK2 || 
+			anim == BOTH_WALK1 || 
+			anim == BOTH_WALK2 || 
+			anim == BOTH_WALKBACK_DUAL || 
+			anim == BOTH_WALK_DUAL)
+		{ 
+			//normal stance when walking backward so saber doesn't look like it's cutting through leg
 			anim = PM_GetSaberStance();
+		}
+
+		// [Jedi Knight: Unlimited]
+		if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+		{
+		   anim = PM_GetSaberStance();
 		}
 
 		if (BG_InSlopeAnim( anim ))
@@ -3947,7 +3977,7 @@ void PM_SetSaberMove(short newMove)
 	{//successfully changed anims
 	//special check for *starting* a saber swing
 		//playing at attack
-		if ( BG_SaberInAttack( newMove ) || BG_SaberInSpecialAttack( anim ) )
+		if ( BG_SaberInAttack( newMove ) || BG_SaberInSpecialAttack( anim ))
 		{
 			if ( pm->ps->saberMove != newMove )
 			{//wasn't playing that attack before

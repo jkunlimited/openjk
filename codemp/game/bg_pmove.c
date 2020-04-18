@@ -276,60 +276,85 @@ static QINLINE qboolean PM_IsRocketTrooper(void)
 int PM_GetSaberStance(void)
 {
 	int anim = BOTH_STAND2;
+
 	saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
 	saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
 
 	if (!pm->ps->saberEntityNum)
-	{ //lost it
-		return BOTH_STAND1;
-	}
-
-	if ( BG_SabersOff( pm->ps ) )
 	{
 		return BOTH_STAND1;
 	}
 
-	if ( saber1
-		&& saber1->readyAnim != -1 )
+	if (BG_SabersOff(pm->ps))
 	{
-		return saber1->readyAnim;
+		return BOTH_STAND1;
 	}
 
-	if ( saber2
-		&& saber2->readyAnim != -1 )
+	if (!(pm->cmd.buttons & BUTTON_JKU_BLOCK) || !pm->ps->canBlock)
 	{
-		return saber2->readyAnim;
+		switch (pm->ps->fd.saberAnimLevel)
+		{
+		case SS_DUAL:
+			return BOTH_SABERDUAL_STANCE;
+		case SS_STAFF:
+			return BOTH_SABERSTAFF_STANCE;
+		case SS_FAST:
+			return BOTH_SABERFAST_STANCE;
+		case SS_TAVION:
+			return BOTH_SABERFAST_STANCE;
+		case SS_STRONG:
+			return BOTH_SABERSLOW_STANCE;
+		case SS_MEDIUM:
+			return BOTH_STAND2;
+		case SS_DESANN:
+			return BOTH_SABERSLOW_STANCE;
+		default:
+			return BOTH_STAND2;
+		}
+	}
+	else
+	{
+		switch (pm->ps->fd.saberAnimLevel)
+		{
+		case SS_DUAL:
+			anim = BOTH_P6_S6_T_;
+			break;
+		case SS_STAFF:
+			anim = BOTH_P7_S7_T_;
+			break;
+		case SS_FAST:
+			anim = BOTH_P1_S1_T_;
+			break;
+		case SS_TAVION:
+			anim = BOTH_P1_S1_T_;
+			break;
+		case SS_STRONG:
+			anim = BOTH_P1_S1_T_;
+			break;
+		case SS_MEDIUM:
+			anim = BOTH_P1_S1_T_;
+			break;
+		case SS_DESANN:
+			anim = BOTH_P1_S1_T_;
+			break;
+		default:
+			anim = BOTH_P1_S1_T_;
+			break;
+		}
+
+      //JKU-Fnuki: Add directional blocking based on walking direction
+      if (pm->cmd.rightmove < 0)
+      {
+         //block right
+         return BOTH_P1_S1_TR;
+      }
+      else if (pm->cmd.rightmove > 0)
+      {
+         //block left
+         return BOTH_P1_S1_TL;
+      }
 	}
 
-	if ( saber1
-		&& saber2
-		&& !pm->ps->saberHolstered )
-	{//dual sabers, both on
-		return BOTH_SABERDUAL_STANCE;
-	}
-
-	switch ( pm->ps->fd.saberAnimLevel )
-	{
-	case SS_DUAL:
-		anim = BOTH_SABERDUAL_STANCE;
-		break;
-	case SS_STAFF:
-		anim = BOTH_SABERSTAFF_STANCE;
-		break;
-	case SS_FAST:
-	case SS_TAVION:
-		anim = BOTH_SABERFAST_STANCE;
-		break;
-	case SS_STRONG:
-		anim = BOTH_SABERSLOW_STANCE;
-		break;
-	case SS_NONE:
-	case SS_MEDIUM:
-	case SS_DESANN:
-	default:
-		anim = BOTH_STAND2;
-		break;
-	}
 	return anim;
 }
 
@@ -5449,7 +5474,7 @@ static void PM_Footsteps( void ) {
 					{
 						//desiredAnim = BOTH_RUNBACK_STAFF;
 						//hmm.. stuff runback anim is pretty messed up for some reason.
-						desiredAnim = BOTH_RUNBACK2;
+						desiredAnim = BOTH_RUNBACK1;
 					}
 					break;
 				case SS_DUAL:
@@ -5461,7 +5486,7 @@ static void PM_Footsteps( void ) {
 					{
 						//desiredAnim = BOTH_RUNBACK_DUAL;
 						//and so is the dual
-						desiredAnim = BOTH_RUNBACK2;
+						desiredAnim = BOTH_RUNBACK1;
 					}
 					break;
 				default:
@@ -5471,7 +5496,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						desiredAnim = BOTH_RUNBACK2;
+						desiredAnim = BOTH_RUNBACK1;
 					}
 					break;
 				}
@@ -5493,12 +5518,12 @@ static void PM_Footsteps( void ) {
 				{
 				case SS_STAFF:
 					if ( pm->ps->saberHolstered > 1 )
-					{//blades off
+					{
 						desiredAnim = BOTH_RUN1;
 					}
 					else if ( pm->ps->saberHolstered == 1 )
-					{//1 blade on
-						desiredAnim = BOTH_RUN2;
+					{
+						desiredAnim = BOTH_RUN1;
 					}
 					else
 					{
@@ -5508,8 +5533,12 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							desiredAnim = BOTH_RUN_STAFF;
+							desiredAnim = BOTH_RUN1;
 						}
+					}
+					if (pm->ps->weapon != WP_SABER)
+					{
+						desiredAnim = BOTH_RUN1;
 					}
 					break;
 				case SS_DUAL:
@@ -5519,11 +5548,15 @@ static void PM_Footsteps( void ) {
 					}
 					else if ( pm->ps->saberHolstered == 1 )
 					{//1 saber on
-						desiredAnim = BOTH_RUN2;
+						desiredAnim = BOTH_RUN1;
 					}
 					else
 					{
-						desiredAnim = BOTH_RUN_DUAL;
+						desiredAnim = BOTH_RUN1;
+					}
+					if (pm->ps->weapon != WP_SABER)
+					{
+						desiredAnim = BOTH_RUN1;
 					}
 					break;
 				default:
@@ -5533,7 +5566,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						desiredAnim = BOTH_RUN2;
+						desiredAnim = BOTH_RUN1;
 					}
 					break;
 				}
@@ -5564,11 +5597,22 @@ static void PM_Footsteps( void ) {
 					}
 					else if ( pm->ps->saberHolstered )
 					{
-						desiredAnim = BOTH_WALKBACK2;
+						desiredAnim = BOTH_WALKBACK1;
 					}
 					else
 					{
-						desiredAnim = BOTH_WALKBACK_STAFF;
+						if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+						{
+							desiredAnim = BOTH_WALKBACK_STAFF;
+						}
+						else
+						{
+							desiredAnim = BOTH_WALKBACK_STAFF;
+						}
+					}
+					if (pm->ps->weapon != WP_SABER)
+					{
+						desiredAnim = BOTH_WALKBACK1;
 					}
 					break;
 				case SS_DUAL:
@@ -5578,11 +5622,22 @@ static void PM_Footsteps( void ) {
 					}
 					else if ( pm->ps->saberHolstered )
 					{
-						desiredAnim = BOTH_WALKBACK2;
+						desiredAnim = BOTH_WALKBACK1;
 					}
 					else
 					{
-						desiredAnim = BOTH_WALKBACK_DUAL;
+						if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+						{
+							desiredAnim = BOTH_WALKBACK_DUAL;
+						}
+						else
+						{
+							desiredAnim = BOTH_WALKBACK_DUAL;
+						}
+					}
+					if (pm->ps->weapon != WP_SABER)
+					{
+						desiredAnim = BOTH_WALKBACK1;
 					}
 					break;
 				default:
@@ -5592,7 +5647,14 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						desiredAnim = BOTH_WALKBACK2;
+						if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+						{
+							desiredAnim = BOTH_WALKBACK1; // We need to introduce a new anim for this...
+						}
+						else
+						{
+							desiredAnim = BOTH_WALKBACK1;
+						}
 					}
 					break;
 				}
@@ -5627,11 +5689,22 @@ static void PM_Footsteps( void ) {
 						}
 						else if ( pm->ps->saberHolstered )
 						{
-							desiredAnim = BOTH_WALK2;
+							desiredAnim = BOTH_WALK1;
 						}
 						else
 						{
-							desiredAnim = BOTH_WALK_STAFF;
+							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+							{
+								desiredAnim = BOTH_WALK_STAFF;
+							}
+							else
+							{
+								desiredAnim = BOTH_WALK_STAFF;
+							}
+						}
+						if (pm->ps->weapon != WP_SABER)
+						{
+							desiredAnim = BOTH_WALK1;
 						}
 						break;
 					case SS_DUAL:
@@ -5641,11 +5714,22 @@ static void PM_Footsteps( void ) {
 						}
 						else if ( pm->ps->saberHolstered )
 						{
-							desiredAnim = BOTH_WALK2;
+							desiredAnim = BOTH_WALK1;
 						}
 						else
 						{
-							desiredAnim = BOTH_WALK_DUAL;
+							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+							{
+								desiredAnim = BOTH_WALK_DUAL;
+							}
+							else
+							{
+								desiredAnim = BOTH_WALK_DUAL;
+							}
+						}
+						if (pm->ps->weapon != WP_SABER)
+						{
+							desiredAnim = BOTH_WALK1;
 						}
 						break;
 					default:
@@ -5655,7 +5739,14 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							desiredAnim = BOTH_WALK2;
+							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+							{
+								desiredAnim = BOTH_WALK2;
+							}
+							else
+							{
+								desiredAnim = BOTH_WALK2;
+							}
 						}
 						break;
 					}

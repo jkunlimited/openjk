@@ -5,6 +5,7 @@ Copyright (C) 2000 - 2013, Raven Software, Inc.
 Copyright (C) 2001 - 2013, Activision, Inc.
 Copyright (C) 2005 - 2015, ioquake3 contributors
 Copyright (C) 2013 - 2015, OpenJK contributors
+Copyright (C) 2019 - 2020, Jedi Knight Unlimited
 
 This file is part of the OpenJK source code.
 
@@ -1861,6 +1862,34 @@ void G_SetTauntAnim( gentity_t *ent, int taunt )
 	}
 }
 
+// [Jedi Knight: Unlimited]
+// [Block Functions]
+void JKU_ActivateBlockButton(gentity_t *ent)
+{
+	if (!ent->client) {
+		return;
+	}
+	else {
+      ent->client->buttons |= BUTTON_JKU_BLOCK;
+#ifdef DEBUG
+		trap->Print("Saber block activated for client %s\n", ent->client->pers.netname);
+#endif // DEBUG
+	}
+}
+void JKU_DisableBlockButton(gentity_t *ent)
+{
+	if (!ent->client) {
+		return;
+	}
+	else {
+		ent->client->buttons &= ~BUTTON_JKU_BLOCK;
+#ifdef DEBUG
+		trap->Print("Saber block disabled for client %s\n", ent->client->pers.netname);
+#endif // DEBUG
+	}
+}
+// [/Jedi Knight: Unlimited]
+
 /*
 ==============
 ClientThink
@@ -3322,6 +3351,11 @@ void ClientThink_real( gentity_t *ent ) {
 		case GENCMD_GLOAT:
 			G_SetTauntAnim( ent, TAUNT_GLOAT );
 			break;
+		case GENCMD_BLOCK:
+			JKU_ActivateBlockButton( ent );
+			break;
+		case GENCMD_BLOCK_STOP:
+			JKU_DisableBlockButton ( ent );
 		default:
 			break;
 		}

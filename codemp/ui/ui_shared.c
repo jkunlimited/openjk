@@ -5,6 +5,7 @@ Copyright (C) 2000 - 2013, Raven Software, Inc.
 Copyright (C) 2001 - 2013, Activision, Inc.
 Copyright (C) 2005 - 2015, ioquake3 contributors
 Copyright (C) 2013 - 2015, OpenJK contributors
+Copyright (C) 2019 - 2020, Jedi Knight Unlimited
 
 This file is part of the OpenJK source code.
 
@@ -4889,7 +4890,8 @@ static const char *g_bindCommands[] = {
 	"weapon 8",
 	"weapon 9",
 	"weapprev",
-	"zoom"
+	"zoom",
+	"button16"
 };
 
 #define g_bindCount ARRAY_LEN(g_bindCommands)
@@ -5388,16 +5390,17 @@ void Item_Model_Paint(itemDef_t *item)
 	{//hack to put saber on it's side
 		if (modelPtr->rotationSpeed)
 		{
-			VectorSet( angles, modelPtr->angle+(float)refdef.time/modelPtr->rotationSpeed, 0, 90 );
+			VectorSet( angles, 0, modelPtr->angle + (float)refdef.time / modelPtr->rotationSpeed, 0 );
 		}
 		else
 		{
-			VectorSet( angles, modelPtr->angle, 0, 90 );
+			//VectorSet( angles, modelPtr->angle, 0, 180 );
+			VectorSet(angles, 0, modelPtr->angle, 0);
 		}
 	}
 	else if (modelPtr->rotationSpeed)
 	{
-		VectorSet( angles, 0, modelPtr->angle + (float)refdef.time/modelPtr->rotationSpeed, 0 );
+		VectorSet(angles, 0, modelPtr->angle + (float)refdef.time / modelPtr->rotationSpeed, 0);
 	}
 	else
 	{

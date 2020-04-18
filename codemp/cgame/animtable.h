@@ -1746,6 +1746,8 @@ stringID_table_t animTable [MAX_ANIMATIONS+1] =
 
 	//New anim as per Jarrod's request
 	ENUM2STRING(LEGS_TURN180),
+	// JKU Animations
+	ENUM2STRING(BOTH_MENU_IDLE),
 
 	//======================================================
 	//cinematic anims
