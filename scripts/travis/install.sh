@@ -6,6 +6,8 @@ set -x
 host="$1"
 shift 1
 
+sudo apt-get update -yq
+
 # This is what Travis does using the apt-addon. Didn't want to duplicate a load
 # of packages in the .travis.yml file though so we have this script instead.
 APT_INSTALL='sudo apt-get -yq --no-install-suggests --no-install-recommends --force-yes install'
