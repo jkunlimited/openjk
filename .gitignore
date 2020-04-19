@@ -177,4 +177,5 @@ pip-log.txt
 #############
 ## JKU install
 #############
+install_includes/*
 installer/*.exe
