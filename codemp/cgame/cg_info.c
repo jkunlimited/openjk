@@ -166,7 +166,7 @@ void CG_DrawInformation( void ) {
 
 	// the first 150 rows are reserved for the client connection
 	// screen to write into
-	const char *psLoading = CG_GetStringEdString("MENUS", "LOADING_MAPNAME");
+	// const char *psLoading = CG_GetStringEdString("MENUS", "LOADING_MAPNAME");
 	
 	// JKU-Bunisher: Need to use CG_DrawScaledProportionalString to avoid pixelation
 	//CG_DrawProportionalString( iMessageWidth, iMessageHeight, "Loading...", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );

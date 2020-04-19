@@ -1875,6 +1875,7 @@ qboolean WP_SabersCheckLock(gentity_t *ent1, gentity_t *ent2)
    return qfalse;
 }
 
+/*
 static QINLINE int G_GetParryForBlock(int block)
 {
    switch (block)
@@ -1915,11 +1916,13 @@ static QINLINE int G_GetParryForBlock(int block)
 
    return LS_NONE;
 }
+*/
 
 int PM_SaberBounceForAttack(int move);
 int PM_SaberDeflectionForQuad(int quad);
 
 extern stringID_table_t animTable[MAX_ANIMATIONS + 1];
+/*
 static QINLINE qboolean WP_GetSaberDeflectionAngle(gentity_t *attacker, gentity_t *defender, float saberHitFraction)
 {
    qboolean animBasedDeflection = qtrue;
@@ -2191,6 +2194,7 @@ static QINLINE qboolean WP_GetSaberDeflectionAngle(gentity_t *attacker, gentity_
       }
    }
 }
+*/
 
 int G_KnockawayForParry(int move)
 {
@@ -2220,6 +2224,7 @@ int G_KnockawayForParry(int move)
 #define SABER_NONATTACK_DAMAGE 1
 
 //For strong attacks, we ramp damage based on the point in the attack animation
+/*
 static QINLINE int G_GetAttackDamage(gentity_t *self, int minDmg, int maxDmg, float multPoint)
 {
    int speedDif = 0;
@@ -2260,7 +2265,9 @@ static QINLINE int G_GetAttackDamage(gentity_t *self, int minDmg, int maxDmg, fl
 
    return totalDamage;
 }
+*/
 
+/*
 //Get the point in the animation and return a percentage of the current point in the anim between 0 and the total anim length (0.0f - 1.0f)
 static QINLINE float G_GetAnimPoint(gentity_t *self)
 {
@@ -2303,6 +2310,7 @@ static QINLINE qboolean G_ClientIdleInWorld(gentity_t *ent)
 
    return qfalse;
 }
+*/
 
 QINLINE qboolean G_G2TraceCollide(trace_t *tr, vec3_t lastValidStart, vec3_t lastValidEnd, vec3_t traceMins, vec3_t traceMaxs)
 { //Hit the ent with the normal trace, try the collision trace.
@@ -2396,6 +2404,7 @@ QINLINE qboolean G_G2TraceCollide(trace_t *tr, vec3_t lastValidStart, vec3_t las
    return qfalse;
 }
 
+/*
 static QINLINE qboolean G_SaberInBackAttack(int move)
 {
    switch (move)
@@ -2408,6 +2417,7 @@ static QINLINE qboolean G_SaberInBackAttack(int move)
 
    return qfalse;
 }
+*/
 
 qboolean saberCheckKnockdown_Thrown(gentity_t *saberent, gentity_t *saberOwner, gentity_t *other);
 qboolean saberCheckKnockdown_Smashed(gentity_t *saberent, gentity_t *saberOwner, gentity_t *other, int damage);
@@ -2421,6 +2431,7 @@ typedef struct saberFace_s
    vec3_t v3;
 } saberFace_t;
 
+/*
 //build faces around blade for collision checking -rww
 static QINLINE void G_BuildSaberFaces(vec3_t base, vec3_t tip, float radius, vec3_t fwd,
    vec3_t right, int *fNum, saberFace_t **fList)
@@ -2539,7 +2550,9 @@ static QINLINE void G_BuildSaberFaces(vec3_t base, vec3_t tip, float radius, vec
    *fNum = i;
    *fList = &faces[0];
 }
+*/
 
+/*
 //collision utility function -rww
 static QINLINE void G_SabCol_CalcPlaneEq(vec3_t x, vec3_t y, vec3_t z, float *planeEq)
 {
@@ -2548,7 +2561,9 @@ static QINLINE void G_SabCol_CalcPlaneEq(vec3_t x, vec3_t y, vec3_t z, float *pl
    planeEq[2] = x[0] * (y[1] - z[1]) + y[0] * (z[1] - x[1]) + z[0] * (x[1] - y[1]);
    planeEq[3] = -(x[0] * (y[1] * z[2] - z[1] * y[2]) + y[0] * (z[1] * x[2] - x[1] * z[2]) + z[0] * (x[1] * y[2] - y[1] * x[2]));
 }
+*/
 
+/*
 //collision utility function -rww
 static QINLINE int G_SabCol_PointRelativeToPlane(vec3_t pos, float *side, float *planeEq)
 {
@@ -2565,7 +2580,9 @@ static QINLINE int G_SabCol_PointRelativeToPlane(vec3_t pos, float *side, float 
 
    return 0;
 }
+*/
 
+/*
 //do actual collision check using generated saber "faces"
 static QINLINE qboolean G_SaberFaceCollisionCheck(int fNum, saberFace_t *fList, vec3_t atkStart,
    vec3_t atkEnd, vec3_t atkMins, vec3_t atkMaxs, vec3_t impactPoint)
@@ -2666,7 +2683,9 @@ static QINLINE qboolean G_SaberFaceCollisionCheck(int fNum, saberFace_t *fList, 
    //did not hit anything
    return qfalse;
 }
+*/
 
+/*
 //check for collision of 2 blades -rww
 static QINLINE qboolean G_SaberCollide(gentity_t *atk, gentity_t *def, vec3_t atkStart,
    vec3_t atkEnd, vec3_t atkMins, vec3_t atkMaxs, vec3_t impactPoint)
@@ -2746,6 +2765,7 @@ static QINLINE qboolean G_SaberCollide(gentity_t *atk, gentity_t *def, vec3_t at
 
    return qfalse;
 }
+*/
 
 float WP_SaberBladeLength(saberInfo_t *saber)
 {//return largest length
@@ -2955,6 +2975,7 @@ qboolean WP_SabersIntersect(gentity_t *ent1, int ent1SaberNum, int ent1BladeNum,
    return qfalse;
 }
 
+/*
 static QINLINE int G_PowerLevelForSaberAnim(gentity_t *ent, int saberNum, qboolean mySaberHit)
 {
    if (!ent || !ent->client || saberNum >= MAX_SABERS)
@@ -3126,7 +3147,6 @@ static QINLINE int G_PowerLevelForSaberAnim(gentity_t *ent, int saberNum, qboole
          return FORCE_LEVEL_3;
          }
          }
-         */
          if ((animTimer >= 1450
             && animTimeElapsed >= 400)
             || (animTimer >= 400
@@ -3179,7 +3199,6 @@ static QINLINE int G_PowerLevelForSaberAnim(gentity_t *ent, int saberNum, qboole
          //FIXME: break up
          return FORCE_LEVEL_3;
          break;
-         */
       case BOTH_STABDOWN:
          if (animTimer <= 900)
          {//end of anim
@@ -3469,7 +3488,7 @@ static QINLINE int G_PowerLevelForSaberAnim(gentity_t *ent, int saberNum, qboole
       }
       return FORCE_LEVEL_0;
    }
-}
+}*/
 
 #define MAX_SABER_VICTIMS 16
 static int		victimEntityNum[MAX_SABER_VICTIMS];
@@ -4011,16 +4030,16 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
    static vec3_t lastValidStart;
    static vec3_t lastValidEnd;
    int dmg = 0;
-   int attackStr = 0;
-   qboolean idleDamage = qfalse;
+   //int attackStr = 0;
+   //qboolean idleDamage = qfalse;
    qboolean didHit = qfalse;
-   qboolean sabersClashed = qfalse;
-   qboolean unblockable = qfalse;
-   qboolean didDefense = qfalse;
-   qboolean didOffense = qfalse;
-   qboolean saberTraceDone = qfalse;
-   qboolean otherUnblockable = qfalse;
-   qboolean tryDeflectAgain = qfalse;
+   //qboolean sabersClashed = qfalse;
+   //qboolean unblockable = qfalse;
+   //qboolean didDefense = qfalse;
+   //qboolean didOffense = qfalse;
+   //qboolean saberTraceDone = qfalse;
+   //qboolean otherUnblockable = qfalse;
+   //qboolean tryDeflectAgain = qfalse;
 
    //JKU-Fnuki: Make blocking timing based
 

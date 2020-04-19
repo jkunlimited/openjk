@@ -277,8 +277,8 @@ int PM_GetSaberStance(void)
 {
 	int anim = BOTH_STAND2;
 
-	saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
-	saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
+	// saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
+	// saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
 
 	if (!pm->ps->saberEntityNum)
 	{

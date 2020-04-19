@@ -760,6 +760,7 @@ static void CG_DrawSaberStyle( centity_t *cent, menuDef_t *menuHUD)
 CG_DrawAmmo
 ================
 */
+/*
 static void CG_DrawAmmo( centity_t	*cent,menuDef_t *menuHUD)
 {
 	playerState_t	*ps;
@@ -865,6 +866,7 @@ static void CG_DrawAmmo( centity_t	*cent,menuDef_t *menuHUD)
 	}
 	trap->R_SetColor( colorTable[CT_WHITE] );
 }
+*/
 
 /*
 ================
@@ -1325,6 +1327,7 @@ static void CG_DrawSimpleAmmo( const centity_t *cent )
 	CG_DrawProportionalString( SCREEN_WIDTH - (16 + 32), (SCREEN_HEIGHT - 80) + 40, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor] );
 }
 
+/*
 static void CG_DrawSimpleForcePower(const centity_t *cent)
 {
 	uint32_t	calcColor;
@@ -1368,6 +1371,7 @@ static void CG_DrawSimpleForcePower(const centity_t *cent)
 
 	CG_DrawProportionalString(SCREEN_WIDTH - (18 + 14 + 32), (SCREEN_HEIGHT - 80) + 40 + 14, num, UI_SMALLFONT | UI_DROPSHADOW, colorTable[calcColor]);
 }
+*/
 
 // JKU-Bunisher: Kindly borrowed from CG_DrawForceSelect
 // JKU-Bunisher: CG_DrawForceSelect was based on a timer. We needed something to stick post-selection.
@@ -1421,7 +1425,7 @@ CG_DrawHUD
 void CG_DrawHUD(centity_t	*cent)
 {
 	menuDef_t	*menuHUD = NULL;
-	itemDef_t	*focusItem = NULL;
+	//itemDef_t	*focusItem = NULL;
 
 	if (cg_hudFiles.integer)
 	{
@@ -2924,6 +2928,8 @@ static float CG_DrawMiniScoreboard ( float y )
 CG_DrawEnemyInfo
 ================
 */
+
+/*
 static float CG_DrawEnemyInfo ( float y )
 {
 	float		size;
@@ -2975,7 +2981,7 @@ static float CG_DrawEnemyInfo ( float y )
 			/*
 			CG_Text_Paint( 630 - CG_Text_Width ( ci->name, 0.7f, FONT_MEDIUM ), y, 0.7f, colorWhite, ci->name, 0, 0, 0, FONT_MEDIUM );
 			y += 15;
-			*/
+			
 
 			CG_Text_Paint( 630 - CG_Text_Width ( title, 0.7f, FONT_MEDIUM ) + xOffset, y, 0.7f, colorWhite, title, 0, 0, 0, FONT_MEDIUM );
 
@@ -3024,7 +3030,7 @@ static float CG_DrawEnemyInfo ( float y )
 			cg.attackerTime = 0;
 			return y;
 		}
-		*/
+		
 		//As of current, we don't want to draw the attacker. Instead, draw whoever is in first place.
 		if (cgs.duelWinner < 0 || cgs.duelWinner >= MAX_CLIENTS)
 		{
@@ -3043,7 +3049,7 @@ static float CG_DrawEnemyInfo ( float y )
 		{
 			title = va("%i kills", cgs.scores1);
 		}
-		*/
+		
 		clientNum = cgs.duelWinner;
 	}
 
@@ -3095,6 +3101,7 @@ static float CG_DrawEnemyInfo ( float y )
 
 	return y + BIGCHAR_HEIGHT + 2;
 }
+*/
 
 /*
 ==================
@@ -5704,8 +5711,8 @@ static void CG_DrawActivePowers(void)
 	int startx = icon_size*2+16;
 	int starty = SCREEN_HEIGHT - icon_size*2;
 
-	int endx = icon_size;
-	int endy = icon_size;
+	//int endx = icon_size;
+	//int endy = icon_size;
 
 	if (cg.snap->ps.zoomMode)
 	{ //don't display over zoom mask
