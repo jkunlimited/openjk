@@ -5466,43 +5466,80 @@ void UI_UpdateCharacterSkin( void )
 	ItemParse_model_g2skin_go( item, skin );
 }
 
-void UI_UpdateCharacterPresetSkin(void)
+// JKU-Bunisher: New UI_UpdatePresetCharacterModel
+void UI_UpdatePresetCharacterModel(void)
 {
 	menuDef_t *menu;
 	itemDef_t *item;
-	char skin[MAX_QPATH];
-	char model[MAX_QPATH];
-	char head[MAX_QPATH];
-	char torso[MAX_QPATH];
-	char legs[MAX_QPATH];
 
 	menu = Menu_GetFocused();	// Get current menu
 
-	if (!menu)
-	{
+	if (!menu) {
 		return;
 	}
 
 	item = (itemDef_t *)Menu_FindItemByName(menu, "presetcharacter");
 
-	if (!item)
-	{
-		Com_Error(ERR_FATAL, "UI_UpdateCharacterSkin: Could not find item (presetcharacter) in menu (%s)", menu->window.name);
+	if (!item) {
+		Com_Error(ERR_FATAL, "UI_UpdateCharacterSkin: Could not find item (character) in menu (%s)", menu->window.name);
 	}
 
-	trap->Cvar_VariableStringBuffer("ui_char_model", model, sizeof(model));
-	trap->Cvar_VariableStringBuffer("ui_char_skin_head", head, sizeof(head));
-	trap->Cvar_VariableStringBuffer("ui_char_skin_torso", torso, sizeof(torso));
-	trap->Cvar_VariableStringBuffer("ui_char_skin_legs", legs, sizeof(legs));
+	char modelPath[MAX_QPATH] = { 0 };
+	char modelSkinPath[MAX_QPATH] = { 0 };
+	char modelSelected[MAX_QPATH] = { 0 };
+	char modelAndSkinPath[MAX_QPATH] = { 0 };
 
-	Com_sprintf(skin, sizeof(skin), "models/players/%s/|%s|%s|%s",
-		model,
-		head,
-		torso,
-		legs
-	);
+	char *tokenStr;
+	char *modelName;
 
-	ItemParse_model_g2skin_go(item, skin);
+	int	animRunLength;
+
+	trap->Cvar_VariableStringBuffer("model", modelSelected, sizeof(modelSelected));
+	Com_sprintf(modelAndSkinPath, sizeof(modelAndSkinPath), "%s", modelSelected);
+
+	if (strstr(modelAndSkinPath, "head") != NULL &&
+		strstr(modelAndSkinPath, "torso") != NULL &&
+		strstr(modelAndSkinPath, "lower") != NULL) {
+
+		char skin[MAX_QPATH];
+		char model[MAX_QPATH];
+		char head[MAX_QPATH];
+		char torso[MAX_QPATH];
+		char legs[MAX_QPATH];
+
+		trap->Cvar_VariableStringBuffer("ui_char_model", model, sizeof(model));
+		trap->Cvar_VariableStringBuffer("ui_char_skin_head", head, sizeof(head));
+		trap->Cvar_VariableStringBuffer("ui_char_skin_torso", torso, sizeof(torso));
+		trap->Cvar_VariableStringBuffer("ui_char_skin_legs", legs, sizeof(legs));
+
+		Com_sprintf(modelPath, sizeof(modelPath), "models/players/%s/model.glm", UI_Cvar_VariableString("ui_char_model"));
+		Com_sprintf(skin, sizeof(skin), "models/players/%s/|%s|%s|%s", model, head, torso, legs);
+
+		ItemParse_asset_model_go(item, modelPath, &animRunLength);
+		ItemParse_model_g2skin_go(item, skin);
+	}
+	else
+	{
+		int index = 0;
+		tokenStr = strtok(modelAndSkinPath, "/");
+		while (tokenStr != NULL) {
+			if (index == 0) {
+				Com_sprintf(modelSkinPath, sizeof(modelSkinPath), "models/players/%s/model_default.skin", tokenStr);
+				Com_sprintf(modelPath, sizeof(modelPath), "models/players/%s/model.glm", tokenStr);
+				modelName = tokenStr;
+			}
+			else if (index == 1) {
+				Com_sprintf(modelSkinPath, sizeof(modelSkinPath), "models/players/%s/model_%s.skin", modelName, tokenStr);
+			}
+			else {
+				break;
+			}
+			tokenStr = strtok(NULL, "/");
+			index++;
+		}
+		ItemParse_asset_model_go(item, modelPath, &animRunLength);
+		ItemParse_model_g2skin_go(item, modelSkinPath);
+	}
 }
 
 static void UI_ResetCharacterListBoxes( void )
@@ -5639,7 +5676,7 @@ static void UI_UpdatePresetCharacter(qboolean changedModel)
 		UI_FeederSelection(FEEDER_PLAYER_SKIN_LEGS, 0, item);
 		UI_FeederSelection(FEEDER_COLORCHOICES, 0, item);
 	}
-	UI_UpdateCharacterPresetSkin();
+	UI_UpdatePresetCharacterModel();
 }
 
 /*
