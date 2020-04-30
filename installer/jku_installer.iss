@@ -31,9 +31,25 @@ OutputBaseFilename=jedi_knight_unlimited_{#JKUBuildConfigDisplayName}_setup
 Compression=lzma
 SolidCompression=yes
 ShowLanguageDialog=auto
+;SetupIconFile={#JKUBuildDirectory}\install_includes\jkuicon-08.ico
 
 ;[Languages]
 ;Name: english; MessagesFile: compiler:Defaults.isl
+
+[Code]
+function MsvcRuntimeNeedsInstall(const SubKeyName : String): Boolean;
+var
+  IsInstalled: Cardinal;
+begin
+  if RegQueryDWordValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\WOW6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\' + SubKeyName,
+     'Installed', IsInstalled) then
+    if IsInstalled = 1 then
+      Result := False
+    else
+      Result := True
+  else
+    Result := True
+end;
 
 [Types]
 Name: custom; Description: Custom installation; Flags: iscustom
@@ -48,6 +64,10 @@ Name: gamefiles; Description: JKU custom gamefiles; Types: custom; Flags: fixed
 Name: rdrend2; Description: rd_rend2; Types: custom
 
 [Files]
+
+; MSVC 2015 runtime
+Source: {#JKUBuildDirectory}\install_includes\vc_redist.x86.exe; DestDir: {tmp}; Flags: deleteafterinstall
+Source: {#JKUBuildDirectory}\install_includes\vc_redist.x64.exe; DestDir: {tmp}; Flags: deleteafterinstall
 
 ; Component: uiassets
 ; Fnuki: Expecting game assets to be located in the include directory, as these cannot be commit'ed to Git for legal reasons
@@ -64,3 +84,7 @@ Source: {#JKUBuildDirectory}\build\{#JKUBuildConfiguration}\uix86.dll; DestDir: 
 
 ; Component: rdrend2
 ;Source: <path_to_rdrend2>;      DestDir: {app}\TBD; Flags: confirmoverwrite; Components: rdrend2
+
+[Run]
+Filename: "{tmp}\vc_redist.x86.exe"; StatusMsg: Installing Visual Studio x86 Runtime Libraries...; Check: MsvcRuntimeNeedsInstall('x86')
+Filename: "{tmp}\vc_redist.x64.exe"; StatusMsg: Installing Visual Studio x64 Runtime Libraries...; Check: IsWin64 and MsvcRuntimeNeedsInstall('x64')
