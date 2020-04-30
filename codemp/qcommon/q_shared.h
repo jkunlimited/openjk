@@ -1341,6 +1341,10 @@ typedef struct playerState_s {
    //JKU-Fnuki: Add new boolean indicating whether or not you are allowed to enter block animation
    qboolean canBlock;
 
+   //JKU-Bunisher: Add new integers indicating selected class and selected class perk
+   int		selectedClass;
+   int		selectedClassPerk;
+
 } playerState_t;
 
 typedef struct siegePers_s
@@ -1737,13 +1741,17 @@ typedef struct entityState_s {
 	int			userInt2;
 	int			userInt3;
 	float		userFloat1;
-	float		userFloat2;
+	float		userFloat2; 
 	float		userFloat3;
 	vec3_t		userVec1;
 	vec3_t		userVec2;
 
    //JKU-Fnuki: Add new JKU functionality
    qboolean canBlock;
+
+   //JKU-Bunisher: Add new integers indicating selected class and selected class perk
+   int		selectedClass;
+   int		selectedClassPerk;
 
 } entityState_t;
 

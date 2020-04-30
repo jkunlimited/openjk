@@ -4008,19 +4008,18 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
    static trace_t tr;
    static vec3_t dir;
    static vec3_t saberTrMins, saberTrMaxs;
-   static vec3_t lastValidStart;
-   static vec3_t lastValidEnd;
+   static vec3_t lastValidStart, lastValidEnd;
    int dmg = 0;
-   int attackStr = 0;
-   qboolean idleDamage = qfalse;
    qboolean didHit = qfalse;
-   qboolean sabersClashed = qfalse;
-   qboolean unblockable = qfalse;
-   qboolean didDefense = qfalse;
-   qboolean didOffense = qfalse;
-   qboolean saberTraceDone = qfalse;
-   qboolean otherUnblockable = qfalse;
-   qboolean tryDeflectAgain = qfalse;
+   //int attackStr = 0;
+   //qboolean idleDamage = qfalse;
+   //qboolean sabersClashed = qfalse;
+   //qboolean unblockable = qfalse;
+   //qboolean didDefense = qfalse;
+   //qboolean didOffense = qfalse;
+   //qboolean saberTraceDone = qfalse;
+   //qboolean otherUnblockable = qfalse;
+   //qboolean tryDeflectAgain = qfalse;
 
    //JKU-Fnuki: Make blocking timing based
 

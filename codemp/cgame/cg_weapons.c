@@ -1494,7 +1494,8 @@ void JKU_DrawWeaponry(void)
 	}
 
 	// Center
-	if (cgs.media.weaponIcons[cg.weaponSelect]) {
+	if (cgs.media.weaponIcons[cg.weaponSelect]) 
+	{
 		CG_RegisterWeapon(cg.weaponSelect);
 		CG_DrawPic(iconX, iconY, iconWidth, iconHeight, cgs.media.weaponIcons[cg.weaponSelect]);
 	}

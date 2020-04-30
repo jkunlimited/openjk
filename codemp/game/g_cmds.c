@@ -966,6 +966,124 @@ void StopFollowing( gentity_t *ent ) {
 
 /*
 =================
+Cmd_Class_f
+[ClassSystem]
+=================
+*/
+void Cmd_Class_f(gentity_t *ent) 
+{
+	char s[MAX_TOKEN_CHARS];
+
+	if (trap->Argc() != 2) 
+	{
+		if (ent->client->sess.selectedClass == CLASS_INVALID) strcpy(s, "invalid");
+		if (ent->client->sess.selectedClass == CLASS_GUNNER) strcpy(s, "gunner");
+		if (ent->client->sess.selectedClass == CLASS_FORCE_SENSITIVE) strcpy(s, "forcesensitive");
+		trap->SendServerCommand(ent - g_entities, va("print \"Current class is %s\n", s));
+	}
+	else
+	{
+		trap->Argv(1, s, sizeof(s));
+		if (strcmp(s, "invalid") == 0) {
+			ent->client->sess.selectedClass = CLASS_INVALID;
+			ent->client->ps.selectedClass = CLASSPERK_INVALID;
+			trap->SendServerCommand(ent - g_entities, va("print \"Class switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Class set to %s for %s\n", s, ent->client->pers.netname));
+		}
+		if (strcmp(s, "gunner") == 0) {
+			ent->client->sess.selectedClass = CLASS_GUNNER;
+			ent->client->ps.selectedClass = CLASS_GUNNER;
+			trap->SendServerCommand(ent - g_entities, va("print \"Class switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Class set to %s for %s\n", s, ent->client->pers.netname));
+		}
+		if (strcmp(s, "forcesensitive") == 0) {
+			ent->client->sess.selectedClass = CLASS_FORCE_SENSITIVE;
+			ent->client->sess.selectedClassPerk = CLASSPERK_INVALID;
+			ent->client->ps.selectedClass = CLASS_FORCE_SENSITIVE;
+			ent->client->ps.selectedClassPerk = CLASSPERK_INVALID;
+			ent->client->ps.fd.forceDoInit = 1; // Required to reinitialize all force powers
+			trap->SendServerCommand(ent - g_entities, va("print \"Class switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Class set to %s for %s\n", s, ent->client->pers.netname));
+		}
+	}
+}
+
+/*
+=================
+Cmd_ClassPerk_f
+[ClassSystem]
+=================
+*/
+void Cmd_ClassPerk_f(gentity_t *ent)
+{
+	if (ent->client->sess.selectedClass != 0) { // Only gunners are allowed to use the classperk command
+		trap->SendServerCommand(ent - g_entities, "print \"Error: Your class is not permitted to use this command\n");
+		return;
+	}
+
+	char s[MAX_TOKEN_CHARS];
+
+	if (trap->Argc() != 2)
+	{
+		if (ent->client->sess.selectedClassPerk == CLASSPERK_INVALID) strcpy(s, "invalid");
+		if (ent->client->sess.selectedClassPerk == CLASSPERK_VANGUARD) strcpy(s, "vanguard");
+		if (ent->client->sess.selectedClassPerk == CLASSPERK_GUNSLINGER) strcpy(s, "gunslinger");
+		if (ent->client->sess.selectedClassPerk == CLASSPERK_POWERTECH) strcpy(s, "powertech");
+		if (ent->client->sess.selectedClassPerk == CLASSPERK_OPERATIVE) strcpy(s, "operative");
+		if (ent->client->sess.selectedClassPerk == CLASSPERK_COMBATMEDIC) strcpy(s, "combatmedic");
+		if (ent->client->sess.selectedClassPerk == CLASSPERK_SWORDSMAN) strcpy(s, "swordsman");
+		trap->SendServerCommand(ent - g_entities, va("print \"Current classperk is %s\n", s));
+	}
+	else
+	{
+		trap->Argv(1, s, sizeof(s));
+		if (strcmp(s, "invalid") == 0) {
+			ent->client->sess.selectedClassPerk = CLASSPERK_INVALID;
+			ent->client->ps.selectedClassPerk = CLASSPERK_INVALID;
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk set to %s for %s\n", s, ent->client->pers.netname));
+		}
+		if (strcmp(s, "vanguard") == 0) {
+			ent->client->sess.selectedClassPerk = CLASSPERK_VANGUARD;
+			ent->client->ps.selectedClassPerk = CLASSPERK_VANGUARD;
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk set to %s for %s\n", s, ent->client->pers.netname));
+		}
+		if (strcmp(s, "gunslinger") == 0) {
+			ent->client->sess.selectedClassPerk = CLASSPERK_GUNSLINGER;
+			ent->client->ps.selectedClassPerk = CLASSPERK_GUNSLINGER;
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk set to %s for %s\n", s, ent->client->pers.netname));
+		}
+		if (strcmp(s, "powertech") == 0) {
+			ent->client->sess.selectedClassPerk = CLASSPERK_POWERTECH;
+			ent->client->ps.selectedClassPerk = CLASSPERK_POWERTECH;
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk set to %s for %s\n", s, ent->client->pers.netname));
+		}
+		if (strcmp(s, "operative") == 0) {
+			ent->client->sess.selectedClassPerk = CLASSPERK_OPERATIVE;
+			ent->client->ps.selectedClassPerk = CLASSPERK_OPERATIVE;
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk set to %s for %s\n", s, ent->client->pers.netname));
+		}
+		if (strcmp(s, "combatmedic") == 0) {
+			ent->client->sess.selectedClassPerk = CLASSPERK_COMBATMEDIC;
+			ent->client->ps.selectedClassPerk = CLASSPERK_COMBATMEDIC;
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk set to %s for %s\n", s, ent->client->pers.netname));
+		}
+		if (strcmp(s, "swordsman") == 0) {
+			ent->client->sess.selectedClassPerk = CLASSPERK_SWORDSMAN;
+			ent->client->ps.selectedClassPerk = CLASSPERK_SWORDSMAN;
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk switched to %s\n", s));
+			trap->SendServerCommand(ent - g_entities, va("print \"Classperk set to %s for %s\n", s, ent->client->pers.netname));
+		}
+	}
+}
+
+/*
+=================
 Cmd_Team_f
 =================
 */
@@ -1019,10 +1137,17 @@ void Cmd_Team_f( gentity_t *ent ) {
 		return;
 	}
 
-	trap->Argv( 1, s, sizeof( s ) );
-
-	SetTeam( ent, s );
-
+	// [ClassSystem]
+	if (ent->client->sess.selectedClass < 0) 
+	{
+		trap->SendServerCommand(ent - g_entities, "print \"Error: Cannot join team without setting a class\n\"");
+		return;
+	}
+	// [/ClassSystem]
+	
+	trap->Argv(1, s, sizeof(s));
+	SetTeam(ent, s);
+	
 	// fix: update team switch time only if team change really happend
 	if (oldTeam != ent->client->sess.sessionTeam)
 		ent->client->switchTeamTime = level.time + 5000;
@@ -3385,6 +3510,10 @@ command_t commands[] = {
 	{ "addbot",				Cmd_AddBot_f,				0 },
 	{ "callteamvote",		Cmd_CallTeamVote_f,			CMD_NOINTERMISSION },
 	{ "callvote",			Cmd_CallVote_f,				CMD_NOINTERMISSION },
+	// [ClassSystem]
+	{ "class",				Cmd_Class_f,				CMD_NOINTERMISSION },
+	{ "classperk",			Cmd_ClassPerk_f,			CMD_NOINTERMISSION },
+	// [/ClassSystem]
 	{ "debugBMove_Back",	Cmd_BotMoveBack_f,			CMD_CHEAT|CMD_ALIVE },
 	{ "debugBMove_Forward",	Cmd_BotMoveForward_f,		CMD_CHEAT|CMD_ALIVE },
 	{ "debugBMove_Left",	Cmd_BotMoveLeft_f,			CMD_CHEAT|CMD_ALIVE },

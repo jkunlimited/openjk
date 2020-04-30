@@ -80,10 +80,13 @@ void G_WriteClientSessionData( gclient_t *client )
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.duelTeam ) );
 	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.siegeDesiredTeam ) );
 	Q_strcat( s, sizeof( s ), va( "%s ", siegeClass ) );
-	Q_strcat( s, sizeof( s ), va( "%s", IP ) );
+	Q_strcat( s, sizeof( s ), va( "%s ", IP ) );
+	// [ClassSystem]
+	Q_strcat( s, sizeof( s ), va( "%i ", client->sess.selectedClass) );
+	Q_strcat( s, sizeof( s ), va( "%i",	 client->sess.selectedClassPerk) );
+	// [/ClassSystem]
 
 	var = va( "session%i", client - level.clients );
-
 	trap->Cvar_Set( var, s );
 }
 
@@ -98,12 +101,17 @@ void G_ReadSessionData( gclient_t *client )
 {
 	char			s[MAX_CVAR_VALUE_STRING] = {0};
 	const char		*var;
-	int			i=0, tempSessionTeam=0, tempSpectatorState, tempTeamLeader;
+	int				i = 0;
+	int				tempSessionTeam = 0; 
+	int				tempSpectatorState;
+	int				tempTeamLeader;
+	int				tempSelectedClass;
+	int				tempSelectedClassPerk;
 
 	var = va( "session%i", client - level.clients );
 	trap->Cvar_VariableStringBuffer( var, s, sizeof(s) );
 
-	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %s %s",
+	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %s %s %i %i",
 		&tempSessionTeam, //&client->sess.sessionTeam,
 		&client->sess.spectatorNum,
 		&tempSpectatorState, //&client->sess.spectatorState,
@@ -117,15 +125,24 @@ void G_ReadSessionData( gclient_t *client )
 		&client->sess.duelTeam,
 		&client->sess.siegeDesiredTeam,
 		client->sess.siegeClass,
-		client->sess.IP
+		client->sess.IP,
+		// [ClassSystem]
+		&tempSelectedClass,
+		&tempSelectedClassPerk
+		// [/ClassSystem]
 		);
 
-	client->sess.sessionTeam	= (team_t)tempSessionTeam;
-	client->sess.spectatorState	= (spectatorState_t)tempSpectatorState;
-	client->sess.teamLeader		= (qboolean)tempTeamLeader;
+	client->sess.sessionTeam		= (team_t)tempSessionTeam;
+	client->sess.spectatorState		= (spectatorState_t)tempSpectatorState;
+	client->sess.teamLeader			= (qboolean)tempTeamLeader;
+
+	// [ClassSystem] 
+	client->sess.selectedClass		= tempSelectedClass;
+	client->sess.selectedClassPerk	= tempSelectedClassPerk;
+	// [/ClassSystem]
 
 	// convert back to spaces from unused chars, as session data is written that way.
-	for ( i=0; client->sess.siegeClass[i]; i++ )
+	for ( i=0; client->sess.siegeClass[i]; i++ ) 
 	{
 		if (client->sess.siegeClass[i] == 1)
 			client->sess.siegeClass[i] = ' ';
@@ -150,28 +167,33 @@ G_InitSessionData
 Called on a first-time connect
 ================
 */
-void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
-	clientSession_t	*sess;
-	const char		*value;
+void G_InitSessionData(gclient_t *client, char *userinfo, qboolean isBot)
+{
+	clientSession_t		*sess;
+	const char			*value;
 
 	sess = &client->sess;
-
 	client->sess.siegeDesiredTeam = TEAM_FREE;
 
 	// initial team determination
-	if ( level.gametype >= GT_TEAM ) {
-		if ( g_teamAutoJoin.integer && !(g_entities[client-level.clients].r.svFlags & SVF_BOT) ) {
-			sess->sessionTeam = PickTeam( -1 );
+	if (level.gametype >= GT_TEAM)
+	{
+		if (g_teamAutoJoin.integer && !(g_entities[client - level.clients].r.svFlags & SVF_BOT))
+		{
+			sess->sessionTeam = PickTeam(-1);
 			client->ps.fd.forceDoInit = 1; //every time we change teams make sure our force powers are set right
-		} else {
+		}
+		else
+		{
 			// always spawn as spectator in team games
 			if (!isBot)
 			{
 				sess->sessionTeam = TEAM_SPECTATOR;
 			}
 			else
-			{ //Bots choose their team on creation
-				value = Info_ValueForKey( userinfo, "team" );
+			{
+				//Bots choose their team on creation
+				value = Info_ValueForKey(userinfo, "team");
 				if (value[0] == 'r' || value[0] == 'R')
 				{
 					sess->sessionTeam = TEAM_RED;
@@ -182,67 +204,85 @@ void G_InitSessionData( gclient_t *client, char *userinfo, qboolean isBot ) {
 				}
 				else
 				{
-					sess->sessionTeam = PickTeam( -1 );
+					sess->sessionTeam = PickTeam(-1);
 				}
 				client->ps.fd.forceDoInit = 1; //every time we change teams make sure our force powers are set right
 			}
 		}
-	} else {
-		value = Info_ValueForKey( userinfo, "team" );
-		if ( value[0] == 's' ) {
+	}
+	else
+	{
+		value = Info_ValueForKey(userinfo, "team");
+		if (value[0] == 's')
+		{
 			// a willing spectator, not a waiting-in-line
 			sess->sessionTeam = TEAM_SPECTATOR;
-		} else {
-			switch ( level.gametype ) {
+		}
+		else
+		{
+			switch (level.gametype)
+			{
 			default:
 			case GT_FFA:
 			case GT_HOLOCRON:
 			case GT_JEDIMASTER:
 			case GT_SINGLE_PLAYER:
-				if ( g_maxGameClients.integer > 0 &&
-					level.numNonSpectatorClients >= g_maxGameClients.integer ) {
+				if (g_maxGameClients.integer > 0 &&
+					level.numNonSpectatorClients >= g_maxGameClients.integer)
+				{
 					sess->sessionTeam = TEAM_SPECTATOR;
-				} else {
+				}
+				else
+				{
 					sess->sessionTeam = TEAM_FREE;
 				}
 				break;
 			case GT_DUEL:
 				// if the game is full, go into a waiting mode
-				if ( level.numNonSpectatorClients >= 2 ) {
+				if (level.numNonSpectatorClients >= 2)
+				{
 					sess->sessionTeam = TEAM_SPECTATOR;
-				} else {
+				}
+				else
+				{
 					sess->sessionTeam = TEAM_FREE;
 				}
 				break;
 			case GT_POWERDUEL:
 				//sess->duelTeam = DUELTEAM_LONE; //default
+			{
+				int loners = 0;
+				int doubles = 0;
+
+				G_PowerDuelCount(&loners, &doubles, qtrue);
+
+				if (!doubles || loners > (doubles / 2))
 				{
-					int loners = 0;
-					int doubles = 0;
-
-					G_PowerDuelCount(&loners, &doubles, qtrue);
-
-					if (!doubles || loners > (doubles/2))
-					{
-						sess->duelTeam = DUELTEAM_DOUBLE;
-					}
-					else
-					{
-						sess->duelTeam = DUELTEAM_LONE;
-					}
+					sess->duelTeam = DUELTEAM_DOUBLE;
 				}
-				sess->sessionTeam = TEAM_SPECTATOR;
-				break;
+				else
+				{
+					sess->duelTeam = DUELTEAM_LONE;
+				}
+			}
+			sess->sessionTeam = TEAM_SPECTATOR;
+			break;
 			}
 		}
 	}
 
 	sess->spectatorState = SPECTATOR_FREE;
 	AddTournamentQueue(client);
-
 	sess->siegeClass[0] = 0;
 
-	G_WriteClientSessionData( client );
+	// [ClassSystem]
+	sess->selectedClass = CLASS_FORCE_SENSITIVE;
+	sess->selectedClassPerk = CLASSPERK_INVALID;
+	client->ps.selectedClass = CLASS_FORCE_SENSITIVE;
+	client->ps.selectedClassPerk = CLASSPERK_INVALID;
+	// [/ClassSystem]
+
+	G_WriteClientSessionData(client);
 }
 
 

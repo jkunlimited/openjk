@@ -3546,7 +3546,8 @@ weapChecks:
 		// Pressing attack, so we must look up the proper attack move.
 		
 		// [ Jedi Knight Unlimited ]
-		if (pm->ps->fd.forcePower < JKU_SABER_ATTACK_DEFAULT_FORCE_COST)
+		if (pm->ps->fd.forcePower < JKU_SABER_ATTACK_DEFAULT_FORCE_COST &&
+			pm->ps->selectedClass == 1) // FS. Doesn't apply to gunners yet... 
 		{
 			anim = LS_NONE;
 		}
