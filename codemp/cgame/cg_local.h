@@ -1877,7 +1877,6 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum, 
 void CG_AddViewWeapon (playerState_t *ps);
 void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team, vec3_t newAngles, qboolean thirdPerson );
 void CG_DrawWeaponSelect( void );
-void JKU_DrawWeaponry(void);
 void CG_DrawIconBackground(void);
 
 void CG_OutOfAmmoChange( int oldWeapon );	// should this be in pmove?

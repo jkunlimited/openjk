@@ -30,6 +30,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "ui/ui_shared.h"
 #include "ui/ui_public.h"
 #include "qcommon/qfiles.h"	// for STYLE_BLINK etc
+#include "jku_utils/draw_utils.h"
 
 // JKU-Bunisher: Moved this waaaaay up top.
 #define MAX_SHOWPOWERS NUM_FORCE_POWERS
@@ -176,8 +177,6 @@ void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text
 							);
 }
 
-// JKU-Bunisher: Moved this to top of file. 
-// JKU-Bunisher: Kept running into hierarchy conflicts.
 qboolean ForcePower_Valid(int i)
 {
 	if (i == FP_LEVITATION ||
@@ -870,213 +869,6 @@ static void CG_DrawAmmo( centity_t	*cent,menuDef_t *menuHUD)
 
 /*
 ================
-JKU_DrawAmmoAndClipReserve
-================
-*/
-static void JKU_DrawAmmoAndClipReserve(centity_t	*cent, menuDef_t *menuHUD)
-{
-	playerState_t	*ps;
-	itemDef_t		*focusItem;
-	int				ammoValue = 0;
-	int				clipValue = 100; // JKU-Bunisher: Need to re-do this. Hardcoded for now.
-
-	ps = &cg.snap->ps;
-
-	if (!menuHUD) {
-		return;
-	}
-
-	if (!cent->currentState.weapon) {
-		return;
-	}
-
-	if (ps->ammo[weaponData[cent->currentState.weapon].ammoIndex] < 0) {
-		return;
-	}
-
-	if (cg.oldammo < ps->ammo[weaponData[cent->currentState.weapon].ammoIndex]) {
-		cg.oldAmmoTime = cg.time + 200;
-	}
-
-	ammoValue = ps->ammo[weaponData[cent->currentState.weapon].ammoIndex];
-	cg.oldammo = ammoValue;
-
-	focusItem = Menu_FindItemByName(menuHUD, "ammoamountandclipreserve");
-
-	if (weaponData[cent->currentState.weapon].energyPerShot == 0 &&
-		weaponData[cent->currentState.weapon].altEnergyPerShot == 0)  {
-
-		focusItem = Menu_FindItemByName(menuHUD, "ammoamountandclipreserveinfinite");
-		if (focusItem) {
-			CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "~ | ~", UI_CENTER, focusItem->window.foreColor, 0.5f);
-		}
-	}
-	else
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "ammoamountandclipreserve");
-		if (focusItem) {
-			ammoValue = ps->ammo[weaponData[cent->currentState.weapon].ammoIndex];
-			CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, va("%d | %d", ammoValue, clipValue), UI_CENTER, focusItem->window.foreColor, 0.5f);
-		}
-	}
-}
-
-/*
-================
-JKU_DrawForceCircle
-================
-*/
-void JKU_DrawForceCircle(centity_t *cent, menuDef_t *menuHUD)
-{
-	itemDef_t		*focusItem;
-	float			value;
-
-	// Can we find the menu?
-	if (!menuHUD)
-	{
-		return;
-	}
-
-	// don't display if dead
-	if (cg.snap->ps.stats[STAT_HEALTH] <= 0)
-	{
-		return;
-	}
-
-	value = cg.snap->ps.fd.forcePower;
-	
-	if (value >= 0)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "forcecircle_tick1");
-
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-	}
-	if (value >= 12.5)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "forcecircle_tick2");
-
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-	}
-	if (value >= 25)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "forcecircle_tick3");
-
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-	}
-	if (value >= 37.5)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "forcecircle_tick4");
-
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-	}
-	if (value >= 50)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "forcecircle_tick5");
-
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-	}
-	if (value >= 62.5)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "forcecircle_tick6");
-
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-	}
-	if (value >= 75)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "forcecircle_tick7");
-
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-	}
-	if (value >= 87.5)
-	{
-		focusItem = Menu_FindItemByName(menuHUD, "forcecircle_tick8");
-
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_WHITE]);
-			CG_DrawPic(
-				focusItem->window.rect.x,
-				focusItem->window.rect.y,
-				focusItem->window.rect.w,
-				focusItem->window.rect.h,
-				focusItem->window.background
-			);
-		}
-	}
-}
-
-/*
-================
 CG_DrawForcePower
 ================
 */
@@ -1373,50 +1165,6 @@ static void CG_DrawSimpleForcePower(const centity_t *cent)
 }
 */
 
-// JKU-Bunisher: Kindly borrowed from CG_DrawForceSelect
-// JKU-Bunisher: CG_DrawForceSelect was based on a timer. We needed something to stick post-selection.
-void JKU_DrawForcePower(centity_t *cent, menuDef_t *menuHUD)
-{
-	float x = 287.5;
-	float y = 400;
-	float w = 64;
-	float h = 64;
-
-	int	i;
-	int	count = 0;
-
-	if (cg.snap->ps.stats[STAT_HEALTH] <= 0 || 
-		!cg.snap->ps.fd.forcePowersKnown) {
-		return;
-	}
-
-	for (i = 0; i < NUM_FORCE_POWERS; ++i) {
-		if (ForcePower_Valid(i)) {
-			count++;
-		}
-	}
-
-	if (count == 0)	{
-		return;
-	}
-
-	i = BG_ProperForceIndex(cg.forceSelect) - 1;
-	if (i < 0) {
-		i = MAX_SHOWPOWERS - 1;
-	}
-
-	if (ForcePower_Valid(cg.forceSelect)) {
-		if (cgs.media.forcePowerIcons[cg.forceSelect]) {
-			CG_DrawPic(x, y, w, h, cgs.media.forcePowerIcons[cg.forceSelect]);
-		}
-	}
-
-	i = BG_ProperForceIndex(cg.forceSelect) + 1;
-	if (i >= MAX_SHOWPOWERS) {
-		i = 0;
-	}
-}
-
 /*
 ================
 CG_DrawHUD
@@ -1496,7 +1244,6 @@ void CG_DrawHUD(centity_t	*cent)
 			JKU_DrawForceCircle(cent, menuHUD);
 			JKU_DrawForcePower(cent, menuHUD);
 			JKU_DrawWeaponry();
-			//JKU_DrawWeapon();
 
 			// JKU-Bunisher: Lightsaber Stance / Ammunition Differentiation
 			if (cent->currentState.weapon == WP_SABER) {

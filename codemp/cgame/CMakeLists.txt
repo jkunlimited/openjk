@@ -139,6 +139,13 @@ set(MPCGameGFiles
 source_group("ghoul2" FILES ${MPCGameG2Files})
 set(MPCGameFiles ${MPCGameFiles} ${MPCGameG2Files})
 
+set(MPCGameJkuUtilsFiles
+    "${MPDir}/jku_utils/draw_utils.h"
+	"${MPDir}/jku_utils/draw_utils.cpp"
+    )
+source_group("jku_utils" FILES ${MPCGameJkuUtilsFiles})
+set(MPCGameFiles ${MPCGameFiles} ${MPCGameJkuUtilsFiles})
+
 add_library(${MPCGame} SHARED ${MPCGameFiles})
 
 if(NOT MSVC)
