@@ -24,6 +24,7 @@ AppVersion=0.1.0.0
 AppPublisher=JKU Development Team
 AppPublisherURL=TBD
 AppSupportURL=TBD
+AppendDefaultDirName=no
 DefaultDirName=C:\Program Files (x86)\jedi_knight_academy
 LicenseFile=jku_license.rtf
 OutputDir={#JKUBuildDirectory}\installer
@@ -31,7 +32,9 @@ OutputBaseFilename=jedi_knight_unlimited_{#JKUBuildConfigDisplayName}_setup
 Compression=lzma
 SolidCompression=yes
 ShowLanguageDialog=auto
-;SetupIconFile={#JKUBuildDirectory}\install_includes\jkuicon-08.ico
+SetupIconFile={#JKUBuildDirectory}\installer\small.ico
+WizardImageFile={#JKUBuildDirectory}\installer\large.bmp
+WizardSmallImageFile={#JKUBuildDirectory}\installer\smallpic.bmp
 
 ;[Languages]
 ;Name: english; MessagesFile: compiler:Defaults.isl
