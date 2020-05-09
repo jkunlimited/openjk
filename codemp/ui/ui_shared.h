@@ -99,7 +99,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define ASSET_SCROLLBAR_ARROWUP     "gfx/menus/scrollbar_arrow_up_a.tga"
 #define ASSET_SCROLLBAR_ARROWLEFT   "gfx/menus/scrollbar_arrow_left.tga"
 #define ASSET_SCROLLBAR_ARROWRIGHT  "gfx/menus/scrollbar_arrow_right.tga"
-#define ASSET_SCROLL_THUMB          "gfx/menus/scrollbar_thumb.tga"
+#define ASSET_SCROLL_THUMB          "gfx/menus/scrollbar_thumb2.tga"
 #define ASSET_SLIDER_BAR			"menu/new/slider"
 #define ASSET_SLIDER_THUMB			"menu/new/sliderthumb"
 #define SCROLLBAR_SIZE 16.0

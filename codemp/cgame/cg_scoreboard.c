@@ -319,7 +319,8 @@ Draw the normal in-game scoreboard
 =================
 */
 int cg_siegeWinTeam = 0;
-qboolean CG_DrawOldScoreboard( void ) {
+qboolean CG_DrawOldScoreboard( void ) 
+{
 	int		x, y, i, n1, n2;
 	float	fade;
 	float	*fadeColor;
@@ -329,24 +330,30 @@ qboolean CG_DrawOldScoreboard( void ) {
 	int topBorderSize, bottomBorderSize;
 
 	// don't draw amuthing if the menu or console is up
-	if ( cl_paused.integer ) {
+	if ( cl_paused.integer ) 
+	{
 		cg.deferredPlayerLoading = 0;
 		return qfalse;
 	}
 
 	// don't draw scoreboard during death while warmup up
-	if ( cg.warmup && !cg.showScores ) {
+	if ( cg.warmup && !cg.showScores ) 
+	{
 		return qfalse;
 	}
 
 	if ( cg.showScores || cg.predictedPlayerState.pm_type == PM_DEAD ||
-		 cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
+		 cg.predictedPlayerState.pm_type == PM_INTERMISSION ) 
+	{
 		fade = 1.0;
 		fadeColor = colorWhite;
-	} else {
+	} 
+	else 
+	{
 		fadeColor = CG_FadeColor( cg.scoreFadeTime, FADE_TIME );
 
-		if ( !fadeColor ) {
+		if ( !fadeColor ) 
+		{
 			// next time scoreboard comes up, don't print killer
 			cg.deferredPlayerLoading = 0;
 			cg.killerName[0] = 0;
@@ -390,7 +397,8 @@ qboolean CG_DrawOldScoreboard( void ) {
 		y = 40;
 		CG_Text_Paint ( x - CG_Text_Width ( s, 1.0f, FONT_MEDIUM ) / 2, y, 1.0f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 	}
-	else if ( cg.killerName[0] ) {
+	else if ( cg.killerName[0] ) 
+	{
 		s = va("%s %s", CG_GetStringEdString("MP_INGAME", "KILLEDBY"), cg.killerName );
 		/*w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 		x = ( SCREEN_WIDTH - w ) / 2;
@@ -406,7 +414,8 @@ qboolean CG_DrawOldScoreboard( void ) {
 	if (cgs.gametype == GT_POWERDUEL)
 	{ //do nothing?
 	}
-	else if ( cgs.gametype < GT_TEAM) {
+	else if ( cgs.gametype < GT_TEAM) 
+	{
 		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR )
 		{
 			char sPlace[256];
@@ -486,19 +495,22 @@ qboolean CG_DrawOldScoreboard( void ) {
 	y = SB_TOP;
 
 	// If there are more than SB_MAXCLIENTS_NORMAL, use the interleaved scores
-	if ( cg.numScores > SB_MAXCLIENTS_NORMAL ) {
+	if ( cg.numScores > SB_MAXCLIENTS_NORMAL ) 
+	{
 		maxClients = SB_MAXCLIENTS_INTER;
 		lineHeight = SB_INTER_HEIGHT;
 		topBorderSize = 8;
 		bottomBorderSize = 16;
-	} else {
+	} 
+	else 
+	{
 		maxClients = SB_MAXCLIENTS_NORMAL;
 		lineHeight = SB_NORMAL_HEIGHT;
 		topBorderSize = 8;
 		bottomBorderSize = 8;
 	}
-	realMaxClients = maxClients;
 
+	realMaxClients = maxClients;
 	localClient = qfalse;
 
 

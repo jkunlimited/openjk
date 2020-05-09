@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "qcommon/q_shared.h"
 #include "bg_public.h"
+#include "jku_utils/class_utils.h"
 
 #if defined(_GAME)
 	#include "g_local.h"
@@ -2041,7 +2042,8 @@ Returns false if the item should not be picked up.
 This needs to be the same for client side prediction and server use.
 ================
 */
-qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) {
+qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) 
+{
 	gitem_t	*item;
 
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems ) {
@@ -2052,8 +2054,10 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 	if ( ps )
 	{
-		if ( ps->trueJedi )
-		{//force powers and saber only
+		if ( ps->trueJedi || ps->selectedClass == CLASS_FORCE_SENSITIVE )
+		{
+			//JKU-Bunisher: Added force sensitive class to check
+			//force powers and saber only
 			if ( item->giType != IT_TEAM //not a flag
 				&& item->giType != IT_ARMOR//not shields
 				&& (item->giType != IT_WEAPON

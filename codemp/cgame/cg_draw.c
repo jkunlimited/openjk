@@ -4229,7 +4229,7 @@ static void CG_DrawCenterString( void ) {
 	int		x, y, w;
 	int h;
 	float	*color;
-	const float scale = 1.0; //0.5
+	const float scale = 0.75;
 
 	if ( !cg.centerPrintTime ) {
 		return;
@@ -4279,10 +4279,10 @@ static void CG_DrawCenterString( void ) {
 		}
 		//[/BugFix19]
 
-		w = CG_Text_Width(linebuffer, scale, FONT_MEDIUM);
-		h = CG_Text_Height(linebuffer, scale, FONT_MEDIUM);
+		w = CG_Text_Width(linebuffer, scale, FONT_SMALL2);
+		h = CG_Text_Height(linebuffer, scale, FONT_SMALL2);
 		x = (SCREEN_WIDTH - w) / 2;
-		CG_Text_Paint(x, y + h, scale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_MEDIUM);
+		CG_Text_Paint(x, y + h, scale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE, FONT_SMALL2);
 		y += h + 6;
 
 		//[BugFix19]

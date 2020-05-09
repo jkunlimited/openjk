@@ -309,15 +309,17 @@ clientkilled:
 			}
 			else
 			{
-				char sPlaceWith[256];
-				char sKilledStr[256];
-				trap->SE_GetStringTextString("MP_INGAME_PLACE_WITH",     sPlaceWith, sizeof(sPlaceWith));
-				trap->SE_GetStringTextString("MP_INGAME_KILLED_MESSAGE", sKilledStr, sizeof(sKilledStr));
+				//char sPlaceWith[256];
+				//char sKilledStr[256];
+				//trap->SE_GetStringTextString("MP_INGAME_PLACE_WITH",     sPlaceWith, sizeof(sPlaceWith));
+				//trap->SE_GetStringTextString("MP_INGAME_KILLED_MESSAGE", sKilledStr, sizeof(sKilledStr));
 
-				s = va("%s %s.\n%s %s %i.", sKilledStr, targetName,
-					CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
-					sPlaceWith,
-					cg.snap->ps.persistant[PERS_SCORE] );
+				// s = va("%s %s.\n%s %s %i.", sKilledStr, targetName,
+				// 	CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
+				// 	sPlaceWith,
+				// 	cg.snap->ps.persistant[PERS_SCORE] );
+
+				s = va("Defeated %s", targetName);
 			}
 		} else {
 			char sKilledStr[256];
@@ -325,7 +327,7 @@ clientkilled:
 			s = va("%s %s", sKilledStr, targetName );
 		}
 		//if (!(cg_singlePlayerActive.integer && cg_cameraOrbit.integer)) {
-			CG_CenterPrint( s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+			CG_CenterPrint( s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH);
 		//}
 		// print the text message as well
 	}
@@ -594,7 +596,8 @@ CG_ItemPickup
 A new item was picked up this frame
 ================
 */
-static void CG_ItemPickup( int itemNum ) {
+static void CG_ItemPickup( int itemNum ) 
+{
 	cg.itemPickup = itemNum;
 	cg.itemPickupTime = cg.time;
 	cg.itemPickupBlendTime = cg.time;
@@ -1303,6 +1306,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	int				eID = 0;
 	int				isnd = 0;
 	centity_t		*cl_ent;
+	qboolean		teleportEffectsEnabled = qfalse;
 
 	es = &cent->currentState;
 	event = es->event & ~EV_EVENT_BITS;
@@ -2697,58 +2701,64 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	// other events
 	//
 	case EV_PLAYER_TELEPORT_IN:
-		DEBUGNAME("EV_PLAYER_TELEPORT_IN");
+		if (teleportEffectsEnabled)
 		{
-			trace_t tr;
-			vec3_t playerMins = {-15, -15, DEFAULT_MINS_2+8};
-			vec3_t playerMaxs = {15, 15, DEFAULT_MAXS_2};
-			vec3_t ang, pos, dpos;
-
-			VectorClear(ang);
-			ang[ROLL] = 1;
-
-			VectorCopy(position, dpos);
-			dpos[2] -= 4096;
-
-			CG_Trace(&tr, position, playerMins, playerMaxs, dpos, es->number, MASK_SOLID);
-			VectorCopy(tr.endpos, pos);
-
-			trap->S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.teleInSound );
-
-			if (tr.fraction == 1)
+			DEBUGNAME("EV_PLAYER_TELEPORT_IN");
 			{
-				break;
+				trace_t tr;
+				vec3_t playerMins = { -15, -15, DEFAULT_MINS_2 + 8 };
+				vec3_t playerMaxs = { 15, 15, DEFAULT_MAXS_2 };
+				vec3_t ang, pos, dpos;
+
+				VectorClear(ang);
+				ang[ROLL] = 1;
+
+				VectorCopy(position, dpos);
+				dpos[2] -= 4096;
+
+				CG_Trace(&tr, position, playerMins, playerMaxs, dpos, es->number, MASK_SOLID);
+				VectorCopy(tr.endpos, pos);
+
+				trap->S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.teleInSound);
+
+				if (tr.fraction == 1)
+				{
+					break;
+				}
+				trap->FX_PlayEffectID(cgs.effects.mSpawn, pos, ang, -1, -1, qfalse);
 			}
-			trap->FX_PlayEffectID(cgs.effects.mSpawn, pos, ang, -1, -1, qfalse);
+			break;
 		}
-		break;
 
 	case EV_PLAYER_TELEPORT_OUT:
-		DEBUGNAME("EV_PLAYER_TELEPORT_OUT");
+		if (teleportEffectsEnabled)
 		{
-			trace_t tr;
-			vec3_t playerMins = {-15, -15, DEFAULT_MINS_2+8};
-			vec3_t playerMaxs = {15, 15, DEFAULT_MAXS_2};
-			vec3_t ang, pos, dpos;
-
-			VectorClear(ang);
-			ang[ROLL] = 1;
-
-			VectorCopy(position, dpos);
-			dpos[2] -= 4096;
-
-			CG_Trace(&tr, position, playerMins, playerMaxs, dpos, es->number, MASK_SOLID);
-			VectorCopy(tr.endpos, pos);
-
-			trap->S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.teleOutSound );
-
-			if (tr.fraction == 1)
+			DEBUGNAME("EV_PLAYER_TELEPORT_OUT");
 			{
-				break;
+				trace_t tr;
+				vec3_t playerMins = { -15, -15, DEFAULT_MINS_2 + 8 };
+				vec3_t playerMaxs = { 15, 15, DEFAULT_MAXS_2 };
+				vec3_t ang, pos, dpos;
+
+				VectorClear(ang);
+				ang[ROLL] = 1;
+
+				VectorCopy(position, dpos);
+				dpos[2] -= 4096;
+
+				CG_Trace(&tr, position, playerMins, playerMaxs, dpos, es->number, MASK_SOLID);
+				VectorCopy(tr.endpos, pos);
+
+				trap->S_StartSound(NULL, es->number, CHAN_AUTO, cgs.media.teleOutSound);
+
+				if (tr.fraction == 1)
+				{
+					break;
+				}
+				trap->FX_PlayEffectID(cgs.effects.mSpawn, pos, ang, -1, -1, qfalse);
 			}
-			trap->FX_PlayEffectID(cgs.effects.mSpawn, pos, ang, -1, -1, qfalse);
+			break;
 		}
-		break;
 
 	case EV_ITEM_POP:
 		DEBUGNAME("EV_ITEM_POP");

@@ -24,7 +24,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "g_local.h"
 #include "bg_saga.h"
-
+#include "jku_utils/class_utils.h"
 #include "ui/menudef.h"			// for the voice chats
 
 //rww - for getting bot commands...
@@ -584,16 +584,16 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 	}
 
 	if ( client->sess.sessionTeam == TEAM_RED ) {
-		trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s\n\"",
+		trap->SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " %s\n\"",
 			client->pers.netname, G_GetStringEdString("MP_SVGAME", "JOINEDTHEREDTEAM")) );
 	} else if ( client->sess.sessionTeam == TEAM_BLUE ) {
-		trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s\n\"",
+		trap->SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " %s\n\"",
 		client->pers.netname, G_GetStringEdString("MP_SVGAME", "JOINEDTHEBLUETEAM")));
 	} else if ( client->sess.sessionTeam == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR ) {
-		trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s\n\"",
+		trap->SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " %s\n\"",
 		client->pers.netname, G_GetStringEdString("MP_SVGAME", "JOINEDTHESPECTATORS")));
 	} else if ( client->sess.sessionTeam == TEAM_FREE ) {
-		trap->SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " %s\n\"",
+		trap->SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " %s\n\"",
 		client->pers.netname, G_GetStringEdString("MP_SVGAME", "JOINEDTHEBATTLE")));
 	}
 
@@ -1016,7 +1016,7 @@ Cmd_ClassPerk_f
 */
 void Cmd_ClassPerk_f(gentity_t *ent)
 {
-	if (ent->client->sess.selectedClass != 0) { // Only gunners are allowed to use the classperk command
+	if (ent->client->sess.selectedClass != CLASS_GUNNER) { // Only gunners are allowed to use the classperk command
 		trap->SendServerCommand(ent - g_entities, "print \"Error: Your class is not permitted to use this command\n");
 		return;
 	}
@@ -1138,7 +1138,7 @@ void Cmd_Team_f( gentity_t *ent ) {
 	}
 
 	// [ClassSystem]
-	if (ent->client->sess.selectedClass < 0) 
+	if (ent->client->sess.selectedClass == CLASS_INVALID) 
 	{
 		trap->SendServerCommand(ent - g_entities, "print \"Error: Cannot join team without setting a class\n\"");
 		return;

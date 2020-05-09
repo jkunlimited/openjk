@@ -10551,11 +10551,11 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 	if (!overlay) {
 		centerPoint = 320;
 		yStart = 130;
-		scale = 1.0f;	// -ste
+		scale = 0.75f;	// -ste
 	} else {
 		centerPoint = 320;
 		yStart = 32;
-		scale = 1.0f;	// -ste
+		scale = 0.75f;	// -ste
 		return;
 	}
 

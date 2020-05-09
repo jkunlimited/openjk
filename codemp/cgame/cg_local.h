@@ -1089,8 +1089,10 @@ typedef struct cgMedia_s {
 	qhandle_t	loadBarLEDCap;
 	qhandle_t	loadBarLEDSurround;
 
+	// [Jedi Knight: Unlimited]
 	qhandle_t	loadBarBackground;
 	qhandle_t	loadBarFiller;
+	// [/Jedi Knight: Unlimited]
 
 	qhandle_t	bryarFrontFlash;
 	qhandle_t	greenFrontFlash;

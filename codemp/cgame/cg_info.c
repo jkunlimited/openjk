@@ -130,81 +130,87 @@ Draw all the status / pacifier stuff during level loading
 overlays UI_DrawConnectScreen
 */
 #define UI_INFOFONT (UI_BIGFONT)
-void CG_DrawInformation( void ) {
+void CG_DrawInformation(void) 
+{
 	const char	*s;
 	const char	*info;
 	const char	*sysInfo;
 	int			y;
-	// JKU-Bunisher: Unnecessary and cluttery
-	// int			value, valueNOFP;
+	int			value, valueNOFP;
 	qhandle_t	levelshot;
-	qhandle_t	logoshot;
+	qboolean	drawLegacyInfo = qfalse; // Change this to qtrue to show all the legacy information (pure mode, gamemode limits, time limits, gamemode name, etc.)
 	char		buf[1024];
 	int			iPropHeight = 18;	// I know, this is total crap, but as a post release asian-hack....  -Ste
+
+	info = CG_ConfigString(CS_SERVERINFO);
+	sysInfo = CG_ConfigString(CS_SYSTEMINFO);
+
+	levelshot = trap->R_RegisterShaderNoMip("menu/art/unknownmap_mp2");
 	
-	// JKU-Bunisher: Easier to manage coords using vars and refs
-	int			loadMsgX = 320; // Loading... X-coord
-	int			loadMsgY = 430; // Loading... Y-coord
-	int			logoX = 192; // Logo X-coord
-	int			logoY = 45; // Logo Y-coord
-	int			logoW = 256; // Logo width
-	int			logoH = 64; // Logo height
-
-	info = CG_ConfigString( CS_SERVERINFO );
-	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
-
-	s = Info_ValueForKey( info, "mapname" );
-	
-	levelshot = trap->R_RegisterShaderNoMip("menu/art/unknownmap_mp");
-	logoshot = trap->R_RegisterShaderNoMip("menu/jku_jediacademy_load");
-
+	trap->R_SetColor(NULL);
 	CG_DrawPic(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, levelshot);
-	CG_DrawPic(logoX, logoY, logoW, logoH, logoshot);
 
-	trap->R_SetColor( NULL );
+	// JKU-Bunisher: New load bar function
 	JKU_LoadBar();
+
+	// draw the icons of things as they are loaded
+	// CG_DrawLoadingIcons();
 
 	// the first 150 rows are reserved for the client connection
 	// screen to write into
-	// const char *psLoading = CG_GetStringEdString("MENUS", "LOADING_MAPNAME");
-	
-	// JKU-Bunisher: Need to use CG_DrawScaledProportionalString to avoid pixelation
-	//CG_DrawProportionalString( iMessageWidth, iMessageHeight, "Loading...", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
-	CG_DrawScaledProportionalString(loadMsgX, loadMsgY, "Loading...", UI_CENTER | UI_BIGFONT | UI_DROPSHADOW, colorWhite, 0.7f);
+	if (cg.infoScreenText[0]) 
+	{
+		const char *psLoading = CG_GetStringEdString("MENUS", "LOADING_MAPNAME");
+		//CG_DrawProportionalString(320, 128 - 32, va(/*"Loading... %s"*/ psLoading, cg.infoScreenText), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+		CG_DrawScaledProportionalString(320, 128 - 32, va(/*"Loading... %s"*/ psLoading, cg.infoScreenText), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite, 0.75f);
+	}
+	else 
+	{
+		const char *psAwaitingSnapshot = CG_GetStringEdString("MENUS", "AWAITING_SNAPSHOT");
+		//CG_DrawProportionalString(320, 128 - 32, /*"Awaiting snapshot..."*/psAwaitingSnapshot, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+		CG_DrawScaledProportionalString(320, 128 - 32, /*"Awaiting snapshot..."*/psAwaitingSnapshot, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite, 0.75f);
+	}
 
-	y = 180-32;
+	// draw info string information
+	y = 180 - 32;
 
 	// don't print server lines if playing a local game
-	trap->Cvar_VariableStringBuffer( "sv_running", buf, sizeof( buf ) );
-	if ( !atoi( buf ) ) {
+	trap->Cvar_VariableStringBuffer("sv_running", buf, sizeof(buf));
+	if (!atoi(buf)) 
+	{
 		// server hostname
-		Q_strncpyz(buf, Info_ValueForKey( info, "sv_hostname" ), sizeof( buf ) );
+		Q_strncpyz(buf, Info_ValueForKey(info, "sv_hostname"), sizeof(buf));
 		Q_CleanStr(buf);
-		CG_DrawProportionalString( 320, y, buf, UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
+		CG_DrawProportionalString(320, y, buf, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
 		y += iPropHeight;
 
-		// pure server
-		//s = Info_ValueForKey( sysInfo, "sv_pure" );
-		//if ( s[0] == '1' ) {
-		//	const char *psPure = CG_GetStringEdString("MP_INGAME", "PURE_SERVER");
-		//	CG_DrawProportionalString( 320, y, psPure, UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-		//	y += iPropHeight;
-		//}
+		if (drawLegacyInfo)
+		{
+			// pure server
+			s = Info_ValueForKey(sysInfo, "sv_pure");
+			if (s[0] == '1')
+			{
+				const char *psPure = CG_GetStringEdString("MP_INGAME", "PURE_SERVER");
+				CG_DrawProportionalString(320, y, psPure, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+				y += iPropHeight;
+			}
+		}
 
 		// server-specific message of the day
-		s = CG_ConfigString( CS_MOTD );
-		if ( s[0] ) {
-			CG_DrawProportionalString( 320, y, s, UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
+		s = CG_ConfigString(CS_MOTD);
+		if (s[0]) 
+		{
+			CG_DrawProportionalString(320, y, s, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
 			y += iPropHeight;
 		}
 
 		{	// display global MOTD at bottom (mirrors ui_main UI_DrawConnectScreen
 			char motdString[1024];
-			trap->Cvar_VariableStringBuffer( "cl_motdString", motdString, sizeof( motdString ) );
+			trap->Cvar_VariableStringBuffer("cl_motdString", motdString, sizeof(motdString));
 
 			if (motdString[0])
 			{
-				CG_DrawProportionalString( 320, 425, motdString, UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
+				CG_DrawProportionalString(320, 425, motdString, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
 			}
 		}
 
@@ -212,166 +218,181 @@ void CG_DrawInformation( void ) {
 		y += 10;
 	}
 
-	// JKU-Bunisher: Unnecessary and cluttery
-	// map-specific message (long map name)
-	//s = CG_ConfigString( CS_MESSAGE );
-	//if ( s[0] ) {
-	//	CG_DrawProportionalString( 320, y, s, UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//}
+	if (drawLegacyInfo)
+	{
+		// map-specific message (long map name)
+		s = CG_ConfigString(CS_MESSAGE);
+		if (s[0])
+		{
+			CG_DrawProportionalString(320, y, s, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+		}
 
-	// cheats warning
-	//s = Info_ValueForKey( sysInfo, "sv_cheats" );
-	//if ( s[0] == '1' ) {
-	//	CG_DrawProportionalString( 320, y, CG_GetStringEdString("MP_INGAME", "CHEATSAREENABLED"), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//}
+		// cheats warning
+		s = Info_ValueForKey(sysInfo, "sv_cheats");
+		if (s[0] == '1')
+		{
+			CG_DrawProportionalString(320, y, CG_GetStringEdString("MP_INGAME", "CHEATSAREENABLED"), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+		}
 
-	// game type
-	//s = BG_GetGametypeString( cgs.gametype );
-	//CG_DrawProportionalString( 320, y, s, UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//y += iPropHeight;
-	//
-	//if (cgs.gametype != GT_SIEGE)
-	//{
-	//	value = atoi( Info_ValueForKey( info, "timelimit" ) );
-	//	if ( value ) {
-	//		CG_DrawProportionalString( 320, y, va( "%s %i", CG_GetStringEdString("MP_INGAME", "TIMELIMIT"), value ), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//		y += iPropHeight;
-	//	}
-	//
-	//	if (cgs.gametype < GT_CTF ) {
-	//		value = atoi( Info_ValueForKey( info, "fraglimit" ) );
-	//		if ( value ) {
-	//			CG_DrawProportionalString( 320, y, va( "%s %i", CG_GetStringEdString("MP_INGAME", "FRAGLIMIT"), value ), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//			y += iPropHeight;
-	//		}
-	//
-	//		if (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL)
-	//		{
-	//			value = atoi( Info_ValueForKey( info, "duel_fraglimit" ) );
-	//			if ( value ) {
-	//				CG_DrawProportionalString( 320, y, va( "%s %i", CG_GetStringEdString("MP_INGAME", "WINLIMIT"), value ), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//				y += iPropHeight;
-	//			}
-	//		}
-	//	}
-	//}
-	//
-	//if (cgs.gametype >= GT_CTF) {
-	//	value = atoi( Info_ValueForKey( info, "capturelimit" ) );
-	//	if ( value ) {
-	//		CG_DrawProportionalString( 320, y, va( "%s %i", CG_GetStringEdString("MP_INGAME", "CAPTURELIMIT"), value ), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//		y += iPropHeight;
-	//	}
-	//}
-	//
-	//if (cgs.gametype >= GT_TEAM)
-	//{
-	//	value = atoi( Info_ValueForKey( info, "g_forceBasedTeams" ) );
-	//	if ( value ) {
-	//		CG_DrawProportionalString( 320, y, CG_GetStringEdString("MP_INGAME", "FORCEBASEDTEAMS"), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//		y += iPropHeight;
-	//	}
-	//}
-	//
-    //if (cgs.gametype != GT_SIEGE)
-	//{
-	//	valueNOFP = atoi( Info_ValueForKey( info, "g_forcePowerDisable" ) );
-	//
-	//	value = atoi( Info_ValueForKey( info, "g_maxForceRank" ) );
-	//	if ( value && !valueNOFP && (value < NUM_FORCE_MASTERY_LEVELS) ) {
-	//		char fmStr[1024];
-	//
-	//		trap->SE_GetStringTextString("MP_INGAME_MAXFORCERANK",fmStr, sizeof(fmStr));
-	//
-	//		CG_DrawProportionalString( 320, y, va( "%s %s", fmStr, CG_GetStringEdString("MP_INGAME", forceMasteryLevels[value]) ), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//		y += iPropHeight;
-	//	}
-	//	else if (!valueNOFP)
-	//	{
-	//		char fmStr[1024];
-	//		trap->SE_GetStringTextString("MP_INGAME_MAXFORCERANK",fmStr, sizeof(fmStr));
-	//
-	//		CG_DrawProportionalString( 320, y, va( "%s %s", fmStr, (char *)CG_GetStringEdString("MP_INGAME", forceMasteryLevels[7]) ), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//		y += iPropHeight;
-	//	}
-	//
-	//	if (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL)
-	//	{
-	//		value = atoi( Info_ValueForKey( info, "g_duelWeaponDisable" ) );
-	//	}
-	//	else
-	//	{
-	//		value = atoi( Info_ValueForKey( info, "g_weaponDisable" ) );
-	//	}
-	//	if ( cgs.gametype != GT_JEDIMASTER && value ) {
-	//		CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "SABERONLYSET") ), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//		y += iPropHeight;
-	//	}
-	//
-	//	if ( valueNOFP ) {
-	//		CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "NOFPSET") ), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//		y += iPropHeight;
-	//	}
-	//}
-	//
-	//// Display the rules based on type
-	//	y += iPropHeight;
-	//switch ( cgs.gametype ) {
-	//case GT_FFA:
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_FFA_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	break;
-	//case GT_HOLOCRON:
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_HOLO_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_HOLO_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	break;
-	//case GT_JEDIMASTER:
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_JEDI_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_JEDI_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	break;
-	//case GT_SINGLE_PLAYER:
-	//	break;
-	//case GT_DUEL:
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_DUEL_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_DUEL_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	break;
-	//case GT_POWERDUEL:
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_POWERDUEL_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_POWERDUEL_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	break;
-	//case GT_TEAM:
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_TEAM_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_TEAM_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	break;
-	//case GT_SIEGE:
-	//	break;
-	//case GT_CTF:
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTF_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTF_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	break;
-	//case GT_CTY:
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTY_1")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	CG_DrawProportionalString( 320, y, va( "%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTY_2")), UI_CENTER|UI_INFOFONT|UI_DROPSHADOW, colorWhite );
-	//	y += iPropHeight;
-	//	break;
-	//default:
-	//	break;
-	//}
+		// game type
+		s = BG_GetGametypeString(cgs.gametype);
+		CG_DrawProportionalString(320, y, s, UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+		y += iPropHeight;
+
+		if (cgs.gametype != GT_SIEGE)
+		{
+			value = atoi(Info_ValueForKey(info, "timelimit"));
+			if (value)
+			{
+				CG_DrawProportionalString(320, y, va("%s %i", CG_GetStringEdString("MP_INGAME", "TIMELIMIT"), value), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+				y += iPropHeight;
+			}
+
+			if (cgs.gametype < GT_CTF)
+			{
+				value = atoi(Info_ValueForKey(info, "fraglimit"));
+				if (value)
+				{
+					CG_DrawProportionalString(320, y, va("%s %i", CG_GetStringEdString("MP_INGAME", "FRAGLIMIT"), value), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+					y += iPropHeight;
+				}
+
+				if (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL)
+				{
+					value = atoi(Info_ValueForKey(info, "duel_fraglimit"));
+					if (value)
+					{
+						CG_DrawProportionalString(320, y, va("%s %i", CG_GetStringEdString("MP_INGAME", "WINLIMIT"), value), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+						y += iPropHeight;
+					}
+				}
+			}
+		}
+
+		if (cgs.gametype >= GT_CTF)
+		{
+			value = atoi(Info_ValueForKey(info, "capturelimit"));
+			if (value)
+			{
+				CG_DrawProportionalString(320, y, va("%s %i", CG_GetStringEdString("MP_INGAME", "CAPTURELIMIT"), value), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+				y += iPropHeight;
+			}
+		}
+
+		if (cgs.gametype >= GT_TEAM)
+		{
+			value = atoi(Info_ValueForKey(info, "g_forceBasedTeams"));
+			if (value)
+			{
+				CG_DrawProportionalString(320, y, CG_GetStringEdString("MP_INGAME", "FORCEBASEDTEAMS"), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+				y += iPropHeight;
+			}
+		}
+
+		if (cgs.gametype != GT_SIEGE)
+		{
+			valueNOFP = atoi(Info_ValueForKey(info, "g_forcePowerDisable"));
+
+			value = atoi(Info_ValueForKey(info, "g_maxForceRank"));
+			if (value && !valueNOFP && (value < NUM_FORCE_MASTERY_LEVELS))
+			{
+				char fmStr[1024];
+
+				trap->SE_GetStringTextString("MP_INGAME_MAXFORCERANK", fmStr, sizeof(fmStr));
+
+				CG_DrawProportionalString(320, y, va("%s %s", fmStr, CG_GetStringEdString("MP_INGAME", forceMasteryLevels[value])), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+				y += iPropHeight;
+			}
+			else if (!valueNOFP)
+			{
+				char fmStr[1024];
+				trap->SE_GetStringTextString("MP_INGAME_MAXFORCERANK", fmStr, sizeof(fmStr));
+
+				CG_DrawProportionalString(320, y, va("%s %s", fmStr, (char *)CG_GetStringEdString("MP_INGAME", forceMasteryLevels[7])), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+				y += iPropHeight;
+			}
+
+			if (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL)
+			{
+				value = atoi(Info_ValueForKey(info, "g_duelWeaponDisable"));
+			}
+			else
+			{
+				value = atoi(Info_ValueForKey(info, "g_weaponDisable"));
+			}
+			if (cgs.gametype != GT_JEDIMASTER && value)
+			{
+				CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "SABERONLYSET")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+				y += iPropHeight;
+			}
+
+			if (valueNOFP)
+			{
+				CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "NOFPSET")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+				y += iPropHeight;
+			}
+		}
+
+		// Display the rules based on type
+		y += iPropHeight;
+		switch (cgs.gametype)
+		{
+		case GT_FFA:
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_FFA_1")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			break;
+		case GT_HOLOCRON:
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_HOLO_1")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_HOLO_2")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			break;
+		case GT_JEDIMASTER:
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_JEDI_1")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_JEDI_2")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			break;
+		case GT_SINGLE_PLAYER:
+			break;
+		case GT_DUEL:
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_DUEL_1")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_DUEL_2")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			break;
+		case GT_POWERDUEL:
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_POWERDUEL_1")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_POWERDUEL_2")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			break;
+		case GT_TEAM:
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_TEAM_1")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_TEAM_2")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			break;
+		case GT_SIEGE:
+			break;
+		case GT_CTF:
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTF_1")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTF_2")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			break;
+		case GT_CTY:
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTY_1")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			CG_DrawProportionalString(320, y, va("%s", (char *)CG_GetStringEdString("MP_INGAME", "RULES_CTY_2")), UI_CENTER | UI_INFOFONT | UI_DROPSHADOW, colorWhite);
+			y += iPropHeight;
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 /*

@@ -2215,34 +2215,45 @@ int Pickup_Ammo (gentity_t *ent, gentity_t *other)
 int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 	int		quantity;
 
-	if ( ent->count < 0 ) {
+	if ( ent->count < 0 ) 
+	{
 		quantity = 0; // None for you, sir!
-	} else {
-		if ( ent->count ) {
+	} 
+	else 
+	{
+		if ( ent->count ) 
+		{
 			quantity = ent->count;
-		} else {
+		} 
+		else 
+		{
 			quantity = ent->item->quantity;
 		}
 
 		// dropped items and teamplay weapons always have full ammo
-		if ( ! (ent->flags & FL_DROPPED_ITEM) && level.gametype != GT_TEAM ) {
+		if ( ! (ent->flags & FL_DROPPED_ITEM) && level.gametype != GT_TEAM ) 
+		{
 			// respawning rules
-
 			// New method:  If the player has less than half the minimum, give them the minimum, else add 1/2 the min.
-
 			// drop the quantity if the already have over the minimum
-			if ( other->client->ps.ammo[ ent->item->giTag ] < quantity*0.5 ) {
+			if ( other->client->ps.ammo[ ent->item->giTag ] < quantity*0.5 ) 
+			{
 				quantity = quantity - other->client->ps.ammo[ ent->item->giTag ];
-			} else {
+			} 
+			else 
+			{
 				quantity = quantity*0.5;		// only add half the value.
 			}
 
 			// Old method:  If the player has less than the minimum, give them the minimum, else just add 1.
-/*
+			/*
 			// drop the quantity if the already have over the minimum
-			if ( other->client->ps.ammo[ ent->item->giTag ] < quantity ) {
+			if ( other->client->ps.ammo[ ent->item->giTag ] < quantity ) 
+			{
 				quantity = quantity - other->client->ps.ammo[ ent->item->giTag ];
-			} else {
+			}
+			else 
+			{
 				quantity = 1;		// only add a single shot
 			}
 			*/
@@ -2401,7 +2412,8 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	if (ent->genericValue10 > level.time &&
 		other &&
 		other->s.number == ent->genericValue11)
-	{ //this is the ent that we don't want to be able to touch us for x seconds
+	{ 
+		//this is the ent that we don't want to be able to touch us for x seconds
 		return;
 	}
 
@@ -2424,12 +2436,17 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	}
 
 	if (!other->client)
+	{
 		return;
+	}
 	if (other->health < 1)
+	{
 		return;		// dead people can't pickup
+	}
 
 	if (ent->item->giType == IT_POWERUP &&
-		(ent->item->giTag == PW_FORCE_ENLIGHTENED_LIGHT || ent->item->giTag == PW_FORCE_ENLIGHTENED_DARK))
+	   (ent->item->giTag == PW_FORCE_ENLIGHTENED_LIGHT || 
+	    ent->item->giTag == PW_FORCE_ENLIGHTENED_DARK))
 	{
 		if (ent->item->giTag == PW_FORCE_ENLIGHTENED_LIGHT)
 		{
@@ -2448,7 +2465,8 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	}
 
 	// the same pickup rules are used for client side and server side
-	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) ) {
+	if ( !BG_CanItemBeGrabbed( level.gametype, &ent->s, &other->client->ps ) ) 
+	{
 		return;
 	}
 
@@ -2466,10 +2484,13 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		other->client->NPC_class == CLASS_REMOTE ||
 		other->client->NPC_class == CLASS_RANCOR ||
 		other->client->NPC_class == CLASS_WAMPA ||
-		//other->client->NPC_class == CLASS_JAWA || //FIXME: in some cases it's okay?
-		other->client->NPC_class == CLASS_UGNAUGHT || //FIXME: in some cases it's okay?
-		other->client->NPC_class == CLASS_SENTRY )
-	{//FIXME: some flag would be better
+		//other->client->NPC_class == CLASS_JAWA || 
+		//FIXME: in some cases it's okay?
+		other->client->NPC_class == CLASS_UGNAUGHT || 
+		//FIXME: in some cases it's okay?
+		other->client->NPC_class == CLASS_SENTRY)
+	{
+		//FIXME: some flag would be better
 		//droids can't pick up items/weapons!
 		return;
 	}

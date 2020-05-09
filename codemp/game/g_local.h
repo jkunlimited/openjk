@@ -98,20 +98,6 @@ extern vec3_t gPainPoint;
 
 #define FL_BBRUSH					0x04000000 //I am a breakable brush
 
-// [ClassSystem]
-#define	CLASS_INVALID			-1
-#define	CLASS_GUNNER			 0
-#define	CLASS_FORCE_SENSITIVE	 1
-
-#define	CLASSPERK_INVALID		-1
-#define	CLASSPERK_VANGUARD		 0
-#define	CLASSPERK_GUNSLINGER	 1
-#define	CLASSPERK_POWERTECH		 2
-#define	CLASSPERK_OPERATIVE		 3
-#define	CLASSPERK_COMBATMEDIC	 4
-#define	CLASSPERK_SWORDSMAN		 5
-// [/ClassSystem]
-
 #ifndef FINAL_BUILD
 #define DEBUG_SABER_BOX
 #endif

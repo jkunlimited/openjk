@@ -25,6 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_local.h"
 #include "ghoul2/G2.h"
 #include "bg_saga.h"
+#include "jku_utils/class_utils.h"
 
 // g_client.c -- client functions that don't happen every frame
 

@@ -23,6 +23,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "g_local.h"
+#include "jku_utils/class_utils.h"
 
 /*
 =======================================================================
