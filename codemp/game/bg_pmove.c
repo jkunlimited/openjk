@@ -8614,7 +8614,8 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 		bgEntity_t *bgEnt = pm_entSelf;
 
 		if (bgEnt && bgEnt->s.NPC_class == CLASS_VEHICLE)
-		{ //vehicles manage their own speed
+		{ 
+			//vehicles manage their own speed
 			return;
 		}
 	}
@@ -8636,9 +8637,18 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 		ps->speed = 0;
 	}
 
+	//running backwards is slower than running forwards
+	//running backwards and strafing is slower as well
+	if ( cmd->forwardmove < 0 && 
+		!(cmd->buttons&BUTTON_WALKING) && 
+		pm->ps->groundEntityNum != ENTITYNUM_NONE ||
+		(cmd->forwardmove < 0 && 
+		!(cmd->buttons&BUTTON_WALKING) && 
+		pm->ps->groundEntityNum != ENTITYNUM_NONE) &&
+		(cmd->rightmove < 0 || 
+		cmd->rightmove > 0) )
 
-	if ( cmd->forwardmove < 0 && !(cmd->buttons&BUTTON_WALKING) && pm->ps->groundEntityNum != ENTITYNUM_NONE )
-	{//running backwards is slower than running forwards (like SP)
+	{
 		ps->speed *= 0.75f;
 	}
 
@@ -8666,104 +8676,111 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 		ps->speed *= 0.5f;
 	}
 
-	if ( ps->fd.forceGripCripple && pm->ps->persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
-		if ( ps->fd.forcePowersActive & (1 << FP_RAGE) )
-			ps->speed *= 0.9f;
-		else if ( ps->fd.forcePowersActive & (1 << FP_SPEED) )
-			ps->speed *= 0.8f;
-		else
-			ps->speed *= 0.2f;
-	}
-
-	if ( BG_SaberInAttack( ps->saberMove ) && cmd->forwardmove < 0 )
-	{//if running backwards while attacking, don't run as fast.
-		switch( ps->fd.saberAnimLevel )
-		{
-		case FORCE_LEVEL_1:
-			ps->speed *= 0.75f;
-			break;
-		case FORCE_LEVEL_2:
-		case SS_DUAL:
-		case SS_STAFF:
-			ps->speed *= 0.60f;
-			break;
-		case FORCE_LEVEL_3:
-			ps->speed *= 0.45f;
-			break;
-		default:
-			break;
-		}
-	}
-	else if ( BG_SpinningSaberAnim( ps->legsAnim ) )
+	if ( ps->fd.forceGripCripple && pm->ps->persistant[PERS_TEAM] != TEAM_SPECTATOR ) 
 	{
-		if (ps->fd.saberAnimLevel == FORCE_LEVEL_3)
+		if (ps->fd.forcePowersActive & (1 << FP_RAGE))
 		{
-			ps->speed *= 0.3f;
+			ps->speed *= 0.9f;
+		}
+		else if (ps->fd.forcePowersActive & (1 << FP_SPEED))
+		{
+			ps->speed *= 0.8f;
 		}
 		else
 		{
-			ps->speed *= 0.5f;
-		}
-	}
-	else if ( ps->weapon == WP_SABER && BG_SaberInAttack( ps->saberMove ) )
-	{//if attacking with saber while running, drop your speed
-		switch( ps->fd.saberAnimLevel )
-		{
-		case FORCE_LEVEL_2:
-		case SS_DUAL:
-		case SS_STAFF:
-			ps->speed *= 0.85f;
-			break;
-		case FORCE_LEVEL_3:
-			ps->speed *= 0.55f;
-			break;
-		default:
-			break;
-		}
-	}
-	else if (ps->weapon == WP_SABER && ps->fd.saberAnimLevel == FORCE_LEVEL_3 &&
-		PM_SaberInTransition(ps->saberMove))
-	{ //Now, we want to even slow down in transitions for level 3 (since it has chains and stuff now)
-		if (cmd->forwardmove < 0)
-		{
-			ps->speed *= 0.4f;
-		}
-		else
-		{
-			ps->speed *= 0.6f;
+			ps->speed *= 0.2f;
 		}
 	}
 
-	if ( BG_InRoll( ps, ps->legsAnim ) && ps->speed > 50 )
-	{ //can't roll unless you're able to move normally
-		if ((ps->legsAnim) == BOTH_ROLL_B)
-		{ //backwards roll is pretty fast, should also be slower
-			if (ps->legsTimer > 800)
-			{
-				ps->speed = ps->legsTimer/2.5;
-			}
-			else
-			{
-				ps->speed = ps->legsTimer/6.0;//450;
-			}
-		}
-		else
-		{
-			if (ps->legsTimer > 800)
-			{
-				ps->speed = ps->legsTimer/1.5;//450;
-			}
-			else
-			{
-				ps->speed = ps->legsTimer/5.0;//450;
-			}
-		}
-		if (ps->speed > 600)
-		{
-			ps->speed = 600;
-		}
-		//Automatically slow down as the roll ends.
-	}
+	// JKU-Bunisher: Removing this
+	// if ( BG_SaberInAttack( ps->saberMove ) && cmd->forwardmove < 0 )
+	// {//if running backwards while attacking, don't run as fast.
+	// 	switch( ps->fd.saberAnimLevel )
+	// 	{
+	// 	case FORCE_LEVEL_1:
+	// 		ps->speed *= 0.75f;
+	// 		break;
+	// 	case FORCE_LEVEL_2:
+	// 	case SS_DUAL:
+	// 	case SS_STAFF:
+	// 		ps->speed *= 0.60f;
+	// 		break;
+	// 	case FORCE_LEVEL_3:
+	// 		ps->speed *= 0.45f;
+	// 		break;
+	// 	default:
+	// 		break;
+	// 	}
+	// }
+	//else if ( BG_SpinningSaberAnim( ps->legsAnim ) )
+	//{
+	//	if (ps->fd.saberAnimLevel == FORCE_LEVEL_3)
+	//	{
+	//		ps->speed *= 0.3f;
+	//	}
+	//	else
+	//	{
+	//		ps->speed *= 0.5f;
+	//	}
+	//}
+	//else if ( ps->weapon == WP_SABER && BG_SaberInAttack( ps->saberMove ) )
+	//{//if attacking with saber while running, drop your speed
+	//	switch( ps->fd.saberAnimLevel )
+	//	{
+	//	case FORCE_LEVEL_2:
+	//	case SS_DUAL:
+	//	case SS_STAFF:
+	//		ps->speed *= 0.85f;
+	//		break;
+	//	case FORCE_LEVEL_3:
+	//		ps->speed *= 0.55f;
+	//		break;
+	//	default:
+	//		break;
+	//	}
+	//}
+	//else if (ps->weapon == WP_SABER && ps->fd.saberAnimLevel == FORCE_LEVEL_3 &&
+	//	PM_SaberInTransition(ps->saberMove))
+	//{ //Now, we want to even slow down in transitions for level 3 (since it has chains and stuff now)
+	//	if (cmd->forwardmove < 0)
+	//	{
+	//		ps->speed *= 0.4f;
+	//	}
+	//	else
+	//	{
+	//		ps->speed *= 0.6f;
+	//	}
+	//}
+	//if ( BG_InRoll( ps, ps->legsAnim ) && ps->speed > 50 )
+	//{ //can't roll unless you're able to move normally
+	//	if ((ps->legsAnim) == BOTH_ROLL_B)
+	//	{ //backwards roll is pretty fast, should also be slower
+	//		if (ps->legsTimer > 800)
+	//		{
+	//			ps->speed = ps->legsTimer/2.5;
+	//		}
+	//		else
+	//		{
+	//			ps->speed = ps->legsTimer/6.0;//450;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		if (ps->legsTimer > 800)
+	//		{
+	//			ps->speed = ps->legsTimer/1.5;//450;
+	//		}
+	//		else
+	//		{
+	//			ps->speed = ps->legsTimer/5.0;//450;
+	//		}
+	//	}
+	//	if (ps->speed > 600)
+	//	{
+	//		ps->speed = 600;
+	//	}
+	//	//Automatically slow down as the roll ends.
+	//}
 
 	saber = BG_MySaber( ps->clientNum, 0 );
 	if ( saber

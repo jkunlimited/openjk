@@ -2680,7 +2680,8 @@ void BG_SetTorsoAnimTimer(playerState_t *ps, int time )
 	ps->torsoTimer = time;
 
 	if (ps->torsoTimer < 0 && time != -1 )
-	{//Cap timer to 0 if was counting down, but let it be -1 if that was intentional.  NOTENOTE Yeah this seems dumb, but it mirrors SP.
+	{
+		//Cap timer to 0 if was counting down, but let it be -1 if that was intentional.  NOTENOTE Yeah this seems dumb, but it mirrors SP.
 		ps->torsoTimer = 0;
 	}
 }
@@ -2688,6 +2689,21 @@ void BG_SetTorsoAnimTimer(playerState_t *ps, int time )
 void PM_SetTorsoAnimTimer(int time )
 {
 	BG_SetTorsoAnimTimer(pm->ps, time);
+}
+
+qboolean PM_SaberReturnAnim(int anim)
+{
+	if ((anim >= BOTH_R1_B__S1 && anim <= BOTH_R1_TR_S1)
+		|| (anim >= BOTH_R2_B__S1 && anim <= BOTH_R2_TR_S1)
+		|| (anim >= BOTH_R3_B__S1 && anim <= BOTH_R3_TR_S1)
+		|| (anim >= BOTH_R4_B__S1 && anim <= BOTH_R4_TR_S1)
+		|| (anim >= BOTH_R5_B__S1 && anim <= BOTH_R5_TR_S1)
+		|| (anim >= BOTH_R6_B__S6 && anim <= BOTH_R6_TR_S6)
+		|| (anim >= BOTH_R7_B__S7 && anim <= BOTH_R7_TR_S7))
+	{
+		return qtrue;
+	}
+	return qfalse;
 }
 
 void BG_SaberStartTransAnim( int clientNum, int saberAnimLevel, int weapon, int anim, float *animSpeed, int broken )
@@ -2711,40 +2727,33 @@ void BG_SaberStartTransAnim( int clientNum, int saberAnimLevel, int weapon, int 
 		}
 	}
 
-	if ( ( (anim) >= BOTH_T1_BR__R &&
-		(anim) <= BOTH_T1_BL_TL ) ||
-		( (anim) >= BOTH_T2_BR__R &&
-		(anim) <= BOTH_T2_BL_TL ) ||
-		( (anim) >= BOTH_T3_BR__R &&
-		(anim) <= BOTH_T3_BL_TL ) )
+	// slow down the attacks
+	if (anim >= BOTH_A1_T__B_ && 
+		anim <= BOTH_ROLL_STAB && 
+		!BG_SaberInSpecialAttack(anim) &&
+		!PM_SaberReturnAnim(anim) &&
+		anim != BOTH_FORCEWALLRELEASE_FORWARD &&
+		anim != BOTH_FORCEWALLRUNFLIP_START && 
+		anim != BOTH_FORCEWALLRUNFLIP_END)
 	{
-		if ( saberAnimLevel == FORCE_LEVEL_1 )
-		{
-			*animSpeed *= 1.5f;
-		}
-		else if ( saberAnimLevel == FORCE_LEVEL_3 )
-		{
-			*animSpeed *= 0.75f;
-		}
-
-		if (broken & (1<<BROKENLIMB_RARM))
-		{
-			*animSpeed *= 0.5f;
-		}
-		else if (broken & (1<<BROKENLIMB_LARM))
-		{
-			*animSpeed *= 0.65f;
-		}
+		*animSpeed *= .75f;
 	}
-	else if (broken && PM_InSaberAnim(anim))
+
+	if ((anim >= BOTH_H1_S1_T_ && 
+		anim <= BOTH_H1_S1_BR) || 
+		(anim >= BOTH_H6_S6_T_ && 
+		anim <= BOTH_H6_S6_BR) || 
+		(anim >= BOTH_H7_S7_T_ && 
+		anim <= BOTH_H7_S7_BR))
 	{
-		if (broken & (1<<BROKENLIMB_RARM))
+		// slow down parries
+		if (anim >= BOTH_H6_S6_T_ && anim <= BOTH_H6_S6_BR)
 		{
-			*animSpeed *= 0.5f;
+			*animSpeed *= .75f;
 		}
-		else if (broken & (1<<BROKENLIMB_LARM))
+		else if (anim >= BOTH_H7_S7_T_ && anim <= BOTH_H7_S7_BR)
 		{
-			*animSpeed *= 0.65f;
+			*animSpeed *= .75f;
 		}
 	}
 }

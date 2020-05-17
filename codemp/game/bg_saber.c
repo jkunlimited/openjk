@@ -3645,26 +3645,31 @@ weapChecks:
 				return;
 			}
 			if ( curmove >= LS_PARRY_UP && curmove <= LS_REFLECT_LL )
-			{//from a parry or reflection, can go directly into an attack
-				switch ( saberMoveData[curmove].endQuad )
-				{
-				case Q_T:
-					newmove = LS_A_T2B;
-					break;
-				case Q_TR:
-					newmove = LS_A_TR2BL;
-					break;
-				case Q_TL:
-					newmove = LS_A_TL2BR;
-					break;
-				case Q_BR:
-					newmove = LS_A_BR2TL;
-					break;
-				case Q_BL:
-					newmove = LS_A_BL2TR;
-					break;
-				//shouldn't be a parry that ends at L, R or B
-				}
+			{
+				//from a parry or reflection, can go directly into an attack
+				// switch ( saberMoveData[curmove].endQuad )
+				// {
+				// case Q_T:
+				// 	newmove = LS_A_T2B;
+				// 	break;
+				// case Q_TR:
+				// 	newmove = LS_A_TR2BL;
+				// 	break;
+				// case Q_TL:
+				// 	newmove = LS_A_TL2BR;
+				// 	break;
+				// case Q_BR:
+				// 	newmove = LS_A_BR2TL;
+				// 	break;
+				// case Q_BL:
+				// 	newmove = LS_A_BL2TR;
+				// 	break;
+				// //shouldn't be a parry that ends at L, R or B
+				// }
+
+				// JKU-Bunisher: Force back into ready anim. 
+				// You cannot instantly riposte into the middle of an attack sequence if you were parried.
+				newmove = LS_READY;
 			}
 
 			if ( newmove != LS_NONE )

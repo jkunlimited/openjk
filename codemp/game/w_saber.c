@@ -3993,12 +3993,36 @@ static QINLINE void JKU_saberDoBlockForceCost(gentity_t* self, saber_styles_t sa
    }
 }
 
-static QINLINE void JKU_extendSaberBlockingTimers(gentity_t* ent)
+static QINLINE void JKU_saberExtendBlockTimers(gentity_t* ent)
 {
    if (ent && ent->client)
    {
       ent->client->enableBlockingTimer = level.time + JKU_EXTEND_BLOCKING_FOR_MSECS;
    }
+}
+
+static QINLINE void JKU_saberDoBlockFeedback(gentity_t *self, vec3_t trace)
+{
+	if (!PM_SaberInKnockaway(self->client->ps.saberMove) && 
+		!PM_InKnockDown(&self->client->ps)) 
+	{	
+		if (!PM_SaberInParry(self->client->ps.saberMove))
+		{
+			WP_SaberBlockNonRandom(self, trace, qfalse);
+			self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
+			self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
+		}
+		else
+		{
+			self->client->ps.saberMove = G_KnockawayForParry(self->client->ps.saberMove);
+			self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
+		}
+	}
+	if (self->client->ps.torsoAnim == self->client->ps.legsAnim) 
+	{
+		int anim = saberMoveData[self->client->ps.saberMove].animToUse;
+		G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, anim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+	}
 }
 
 // [/Jedi Knight: Unlimited]
@@ -4148,35 +4172,33 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
    //JKU-Fnuki: New implementation of collision handling
    gentity_t* hitEntity = &g_entities[tr.entityNum];
 
-   if ((tr.fraction != 1 || tr.startsolid) &&
-	   hitEntity->takedamage &&
-	   (hitEntity->health > 0 || !(hitEntity->s.eFlags & EF_DISINTEGRATION)) &&
-	   hitEntity->s.number != self->s.number &&
-	   hitEntity->inuse)
-   {
-		if (hitEntity->client &&
-			(hitEntity->client->buttons & BUTTON_JKU_BLOCK) &&
+	if ((tr.fraction != 1 || 
+		tr.startsolid) && 
+		hitEntity->takedamage && 
+		(hitEntity->health > 0 || 
+		!(hitEntity->s.eFlags & EF_DISINTEGRATION)) &&
+		hitEntity->s.number != self->s.number &&  
+		hitEntity->inuse) {
+
+		if (hitEntity->client && 
+			(hitEntity->client->buttons & BUTTON_JKU_BLOCK) && 
 			JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse)) {
-			
-			self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
-			self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
 
-			if (self->client->ps.torsoAnim == self->client->ps.legsAnim) {
-				int anim = saberMoveData[self->client->ps.saberMove].animToUse;
-				G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, anim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-			}
-
+			WP_SaberBlockNonRandom(hitEntity, tr.endpos, qfalse);
 			WP_SaberBounceSound(self, rSaberNum, rBladeNum);
-			WP_SaberBlockNonRandom(hitEntity, lastValidEnd, qfalse);
-			
+
+			JKU_saberDoBlockFeedback(self, tr.endpos);
 			JKU_saberDoBlockEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
 			JKU_saberDoBlockForceCost(hitEntity, self->client->saber->singleBladeStyle);
-			JKU_extendSaberBlockingTimers(hitEntity);
+			JKU_saberExtendBlockTimers(hitEntity);
 
 			didHit = qfalse;
 		}
 		else 
 		{
+			// JKU-Bunisher: Time for some fun...
+			// Let's shake them up a little... they need to step up their game.
+			G_ScreenShake(hitEntity->s.origin, hitEntity, 1.0f /* 1/4 the intensity of rancor AI */, 500 /* Half the duration of rancor AI */, qfalse);
 			didHit = qtrue;
 		}
    }
@@ -4186,12 +4208,13 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
       //JKU-Fnuki: Apply the damage to the target
       int knockbackFlags = 0;
 
-      if (self->s.eType == ET_NPC &&
-         g_entities[tr.entityNum].client &&
-         self->client->playerTeam == g_entities[tr.entityNum].client->playerTeam)
-      { //Oops. Since he's an NPC, we'll be forgiving and cut the damage down.
-         dmg *= 0.2f;
-      }
+	  //JKU-Bunisher: Don't give NPCs special treatment.
+      //if (self->s.eType == ET_NPC &&
+      //   g_entities[tr.entityNum].client &&
+      //   self->client->playerTeam == g_entities[tr.entityNum].client->playerTeam)
+      //{ //Oops. Since he's an NPC, we'll be forgiving and cut the damage down.
+      //   dmg *= 0.2f;
+      //}
 
       if (!WP_SaberBladeUseSecondBladeStyle(&self->client->saber[rSaberNum], rBladeNum)
          && self->client->saber[rSaberNum].knockbackScale > 0.0f)
