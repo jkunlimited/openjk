@@ -3898,6 +3898,32 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
    float cosAngle = JKU_calculateSaberHitAngle(self, attacker);
    float degAngle = JKU_radToDeg(cosAngle);
 
+   if (degAngle < JKU_BLOCKABLE_ANGLE_STATIONARY)
+   {
+	   // The angle with which the defender was hit was outside the 60*2*2 cone radius 
+	   // Therefore, the attack is unblockable... however...
+	   if (InFront(attacker->client->ps.origin, self->client->ps.origin, self->client->ps.viewangles, -.7f))
+	   {
+		   // If the attacker was actually infront of him...
+		   // That means that the attacker is likely excessively yawing or angling his attacks...
+		   // Therefore, we will allow blocking it
+		   Com_Printf("CosineAngle: %f, Degrees: %f, Penetrated Defensive Arc, Hit InFront - Enabling Blocking...\n", cosAngle, degAngle);
+		   return 1;
+	   }
+	   else
+	   {
+		   // The attacker was behind him.
+		   // Therefore, we will not allow blocking it
+		   Com_Printf("CosineAngle: %f, Degrees: %f, Penetrated Defensive Arc, Disabling Blocking...\n", cosAngle, degAngle);
+		   return 0;
+	   }
+   }
+
+   if (!JKU_checkSaberBlockForceCost(self, attacker->client->saber->singleBladeStyle))
+   {
+	   return 0;
+   }
+
    /*if (cosAngle > 0)
    {
    degAngle -= 180.0f;
@@ -3906,9 +3932,7 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
    degAngle *= -1.0f;
    }
 
-   //trap->Print("CosineAngle: %f, Degrees: %f\n", cosAngle, degAngle);
-
-   /*if (degAngle < JKU_UNBLOCKABLE_ANGLE)
+   /*if (degAngle < JKU_UNBLOCKABLE_ANGLE) 
    {
    return 0;
    }*/
@@ -3926,22 +3950,12 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
    //    return 0;
    // }
 
-   if (degAngle < JKU_BLOCKABLE_ANGLE_STATIONARY)
-   {
-      return 0;
-   }
-
    // else if (!projectile && self->client->pers.cmd.rightmove == 0 &&
    //    self->client->pers.cmd.forwardmove == 0)
    // {
    //    //Cant block sabers standing still
    //    return 0;
    // }
-
-   if (!JKU_checkSaberBlockForceCost(self, attacker->client->saber->singleBladeStyle))
-   {
-      return 0;
-   }
 
    return 1;
 }
@@ -4042,6 +4056,14 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
       self->client->enableBlockingTimer = level.time + JKU_ENABLE_BLOCKING_FOR_MSECS;
       self->client->disableBlockingTimer = level.time + JKU_DISABLE_BLOCKING_FOR_MSECS;
       self->client->ps.canBlock = qtrue;
+   }
+
+   // JKU-Bunisher: Hideous attempt at making blocks unavailable during attacks but not wind-up
+   if (BG_SaberInAttack(self->client->ps.saberMove) || BG_SaberInReturn(self->client->ps.saberMove))
+   {
+	   self->client->enableBlockingTimer = level.time;
+	   self->client->disableBlockingTimer = level.time;
+	   self->client->ps.canBlock = qfalse;
    }
 
    // JKU-Bunisher: Don't even begin calculating damage when you're not attacking.

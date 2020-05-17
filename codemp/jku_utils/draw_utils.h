@@ -45,6 +45,7 @@ extern void JKU_DrawAmmoAndClipReserve(centity_t	*cent, menuDef_t *menuHUD);
 extern void JKU_DrawForceCircle(centity_t *cent, menuDef_t *menuHUD);
 extern void JKU_DrawForcePower(centity_t *cent, menuDef_t *menuHUD);
 extern void JKU_DrawWeaponry();
+extern void JKU_DrawBlockStatus(centity_t *cent);
 
 extern qboolean ForcePower_Valid(int i);
 extern qboolean CG_WeaponSelectable(int i);

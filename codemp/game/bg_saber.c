@@ -2740,6 +2740,75 @@ qboolean PM_CanDoRollStab( void )
 	return qtrue;
 }
 
+qboolean PM_BlockWhileWindingUpAttack(pmove_t *pm)
+{
+	if ((pm->cmd.buttons & (BUTTON_JKU_BLOCK) && (pm->ps->canBlock)))
+	{
+		return qtrue;
+	}
+	else
+	{
+		return qfalse;
+	}
+}
+
+void PM_ReturnToBlockAnim(pmove_t *pm)
+{
+	pm->ps->saberMove = LS_READY;
+	pm->ps->weaponTime = 0;
+}
+
+int PM_ReturnForQuad(int quad)
+{
+	switch (quad)
+	{
+		case Q_BR:
+		{
+			return LS_R_TL2BR;
+			break;
+		}
+		case Q_R:
+		{
+			return LS_R_L2R;
+			break;
+		}
+		case Q_TR:
+		{
+			return LS_R_BL2TR;
+			break;
+		}
+		case Q_T:
+		{
+			return LS_R_BL2TR;
+			break;
+		}
+		case Q_TL:
+		{
+			return LS_R_BR2TL;
+			break;
+		}
+		case Q_L:
+		{
+			return LS_R_R2L;
+			break;
+		}
+		case Q_BL:
+		{
+			return LS_R_TR2BL;
+			break;
+		}
+		case Q_B:
+		{
+			return LS_R_T2B;
+			break;
+		}
+		default:
+		{
+			return LS_READY;
+		}
+	};
+}
+
 /*
 =================
 PM_WeaponLightsaber
@@ -2748,13 +2817,14 @@ Consults a chart to choose what to do with the lightsaber.
 While this is a little different than the Quake 3 code, there is no clean way of using the Q3 code for this kind of thing.
 =================
 */
+
 // Ultimate goal is to set the sabermove to the proper next location
 // Note that if the resultant animation is NONE, then the animation is essentially "idle", and is set in WP_TorsoAnim
 qboolean PM_WalkingAnim( int anim );
 qboolean PM_SwimmingAnim( int anim );
-int PM_SaberBounceForAttack( int move );
 qboolean BG_SuperBreakLoseAnim( int anim );
 qboolean BG_SuperBreakWinAnim( int anim );
+int PM_SaberBounceForAttack(int move);
 void PM_WeaponLightsaber(void)
 {
 	int			addTime;
@@ -3483,61 +3553,61 @@ weapChecks:
 	}
 
 	//this is never a valid regular saber attack button
-	pm->cmd.buttons &= ~BUTTON_ALT_ATTACK;
+	//pm->cmd.buttons &= ~BUTTON_ALT_ATTACK;
 
 	if(!delayed_fire)
 	{
-		// Start with the current move, and cross index it with the current control states.
-		if ( pm->ps->saberMove > LS_NONE && pm->ps->saberMove < LS_MOVE_MAX )
-		{
-			curmove = pm->ps->saberMove;
-		}
-		else
-		{
-			curmove = LS_READY;
-		}
+		// Check the current move, and cross index it with the current control states.
+		curmove = (pm->ps->saberMove > LS_NONE && pm->ps->saberMove < LS_MOVE_MAX) ? pm->ps->saberMove : LS_READY;
 
-		if ( curmove == LS_A_JUMP_T__B_ || pm->ps->torsoAnim == BOTH_FORCELEAP2_T__B_ )
-		{//must transition back to ready from this anim
+		// Check to see if we're in special animation sequences that must be reset before proceeding.
+		if ( curmove == LS_A_JUMP_T__B_ || pm->ps->torsoAnim == BOTH_FORCELEAP2_T__B_ ) 
+		{
 			newmove = LS_R_T2B;
 		}
-		// check for fire
-		else if ( !(pm->cmd.buttons & (BUTTON_ATTACK|BUTTON_ALT_ATTACK)) )
-		{//not attacking
-			pm->ps->weaponTime = 0;
 
-			if ( pm->ps->weaponTime > 0 )
-			{//Still firing
-				pm->ps->weaponstate = WEAPON_FIRING;
-			}
-			else if ( pm->ps->weaponstate != WEAPON_READY )
+		// Check to see if we're not holding down attack.
+		else if (!(pm->cmd.buttons & (BUTTON_ATTACK))) 
+		{
+			if (pm->ps->weaponstate != WEAPON_READY) 
 			{
 				pm->ps->weaponstate = WEAPON_IDLE;
 			}
-			//Check for finishing an anim if necc.
-			if ( curmove >= LS_S_TL2BR && curmove <= LS_S_T2B )
-			{//started a swing, must continue from here
-				newmove = LS_A_TL2BR + (curmove-LS_S_TL2BR);
+
+			// Check to see if we're in the start sequences of attack animations.
+			if (curmove >= LS_S_TL2BR && curmove <= LS_S_T2B) 
+			{
+				if (PM_BlockWhileWindingUpAttack(pm))
+				{
+					// We're blocking while winding up an attack.
+					PM_ReturnToBlockAnim(pm);
+					return;
+				}
+				else
+				{
+					// We're fake attacking.
+					newmove = PM_ReturnForQuad(saberMoveData[curmove].endQuad);
+				}
 			}
-			else if ( curmove >= LS_A_TL2BR && curmove <= LS_A_T2B )
-			{//finished an attack, must continue from here
-				newmove = LS_R_TL2BR + (curmove-LS_A_TL2BR);
+			else if (curmove >= LS_A_TL2BR && curmove <= LS_A_T2B) 
+			{
+				// We're in the middle of changing animations, set newmove.
+				newmove = LS_R_TL2BR + (curmove - LS_A_TL2BR);
 			}
-			else if ( PM_SaberInTransition( curmove ) )
-			{//in a transition, must play sequential attack
-				newmove = saberMoveData[curmove].chain_attack;
+			else if (PM_SaberInTransition(curmove))
+			{
+				// We're in transition, return for quad.
+				newmove = PM_ReturnForQuad(saberMoveData[curmove].endQuad);
 			}
-			else if ( PM_SaberInBounce( curmove ) )
-			{//in a bounce
-				newmove = saberMoveData[curmove].chain_idle;//oops, not attacking, so don't chain
+			else if (PM_SaberInBounce(curmove))
+			{
+				// We're being bounced.
+				newmove = saberMoveData[curmove].chain_idle;
 			}
 			else
-			{//FIXME: what about returning from a parry?
-				//PM_SetSaberMove( LS_READY );
-				//if ( pm->ps->saberBlockingTime > pm->cmd.serverTime )
-				{
-					PM_SetSaberMove( LS_READY );
-				}
+			{
+				// We're not blocking, attacking or doing anything, so set to ready.
+				PM_SetSaberMove(LS_READY);
 				return;
 			}
 		}

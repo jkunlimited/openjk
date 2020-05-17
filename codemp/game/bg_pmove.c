@@ -273,88 +273,253 @@ static QINLINE qboolean PM_IsRocketTrooper(void)
 	return qfalse;
 }
 
+// JKU-Bunisher: Function responsible for determining block animations
+int PM_GetSaberBlockAnim(int saberAnimLevel)
+{
+	int resultAnim = BOTH_STAND2;
+
+	switch (saberAnimLevel)
+	{
+		case SS_DUAL:
+		{
+			if (pm->cmd.rightmove > 0) // Right
+			{
+				if (pm->cmd.forwardmove > 0) // Right Forward
+				{
+					resultAnim = BOTH_P6_S6_TR;
+				}
+				else if (pm->cmd.forwardmove < 0) // Right Backward
+				{
+					resultAnim = BOTH_P6_S6_BR;
+				}
+				else // Right
+				{
+					resultAnim = BOTH_P6_S6_TR;
+				}
+			}
+			else if (pm->cmd.rightmove < 0) // Left
+			{
+				if (pm->cmd.forwardmove > 0) // Left Forward
+				{
+					resultAnim = BOTH_P6_S6_TL;
+				}
+				else if (pm->cmd.forwardmove < 0) // Left Backward
+				{
+					resultAnim = BOTH_P6_S6_BL;
+				}
+				else // Left
+				{
+					resultAnim = BOTH_P6_S6_TL;
+				}
+			}
+			else if (pm->cmd.forwardmove > 0) // Forward
+			{
+				if (pm->cmd.rightmove > 0) // Forward Right
+				{
+					resultAnim = BOTH_P6_S6_TR;
+				}
+				else if (pm->cmd.rightmove < 0) // Forward Left
+				{
+					resultAnim = BOTH_P6_S6_TL;
+				}
+				else // Forward
+				{
+					resultAnim = BOTH_P6_S6_T_;
+				}
+			}
+			else if (pm->cmd.forwardmove < 0) // Backwards
+			{
+				if (pm->cmd.rightmove > 0) // Backwards Right
+				{
+					resultAnim = BOTH_P6_S6_BR;
+				}
+				else if (pm->cmd.rightmove < 0) // Backwards Left
+				{
+					resultAnim = BOTH_P6_S6_BL;
+				}
+				else // Backwards
+				{
+					resultAnim = BOTH_P6_S6_T_;
+				}
+			}
+			else // Stationary
+			{
+				resultAnim = BOTH_P6_S6_T_;
+			}
+			break;
+		}
+		case SS_STAFF:
+		{
+			if (pm->cmd.rightmove > 0) // Right
+			{
+				if (pm->cmd.forwardmove > 0) // Right Forward
+				{
+					resultAnim = BOTH_P7_S7_TR;
+				}
+				else if (pm->cmd.forwardmove < 0) // Right Backward
+				{
+					resultAnim = BOTH_P7_S7_BR;
+				}
+				else // Right
+				{
+					resultAnim = BOTH_P7_S7_TR;
+				}
+			}
+			else if (pm->cmd.rightmove < 0) // Left
+			{
+				if (pm->cmd.forwardmove > 0) // Left Forward
+				{
+					resultAnim = BOTH_P7_S7_TL;
+				}
+				else if (pm->cmd.forwardmove < 0) // Left Backward
+				{
+					resultAnim = BOTH_P7_S7_BL;
+				}
+				else // Left
+				{
+					resultAnim = BOTH_P7_S7_TL;
+				}
+			}
+			else if (pm->cmd.forwardmove > 0) // Forward
+			{
+				if (pm->cmd.rightmove > 0) // Forward Right
+				{
+					resultAnim = BOTH_P7_S7_TR;
+				}
+				else if (pm->cmd.rightmove < 0) // Forward Left
+				{
+					resultAnim = BOTH_P7_S7_TL;
+				}
+				else // Forward
+				{
+					resultAnim = BOTH_P7_S7_T_;
+				}
+			}
+			else if (pm->cmd.forwardmove < 0) // Backwards
+			{
+				if (pm->cmd.rightmove > 0) // Backwards Right
+				{
+					resultAnim = BOTH_P7_S7_BR;
+				}
+				else if (pm->cmd.rightmove < 0) // Backwards Left
+				{
+					resultAnim = BOTH_P7_S7_BL;
+				}
+				else // Backwards
+				{
+					resultAnim = BOTH_P7_S7_T_;
+				}
+			}
+			else // Stationary
+			{
+				resultAnim = BOTH_P7_S7_T_;
+			}
+			break;
+		}
+		case SS_DESANN:
+		case SS_FAST:
+		case SS_MEDIUM:
+		case SS_STRONG:
+		case SS_TAVION:
+		default:
+		{
+			if (pm->cmd.rightmove > 0) // Right
+			{
+				if (pm->cmd.forwardmove > 0) // Right Forward
+				{
+					resultAnim = BOTH_P1_S1_TR;
+				}
+				else if (pm->cmd.forwardmove < 0) // Right Backward
+				{
+					resultAnim = BOTH_P1_S1_BR;
+				}
+				else // Right
+				{
+					resultAnim = BOTH_P1_S1_TR;
+				}
+			}
+			else if (pm->cmd.rightmove < 0) // Left
+			{
+				if (pm->cmd.forwardmove > 0) // Left Forward
+				{
+					resultAnim = BOTH_P1_S1_TL;
+				}
+				else if (pm->cmd.forwardmove < 0) // Left Backward
+				{
+					resultAnim = BOTH_P1_S1_BL;
+				}
+				else // Left
+				{
+					resultAnim = BOTH_P1_S1_TL;
+				}
+			}
+			else if (pm->cmd.forwardmove > 0) // Forward
+			{
+				if (pm->cmd.rightmove > 0) // Forward Right
+				{
+					resultAnim = BOTH_P1_S1_TR;
+				}
+				else if (pm->cmd.rightmove < 0) // Forward Left
+				{
+					resultAnim = BOTH_P1_S1_TL;
+				}
+				else // Forward
+				{
+					resultAnim = BOTH_P1_S1_T_;
+				}
+			}
+			else if (pm->cmd.forwardmove < 0) // Backwards
+			{
+				if (pm->cmd.rightmove > 0) // Backwards Right
+				{
+					resultAnim = BOTH_P1_S1_BR;
+				}
+				else if (pm->cmd.rightmove < 0) // Backwards Left
+				{
+					resultAnim = BOTH_P1_S1_BL;
+				}
+				else // Backwards
+				{
+					resultAnim = BOTH_P1_S1_T_;
+				}
+			}
+			else // Stationary
+			{
+				resultAnim = BOTH_P1_S1_T_;
+			}
+			break;
+		}
+	}
+	return resultAnim;
+}
+
 int PM_GetSaberStance(void)
 {
 	int anim = BOTH_STAND2;
 
-	// saberInfo_t *saber1 = BG_MySaber( pm->ps->clientNum, 0 );
-	// saberInfo_t *saber2 = BG_MySaber( pm->ps->clientNum, 1 );
-
-	if (!pm->ps->saberEntityNum)
+	if ( !( pm->ps->saberEntityNum ) || BG_SabersOff( pm->ps ) )
 	{
 		return BOTH_STAND1;
 	}
 
-	if (BG_SabersOff(pm->ps))
+	if ( !( pm->cmd.buttons & BUTTON_JKU_BLOCK ) || !pm->ps->canBlock )
 	{
-		return BOTH_STAND1;
-	}
-
-	if (!(pm->cmd.buttons & BUTTON_JKU_BLOCK) || !pm->ps->canBlock)
-	{
-		switch (pm->ps->fd.saberAnimLevel)
+		switch ( pm->ps->fd.saberAnimLevel )
 		{
-		case SS_DUAL:
-			return BOTH_SABERDUAL_STANCE;
-		case SS_STAFF:
-			return BOTH_SABERSTAFF_STANCE;
-		case SS_FAST:
-			return BOTH_SABERFAST_STANCE;
-		case SS_TAVION:
-			return BOTH_SABERFAST_STANCE;
-		case SS_STRONG:
-			return BOTH_SABERSLOW_STANCE;
-		case SS_MEDIUM:
-			return BOTH_STAND2;
-		case SS_DESANN:
-			return BOTH_SABERSLOW_STANCE;
-		default:
-			return BOTH_STAND2;
+			case SS_DUAL:		return BOTH_SABERDUAL_STANCE;
+			case SS_STAFF:		return BOTH_SABERSTAFF_STANCE;
+			case SS_FAST:		return BOTH_SABERFAST_STANCE;
+			case SS_TAVION:		return BOTH_SABERFAST_STANCE;
+			case SS_STRONG:		return BOTH_SABERSLOW_STANCE;
+			case SS_MEDIUM:		return BOTH_STAND2;
+			case SS_DESANN:		return BOTH_SABERSLOW_STANCE;
+			default:			return BOTH_STAND2;
 		}
 	}
 	else
 	{
-		switch (pm->ps->fd.saberAnimLevel)
-		{
-		case SS_DUAL:
-			anim = BOTH_P6_S6_T_;
-			break;
-		case SS_STAFF:
-			anim = BOTH_P7_S7_T_;
-			break;
-		case SS_FAST:
-			anim = BOTH_P1_S1_T_;
-			break;
-		case SS_TAVION:
-			anim = BOTH_P1_S1_T_;
-			break;
-		case SS_STRONG:
-			anim = BOTH_P1_S1_T_;
-			break;
-		case SS_MEDIUM:
-			anim = BOTH_P1_S1_T_;
-			break;
-		case SS_DESANN:
-			anim = BOTH_P1_S1_T_;
-			break;
-		default:
-			anim = BOTH_P1_S1_T_;
-			break;
-		}
-
-      //JKU-Fnuki: Add directional blocking based on walking direction
-      if (pm->cmd.rightmove < 0)
-      {
-         //block right
-         return BOTH_P1_S1_TR;
-      }
-      else if (pm->cmd.rightmove > 0)
-      {
-         //block left
-         return BOTH_P1_S1_TL;
-      }
+		anim = PM_GetSaberBlockAnim(pm->ps->fd.saberAnimLevel);
 	}
-
 	return anim;
 }
 

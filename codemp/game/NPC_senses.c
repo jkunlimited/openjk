@@ -101,7 +101,7 @@ qboolean CanSee ( gentity_t *ent )
 }
 
 qboolean InFront( vec3_t spot, vec3_t from, vec3_t fromAngles, float threshHold )
-{
+{//RACC - checks to see if spot is in front of from based on the viewangles fromAngle.
 	vec3_t	dir, forward, angles;
 	float	dot;
 
