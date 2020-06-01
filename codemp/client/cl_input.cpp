@@ -929,59 +929,6 @@ void CL_KeyMove(usercmd_t *cmd) {
 	cmd->upmove = ClampChar(up);
 }
 
-
-//void CL_KeyMove( usercmd_t *cmd ) {
-//	int		forwardMovespeed, sideMovespeed;
-//	int		forward, side, up;
-//
-//   int baseRunningSpeed = 127, baseWalkingSpeed = 46;
-//
-//	//
-//	// adjust for speed key / running
-//	// the walking flag is to keep animations consistant
-//	// even during acceleration and develeration
-//	//
-//
-//   //JKU-Fnuki: Force player to walk if blocking with saber
-//   //JKU-Fnuki: Reduce forward movement speed by 20%
-//   //           Reduce strafe movement speed by 40%
-//
-//	if ((cl.snap.ps.weapon != WP_SABER || !(cmd->buttons & BUTTON_JKU_BLOCK)) && (in_speed.active ^ cl_run->integer ))
-//   {
-//		forwardMovespeed = 110;
-//      sideMovespeed = 85;
-//		cmd->buttons &= ~BUTTON_WALKING;
-//	} else {
-//		cmd->buttons |= BUTTON_WALKING;
-//		forwardMovespeed = 40;
-//      sideMovespeed = 35;
-//	}
-//
-//	forward = 0;
-//	side = 0;
-//	up = 0;
-//
-//	if ( in_strafe.active ) {
-//		side += sideMovespeed * CL_KeyState (&in_right);
-//		side -= sideMovespeed * CL_KeyState (&in_left);
-//	}
-//   else
-//   {
-//      side += sideMovespeed * CL_KeyState(&in_moveright);
-//      side -= sideMovespeed * CL_KeyState(&in_moveleft);
-//   }
-//
-//	up += forwardMovespeed * CL_KeyState (&in_up);
-//	up -= forwardMovespeed * CL_KeyState (&in_down);
-//
-//	forward += forwardMovespeed * CL_KeyState (&in_forward);
-//	forward -= forwardMovespeed * CL_KeyState (&in_back);
-//
-//	cmd->forwardmove = ClampChar( forward );
-//	cmd->rightmove = ClampChar( side );
-//	cmd->upmove = ClampChar( up );
-//}
-
 /*
 =================
 CL_MouseEvent

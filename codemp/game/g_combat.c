@@ -5291,7 +5291,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_
 						maxtake = 200;
 					}
 				}
-				else if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] == FORCE_LEVEL_3)
+				else if (targ->client->ps.fd.forcePowerLevel[FP_PROTECT] >= FORCE_LEVEL_3)
 				{
 					famt = 0.25f;
 					hamt = 0.80f;

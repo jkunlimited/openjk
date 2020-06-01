@@ -177,24 +177,24 @@ int forceMasteryPoints[NUM_FORCE_MASTERY_LEVELS] =
 
 int bgForcePowerCost[NUM_FORCE_POWERS][NUM_FORCE_POWER_LEVELS] = //0 == neutral
 {
-	{	0,	2,	4,	6	},	// Heal			// FP_HEAL
-	{	0,	0,	2,	6	},	// Jump			//FP_LEVITATION,//hold/duration
-	{	0,	2,	4,	6	},	// Speed		//FP_SPEED,//duration
-	{	0,	1,	3,	6	},	// Push			//FP_PUSH,//hold/duration
-	{	0,	1,	3,	6	},	// Pull			//FP_PULL,//hold/duration
-	{	0,	4,	6,	8	},	// Mind Trick	//FP_TELEPATHY,//instant
-	{	0,	1,	3,	6	},	// Grip			//FP_GRIP,//hold/duration
-	{	0,	2,	5,	8	},	// Lightning	//FP_LIGHTNING,//hold/duration
-	{	0,	4,	6,	8	},	// Dark Rage	//FP_RAGE,//duration
-	{	0,	2,	5,	8	},	// Protection	//FP_PROTECT,//duration
-	{	0,	1,	3,	6	},	// Absorb		//FP_ABSORB,//duration
-	{	0,	1,	3,	6	},	// Team Heal	//FP_TEAM_HEAL,//instant
-	{	0,	1,	3,	6	},	// Team Force	//FP_TEAM_FORCE,//instant
-	{	0,	2,	4,	6	},	// Drain		//FP_DRAIN,//hold/duration
-	{	0,	2,	5,	8	},	// Sight		//FP_SEE,//duration
-	{	0,	1,	5,	8	},	// Saber Attack	//FP_SABER_OFFENSE,
-	{	0,	1,	5,	8	},	// Saber Defend	//FP_SABER_DEFENSE,
-	{	0,	4,	6,	8	}	// Saber Throw	//FP_SABERTHROW,
+	{ 0, 2,	4, 6, 8, 8 },	// Heal			// FP_HEAL
+	{ 0, 0,	2, 6, 8, 8 },	// Jump			//FP_LEVITATION,//hold/duration
+	{ 0, 2,	4, 6, 8, 8 },	// Speed		//FP_SPEED,//duration
+	{ 0, 1,	3, 6, 8, 8 },	// Push			//FP_PUSH,//hold/duration
+	{ 0, 1,	3, 6, 8, 8 },	// Pull			//FP_PULL,//hold/duration
+	{ 0, 4,	6, 8, 8, 8 },	// Mind Trick	//FP_TELEPATHY,//instant
+	{ 0, 1,	3, 6, 8, 8 },	// Grip			//FP_GRIP,//hold/duration
+	{ 0, 2,	5, 8, 8, 8 },	// Lightning	//FP_LIGHTNING,//hold/duration
+	{ 0, 4,	6, 8, 8, 8 },	// Dark Rage	//FP_RAGE,//duration
+	{ 0, 2,	5, 8, 8, 8 },	// Protection	//FP_PROTECT,//duration
+	{ 0, 1,	3, 6, 8, 8 },	// Absorb		//FP_ABSORB,//duration
+	{ 0, 1,	3, 6, 8, 8 },	// Team Heal	//FP_TEAM_HEAL,//instant
+	{ 0, 1,	3, 6, 8, 8 },	// Team Force	//FP_TEAM_FORCE,//instant
+	{ 0, 2,	4, 6, 8, 8 },	// Drain		//FP_DRAIN,//hold/duration
+	{ 0, 2,	5, 8, 8, 8 },	// Sight		//FP_SEE,//duration
+	{ 0, 1,	5, 8, 8, 8 },	// Saber Attack	//FP_SABER_OFFENSE,
+	{ 0, 1,	5, 8, 8, 8 },	// Saber Defend	//FP_SABER_DEFENSE,
+	{ 0, 4,	6, 8, 8, 8 }	// Saber Throw	//FP_SABERTHROW,
 	//NUM_FORCE_POWERS
 };
 
@@ -454,7 +454,7 @@ qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRan
 	//Read the force powers in, and cut them down based on the various rules supplied.
 	c = 0;
 	while (i < sizeof( powerBuf ) && powerBuf[i] && powerBuf[i] != '\n' && powerBuf[i] != '\r'
-		&& powerBuf[i] >= '0' && powerBuf[i] <= '3' && c < NUM_FORCE_POWERS)
+		&& powerBuf[i] >= '0' && powerBuf[i] <= '5' && c < NUM_FORCE_POWERS)
 	{
 		readBuf[0] = powerBuf[i];
 		readBuf[1] = 0;
@@ -626,8 +626,8 @@ qboolean BG_LegalizedForcePowers(char *powerOut, size_t powerOutSize, int maxRan
 	i = 0;
 	while (i < NUM_FORCE_POWERS)
 	{
-		if (final_Powers[i] > FORCE_LEVEL_3)
-			final_Powers[i] = FORCE_LEVEL_3;
+		if (final_Powers[i] > FORCE_LEVEL_5)
+			final_Powers[i] = FORCE_LEVEL_5;
 		i++;
 	}
 

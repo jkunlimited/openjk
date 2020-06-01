@@ -552,7 +552,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		//For jedi AI
 		other->client->ps.saberEventFlags |= SEF_DEFLECTED;
 
-		if (otherDefLevel == FORCE_LEVEL_3)
+		if (otherDefLevel >= FORCE_LEVEL_3)
 		{
 			other->client->ps.saberBlockTime = 0; //^_^
 		}
@@ -629,7 +629,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			//For jedi AI
 			otherOwner->client->ps.saberEventFlags |= SEF_DEFLECTED;
 
-			if (otherDefLevel == FORCE_LEVEL_3)
+			if (otherDefLevel >= FORCE_LEVEL_3)
 			{
 				otherOwner->client->ps.saberBlockTime = 0; //^_^
 			}

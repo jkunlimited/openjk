@@ -990,7 +990,8 @@ netField_t	entityStateFields[] =
 { NETF(userVec2[2]), 1 },
 
 //JKU-Fnuki: Add new JKU functionality
-{ NETF(canBlock), 1 },
+{ NETF(isBlockInitiated), 1 },
+{ NETF(isBlock), 1 },
 
 // JKU-Bunisher: Add new JKU class functionality
 { NETF(selectedClass), 1 },
@@ -1436,7 +1437,8 @@ netField_t	playerStateFields[] =
 { PSF(userVec2[2]), 1 },
 
 //JKU-Fnuki: Add new JKU functionality
-{ PSF(canBlock), 1 },
+{ PSF(isBlockInitiated), 1 },
+{ PSF(isBlock), 1 },
 
 //JKU-Bunisher: Add new JKU class functionality
 { PSF(selectedClass), 1 },
@@ -1607,7 +1609,8 @@ netField_t	pilotPlayerStateFields[] =
 { PSF(userVec2[2]), 1 },
 
 //JKU-Fnuki: Add new JKU functionality
-{ PSF(canBlock), 1 },
+{ PSF(isBlockInitiated), 1 },
+{ PSF(isBlock), 1 },
 
 //JKU-Bunisher: Add new JKU class functionality
 { PSF(selectedClass), 1 },
@@ -1700,7 +1703,8 @@ netField_t	vehPlayerStateFields[] =
 { PSF(userVec2[2]), 1 },
 
 //JKU-Fnuki: Add new JKU functionality
-{ PSF(canBlock), 1},
+{ PSF(isBlockInitiated), 1 },
+{ PSF(isBlock), 1 },
 
 //JKU-Bunisher: Add new JKU class functionality
 { PSF(selectedClass), 1 },
@@ -1870,7 +1874,8 @@ netField_t	playerStateFields[] =
 { PSF(userVec2[2]), 1 },
 
 //JKU-Fnuki: Add new JKU functionality
-{ PSF(canBlock), 1 },
+{ PSF(isBlockInitiated), 1 },
+{ PSF(isBlock), 1 },
 
 //JKU-Bunisher: Add new JKU class functionality
 { PSF(selectedClass), 1 },

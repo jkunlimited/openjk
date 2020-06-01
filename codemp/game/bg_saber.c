@@ -30,13 +30,6 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 	[Jedi Knight: Unlimited]
 */
 
-#define SABER_SWING_DEFAULT_FORCE_COST 10
-#define SABER_SWING_FAST_ATTACK_FORCE_COST 5
-#define SABER_SWING_MEDIUM_ATTACK_FORCE_COST 10
-#define SABER_SWING_STRONG_ATTACK_FORCE_COST 15
-#define SABER_SWING_DUAL_ATTACK_FORCE_COST 20
-#define SABER_SWING_STAFF_ATTACK_FORCE_COST 20
-
 extern qboolean BG_SabersOff( playerState_t *ps );
 saberInfo_t *BG_MySaber( int clientNum, int saberNum );
 
@@ -734,22 +727,19 @@ qboolean PM_SaberKataDone(int curmove, int newmove)
 		}
 	}
 
-	if ( pm->ps->fd.saberAnimLevel == SS_DESANN || pm->ps->fd.saberAnimLevel == SS_TAVION )
-	{//desann and tavion can link up as many attacks as they want
+	if ( pm->ps->fd.saberAnimLevel == SS_DESANN || 
+		pm->ps->fd.saberAnimLevel == SS_TAVION ||
+		pm->ps->fd.saberAnimLevel == SS_FAST ||
+		pm->ps->fd.saberAnimLevel == SS_MEDIUM ||
+		pm->ps->fd.saberAnimLevel == SS_STRONG ||
+		pm->ps->fd.saberAnimLevel == SS_STAFF ||
+		pm->ps->fd.saberAnimLevel == SS_DUAL) {
+
+		// Everyone can link up all the attacks they want
 		return qfalse;
 	}
 
-	if ( pm->ps->fd.saberAnimLevel == SS_STAFF )
-	{
-		//TEMP: for now, let staff attacks infinitely chain
-		return qfalse;
-	}
-	else if ( pm->ps->fd.saberAnimLevel == SS_DUAL )
-	{
-		//TEMP: for now, let staff attacks infinitely chain
-		return qfalse;
-	}
-	else if ( pm->ps->fd.saberAnimLevel == FORCE_LEVEL_3 )
+	else if ( pm->ps->fd.saberAnimLevel >= FORCE_LEVEL_3 )
 	{
 		if ( curmove == LS_NONE || newmove == LS_NONE )
 		{
@@ -2700,6 +2690,8 @@ int bg_parryDebounce[NUM_FORCE_POWER_LEVELS] =
 	500,//if don't even have defense, can't use defense!
 	300,
 	150,
+	50,
+	50,
 	50
 };
 
@@ -2738,75 +2730,6 @@ qboolean PM_CanDoRollStab( void )
 		}
 	}
 	return qtrue;
-}
-
-qboolean PM_BlockWhileWindingUpAttack(pmove_t *pm)
-{
-	if ((pm->cmd.buttons & (BUTTON_JKU_BLOCK) && (pm->ps->canBlock)))
-	{
-		return qtrue;
-	}
-	else
-	{
-		return qfalse;
-	}
-}
-
-void PM_ReturnToBlockAnim(pmove_t *pm)
-{
-	pm->ps->saberMove = LS_READY;
-	pm->ps->weaponTime = 0;
-}
-
-int PM_ReturnForQuad(int quad)
-{
-	switch (quad)
-	{
-		case Q_BR:
-		{
-			return LS_R_TL2BR;
-			break;
-		}
-		case Q_R:
-		{
-			return LS_R_L2R;
-			break;
-		}
-		case Q_TR:
-		{
-			return LS_R_BL2TR;
-			break;
-		}
-		case Q_T:
-		{
-			return LS_R_BL2TR;
-			break;
-		}
-		case Q_TL:
-		{
-			return LS_R_BR2TL;
-			break;
-		}
-		case Q_L:
-		{
-			return LS_R_R2L;
-			break;
-		}
-		case Q_BL:
-		{
-			return LS_R_TR2BL;
-			break;
-		}
-		case Q_B:
-		{
-			return LS_R_T2B;
-			break;
-		}
-		default:
-		{
-			return LS_READY;
-		}
-	};
 }
 
 /*
@@ -3230,19 +3153,19 @@ void PM_WeaponLightsaber(void)
 						//}
 						//else
 						{//return to ready
-							if ( saberMoveData[pm->ps->saberMove].startQuad == Q_T )
-							{
-								bounceMove = LS_R_BL2TR;
-							}
-							else if ( saberMoveData[pm->ps->saberMove].startQuad < Q_T )
-							{
-								bounceMove = LS_R_TL2BR+saberMoveData[pm->ps->saberMove].startQuad-Q_BR;
-							}
-							else// if ( saberMoveData[pm->ps->saberMove].startQuad > Q_T )
-							{
-								bounceMove = LS_R_BR2TL+saberMoveData[pm->ps->saberMove].startQuad-Q_TL;
-							}
+						if ( saberMoveData[pm->ps->saberMove].startQuad == Q_T )
+						{
+							bounceMove = LS_R_BL2TR;
 						}
+						else if ( saberMoveData[pm->ps->saberMove].startQuad < Q_T )
+						{
+							bounceMove = LS_R_TL2BR+saberMoveData[pm->ps->saberMove].startQuad-Q_BR;
+						}
+							else// if ( saberMoveData[pm->ps->saberMove].startQuad > Q_T )
+						{
+							bounceMove = LS_R_BR2TL+saberMoveData[pm->ps->saberMove].startQuad-Q_TL;
+						}
+					}
 					}
 					else
 					{//start the bounce
@@ -3553,61 +3476,61 @@ weapChecks:
 	}
 
 	//this is never a valid regular saber attack button
-	//pm->cmd.buttons &= ~BUTTON_ALT_ATTACK;
+	pm->cmd.buttons &= ~BUTTON_ALT_ATTACK;
 
-	if(!delayed_fire)
+	if (!delayed_fire)
 	{
-		// Check the current move, and cross index it with the current control states.
-		curmove = (pm->ps->saberMove > LS_NONE && pm->ps->saberMove < LS_MOVE_MAX) ? pm->ps->saberMove : LS_READY;
-
-		// Check to see if we're in special animation sequences that must be reset before proceeding.
-		if ( curmove == LS_A_JUMP_T__B_ || pm->ps->torsoAnim == BOTH_FORCELEAP2_T__B_ ) 
+		// Start with the current move, and cross index it with the current control states.
+		if (pm->ps->saberMove > LS_NONE && pm->ps->saberMove < LS_MOVE_MAX)
 		{
-			newmove = LS_R_T2B;
+			curmove = pm->ps->saberMove;
+		}
+		else
+		{
+			curmove = LS_READY;
 		}
 
-		// Check to see if we're not holding down attack.
-		else if (!(pm->cmd.buttons & (BUTTON_ATTACK))) 
-		{
-			if (pm->ps->weaponstate != WEAPON_READY) 
+		if (curmove == LS_A_JUMP_T__B_ || pm->ps->torsoAnim == BOTH_FORCELEAP2_T__B_)
+		{//must transition back to ready from this anim
+			newmove = LS_R_T2B;
+		}
+		// check for fire
+		else if (!(pm->cmd.buttons & (BUTTON_ATTACK | BUTTON_ALT_ATTACK)))
+		{//not attacking
+			pm->ps->weaponTime = 0;
+
+			if (pm->ps->weaponTime > 0)
+			{//Still firing
+				pm->ps->weaponstate = WEAPON_FIRING;
+			}
+			else if (pm->ps->weaponstate != WEAPON_READY)
 			{
 				pm->ps->weaponstate = WEAPON_IDLE;
 			}
-
-			// Check to see if we're in the start sequences of attack animations.
-			if (curmove >= LS_S_TL2BR && curmove <= LS_S_T2B) 
-			{
-				if (PM_BlockWhileWindingUpAttack(pm))
-				{
-					// We're blocking while winding up an attack.
-					PM_ReturnToBlockAnim(pm);
-					return;
-				}
-				else
-				{
-					// We're fake attacking.
-					newmove = PM_ReturnForQuad(saberMoveData[curmove].endQuad);
-				}
+			//Check for finishing an anim if necc.
+			if (curmove >= LS_S_TL2BR && curmove <= LS_S_T2B)
+			{//started a swing, must continue from here
+				newmove = LS_A_TL2BR + (curmove - LS_S_TL2BR);
 			}
-			else if (curmove >= LS_A_TL2BR && curmove <= LS_A_T2B) 
-			{
-				// We're in the middle of changing animations, set newmove.
+			else if (curmove >= LS_A_TL2BR && curmove <= LS_A_T2B)
+			{//finished an attack, must continue from here
 				newmove = LS_R_TL2BR + (curmove - LS_A_TL2BR);
 			}
 			else if (PM_SaberInTransition(curmove))
-			{
-				// We're in transition, return for quad.
-				newmove = PM_ReturnForQuad(saberMoveData[curmove].endQuad);
+			{//in a transition, must play sequential attack
+				newmove = saberMoveData[curmove].chain_attack;
 			}
 			else if (PM_SaberInBounce(curmove))
-			{
-				// We're being bounced.
-				newmove = saberMoveData[curmove].chain_idle;
+			{//in a bounce
+				newmove = saberMoveData[curmove].chain_idle;//oops, not attacking, so don't chain
 			}
 			else
-			{
-				// We're not blocking, attacking or doing anything, so set to ready.
-				PM_SetSaberMove(LS_READY);
+			{//FIXME: what about returning from a parry?
+			 //PM_SetSaberMove( LS_READY );
+			 //if ( pm->ps->saberBlockingTime > pm->cmd.serverTime )
+				{
+					PM_SetSaberMove(LS_READY);
+				}
 				return;
 			}
 		}
@@ -3616,11 +3539,11 @@ weapChecks:
 		// Pressing attack, so we must look up the proper attack move.
 		
 		// [ Jedi Knight Unlimited ]
-		if (pm->ps->fd.forcePower < JKU_SABER_ATTACK_DEFAULT_FORCE_COST &&
-			pm->ps->selectedClass == 1) // FS. Doesn't apply to gunners yet... 
-		{
-			anim = LS_NONE;
-		}
+		//if (pm->ps->fd.forcePower < jku_force_cost_attack.integer &&
+		//	pm->ps->selectedClass == 1) // FS. Doesn't apply to gunners yet... 
+		//{
+		//	anim = LS_NONE;
+		//}
 		// [ Jedi Knight Unlimited ]
 
 		if ( pm->ps->weaponTime > 0 )
@@ -3808,7 +3731,7 @@ void PM_SetSaberMove(short newMove)
 	{//finished with a kata (or in a special move) reset attack counter
 		// JKU-Bunisher: Below is bugged atm, so disabling it...
 		// JKU-Bunisher: Subtract force power points for attacking
-		// pm->ps->fd.forcePower =- JKU_SABER_ATTACK_DEFAULT_FORCE_COST;
+		// pm->ps->fd.forcePower =- jku_ATTACK_DEFAULT_FORCE_COST;
 		pm->ps->saberAttackChainCount = 0;
 	}
 	else if ( BG_SaberInAttack( newMove ) )
@@ -3961,13 +3884,11 @@ void PM_SetSaberMove(short newMove)
 		}
 
 		// [Jedi Knight: Unlimited]
-		if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
-		{
+		if (pm->ps->isBlock) {
 		   anim = PM_GetSaberStance();
 		}
 
-		if (BG_InSlopeAnim( anim ))
-		{
+		if (BG_InSlopeAnim( anim )) {
 			anim = PM_GetSaberStance();
 		}
 

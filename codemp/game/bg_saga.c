@@ -612,7 +612,7 @@ void BG_SiegeTranslateForcePowers(char *buf, siegeClass_t *siegeClass)
 	{
 		if (allPowers)
 		{
-			siegeClass->forcePowerLevels[i] = FORCE_LEVEL_3;
+			siegeClass->forcePowerLevels[i] = FORCE_LEVEL_5;
 		}
 		else
 		{

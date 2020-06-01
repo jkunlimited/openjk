@@ -696,61 +696,83 @@ static void CG_DrawSaberStyle( centity_t *cent, menuDef_t *menuHUD)
 	// draw the current saber style in this window
 	switch ( cg.predictedPlayerState.fd.saberDrawAnimLevel )
 	{
-	case SS_FAST:
-		focusItem = Menu_FindItemByName(menuHUD, "saberstyle_fast");
-
-		if (focusItem)
+		case SS_FAST:
 		{
-			trap->R_SetColor(colorTable[CT_BLUE]);
-			CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "FAST", UI_CENTER, focusItem->window.foreColor, 0.5f);
-		}
-		break;
-	case SS_MEDIUM:
-		focusItem = Menu_FindItemByName(menuHUD, "saberstyle_medium");
+			focusItem = Menu_FindItemByName(menuHUD, "saberstyle_fast");
 
-		if (focusItem)
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_BLUE]);
+				CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "FAST", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			}
+			break;
+		}
+		case SS_MEDIUM:
 		{
-			trap->R_SetColor(colorTable[CT_YELLOW]);
-			CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "MEDIUM", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			focusItem = Menu_FindItemByName(menuHUD, "saberstyle_medium");
+
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_YELLOW]);
+				CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "MEDIUM", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			}
+			break;
 		}
-		break;
-	case SS_TAVION://FORCE_LEVEL_5://Tavion
-
-		focusItem = Menu_FindItemByName(menuHUD, "saberstyle_fast");
-
-		if (focusItem)
+		case SS_STRONG:
 		{
-			trap->R_SetColor( colorTable[CT_BLUE] );
-			CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "FAST", UI_CENTER, focusItem->window.foreColor, 0.5f);
-		}
-		break;
-	case SS_DUAL://SS_DUAL
-		focusItem = Menu_FindItemByName(menuHUD, "saberstyle_dual");
+			focusItem = Menu_FindItemByName(menuHUD, "saberstyle_strong");
 
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_YELLOW]);
-			CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "DUAL", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_RED]);
+				CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "STRONG", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			}
+			break;
 		}
-		break;
-	case SS_STAFF://SS_STAFF
-		focusItem = Menu_FindItemByName(menuHUD, "saberstyle_staff");
+		case SS_DESANN:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "saberstyle_strong");
 
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_YELLOW]);
-			CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "STAFF", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_RED]);
+				CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "DESANN", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			}
+			break;
 		}
-		break;
-	case SS_STRONG://FORCE_LEVEL_4://Desann
-		focusItem = Menu_FindItemByName(menuHUD, "saberstyle_strong");
+		case SS_TAVION:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "saberstyle_fast");
 
-		if (focusItem)
-		{
-			trap->R_SetColor(colorTable[CT_RED]);
-			CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "STRONG", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_BLUE]);
+				CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "TAVION", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			}
+			break;
 		}
-		break;
+		case SS_DUAL:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "saberstyle_dual");
+
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_YELLOW]);
+				CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "DUAL", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			}
+			break;
+		}
+		case SS_STAFF:
+		{
+			focusItem = Menu_FindItemByName(menuHUD, "saberstyle_staff");
+
+			if (focusItem)
+			{
+				trap->R_SetColor(colorTable[CT_YELLOW]);
+				CG_DrawScaledProportionalString(focusItem->window.rect.x, focusItem->window.rect.y, "STAFF", UI_CENTER, focusItem->window.foreColor, 0.5f);
+			}
+			break;
+		}
 	}
 }
 

@@ -391,11 +391,10 @@ typedef enum forcePowerLevels_e {
 	FORCE_LEVEL_1,
 	FORCE_LEVEL_2,
 	FORCE_LEVEL_3,
+	FORCE_LEVEL_4,
+	FORCE_LEVEL_5,
 	NUM_FORCE_POWER_LEVELS
 } forcePowerLevels_t;
-
-#define	FORCE_LEVEL_4 (FORCE_LEVEL_3+1)
-#define	FORCE_LEVEL_5 (FORCE_LEVEL_4+1)
 
 //rww - a C-ified structure version of the class which fires off callbacks and gives arguments to update ragdoll status.
 enum sharedERagPhase
@@ -1339,7 +1338,8 @@ typedef struct playerState_s {
 #endif
 
    //JKU-Fnuki: Add new boolean indicating whether or not you are allowed to enter block animation
-   qboolean canBlock;
+   qboolean isBlockInitiated;
+   qboolean isBlock;
 
    //JKU-Bunisher: Add new integers indicating selected class and selected class perk
    int		selectedClass;
@@ -1382,7 +1382,7 @@ typedef struct siegePers_s
 
 #define BUTTON_FORCE_DRAIN		2048
 
-#define BUTTON_JKU_BLOCK 8192
+#define BUTTON_JKU_BLOCK		8192
 
 // Here's an interesting bit.  The bots in TA used buttons to do additional gestures.
 // I ripped them out because I didn't want too many buttons given the fact that I was already adding some for JK2.
@@ -1434,7 +1434,6 @@ typedef enum
 	GENCMD_FLOURISH,
 	GENCMD_GLOAT,
 	// [Jedi Knight: Unlimited]
-	// [Blocking Button]
 	GENCMD_BLOCK,
 	GENCMD_BLOCK_STOP
 	// [/Jedi Knight: Unlimited]
@@ -1747,11 +1746,12 @@ typedef struct entityState_s {
 	vec3_t		userVec2;
 
    //JKU-Fnuki: Add new JKU functionality
-   qboolean canBlock;
+   qboolean		isBlockInitiated;
+   qboolean		isBlock;
 
    //JKU-Bunisher: Add new integers indicating selected class and selected class perk
-   int		selectedClass;
-   int		selectedClassPerk;
+   int			selectedClass;
+   int			selectedClassPerk;
 
 } entityState_t;
 

@@ -23,8 +23,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#ifndef _jku_saber_utils
-#define _jku_saber_utils
+#ifndef _jku_utils
+#define _jku_utils
 
 #ifdef _WIN32
 	#ifdef __cplusplus

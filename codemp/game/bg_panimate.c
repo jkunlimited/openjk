@@ -59,6 +59,8 @@ qboolean BG_SaberStanceAnim( int anim )
 	case BOTH_SABERSLOW_STANCE://single-saber, strong style
 	case BOTH_SABERSTAFF_STANCE://saber staff style
 	case BOTH_SABERDUAL_STANCE://dual saber style
+	case BOTH_SABERTAVION_STANCE:
+	case BOTH_SABERDESANN_STANCE:
 		return qtrue;
 		break;
 	}
@@ -159,6 +161,8 @@ qboolean BG_InSaberStandAnim( int anim )
 	case BOTH_SABERSLOW_STANCE:
 	case BOTH_SABERDUAL_STANCE:
 	case BOTH_SABERSTAFF_STANCE:
+	case BOTH_SABERTAVION_STANCE:
+	case BOTH_SABERDESANN_STANCE:
 		return qtrue;
 	default:
 		return qfalse;
@@ -2736,7 +2740,7 @@ void BG_SaberStartTransAnim( int clientNum, int saberAnimLevel, int weapon, int 
 		anim != BOTH_FORCEWALLRUNFLIP_START && 
 		anim != BOTH_FORCEWALLRUNFLIP_END)
 	{
-		*animSpeed *= .75f;
+		*animSpeed *= 1.0f;
 	}
 
 	if ((anim >= BOTH_H1_S1_T_ && 

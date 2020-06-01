@@ -88,7 +88,8 @@ float forceSpeedLevels[4] =
 
 int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 {
-	{ //nothing should be usable at rank 0..
+	{ 
+		//nothing should be usable at rank 0..
 		999,//FP_HEAL,//instant
 		999,//FP_LEVITATION,//hold/duration
 		999,//FP_SPEED,//duration
@@ -171,6 +172,48 @@ int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 		0,//FP_SABER_DEFENSE,
 		20//FP_SABERTHROW,
 		//NUM_FORCE_POWERS
+	},
+	{
+		50,//FP_HEAL,//instant //You get 5 points of health.. for 50 force points!
+		10,//FP_LEVITATION,//hold/duration
+		50,//FP_SPEED,//duration
+		20,//FP_PUSH,//hold/duration
+		20,//FP_PULL,//hold/duration
+		20,//FP_TELEPATHY,//instant
+		60,//FP_GRIP,//hold/duration
+		1,//FP_LIGHTNING,//hold/duration
+		50,//FP_RAGE,//duration
+		10,//FP_PROTECT,//duration
+		10,//FP_ABSORB,//duration
+		25,//FP_TEAM_HEAL,//instant
+		25,//FP_TEAM_FORCE,//instant
+		20,//FP_DRAIN,//hold/duration
+		20,//FP_SEE,//duration
+		0,//FP_SABER_OFFENSE,
+		0,//FP_SABER_DEFENSE,
+		20//FP_SABERTHROW,
+		  //NUM_FORCE_POWERS
+	},
+	{
+		50,//FP_HEAL,//instant //You get 5 points of health.. for 50 force points!
+		10,//FP_LEVITATION,//hold/duration
+		50,//FP_SPEED,//duration
+		20,//FP_PUSH,//hold/duration
+		20,//FP_PULL,//hold/duration
+		20,//FP_TELEPATHY,//instant
+		60,//FP_GRIP,//hold/duration
+		1,//FP_LIGHTNING,//hold/duration
+		50,//FP_RAGE,//duration
+		10,//FP_PROTECT,//duration
+		10,//FP_ABSORB,//duration
+		25,//FP_TEAM_HEAL,//instant
+		25,//FP_TEAM_FORCE,//instant
+		20,//FP_DRAIN,//hold/duration
+		20,//FP_SEE,//duration
+		0,//FP_SABER_OFFENSE,
+		0,//FP_SABER_DEFENSE,
+		20//FP_SABERTHROW,
+		  //NUM_FORCE_POWERS
 	}
 };
 
@@ -179,6 +222,8 @@ float forceJumpHeight[NUM_FORCE_POWER_LEVELS] =
 	32,//normal jump (+stepheight+crouchdiff = 66)
 	96,//(+stepheight+crouchdiff = 130)
 	192,//(+stepheight+crouchdiff = 226)
+	384,//(+stepheight+crouchdiff = 418)
+	384,//(+stepheight+crouchdiff = 418)
 	384//(+stepheight+crouchdiff = 418)
 };
 
@@ -187,6 +232,8 @@ float forceJumpStrength[NUM_FORCE_POWER_LEVELS] =
 	JUMP_VELOCITY,//normal jump
 	420,
 	590,
+	840,
+	840,
 	840
 };
 
@@ -493,33 +540,58 @@ int PM_GetSaberBlockAnim(int saberAnimLevel)
 	return resultAnim;
 }
 
+//  int PM_GetSaberStance(void)
+//  {
+//  	int anim = BOTH_STAND2;
+//  
+//  	if (!(pm->ps->saberEntityNum) || BG_SabersOff(pm->ps))
+//  	{
+//  		return BOTH_STAND1;
+//  	}
+//  
+//  	if (!pm->ps->isBlock)
+//  	{
+//  		switch (pm->ps->fd.saberAnimLevel)
+//  		{
+//  		case SS_DUAL:		return BOTH_SABERDUAL_STANCE;
+//  		case SS_STAFF:		return BOTH_SABERSTAFF_STANCE;
+//  		case SS_FAST:		return BOTH_SABERFAST_STANCE;
+//  		case SS_TAVION:		return BOTH_SABERTAVION_STANCE;
+//  		case SS_STRONG:		return BOTH_SABERSLOW_STANCE;
+//  		case SS_MEDIUM:		return BOTH_STAND2;
+//  		case SS_DESANN:		return BOTH_SABERDESANN_STANCE;
+//  		default:			return BOTH_STAND2;
+//  		}
+//  	}
+//  	else
+//  	{
+//  		anim = PM_GetSaberBlockAnim(pm->ps->fd.saberAnimLevel);
+//  	}
+//  	return anim;
+//  }
+
 int PM_GetSaberStance(void)
 {
 	int anim = BOTH_STAND2;
 
-	if ( !( pm->ps->saberEntityNum ) || BG_SabersOff( pm->ps ) )
+	if (!(pm->ps->saberEntityNum) || BG_SabersOff(pm->ps))
 	{
 		return BOTH_STAND1;
 	}
 
-	if ( !( pm->cmd.buttons & BUTTON_JKU_BLOCK ) || !pm->ps->canBlock )
+
+	switch (pm->ps->fd.saberAnimLevel)
 	{
-		switch ( pm->ps->fd.saberAnimLevel )
-		{
-			case SS_DUAL:		return BOTH_SABERDUAL_STANCE;
-			case SS_STAFF:		return BOTH_SABERSTAFF_STANCE;
-			case SS_FAST:		return BOTH_SABERFAST_STANCE;
-			case SS_TAVION:		return BOTH_SABERFAST_STANCE;
-			case SS_STRONG:		return BOTH_SABERSLOW_STANCE;
-			case SS_MEDIUM:		return BOTH_STAND2;
-			case SS_DESANN:		return BOTH_SABERSLOW_STANCE;
-			default:			return BOTH_STAND2;
-		}
+		case SS_DUAL:		return BOTH_SABERDUAL_STANCE;
+		case SS_STAFF:		return BOTH_SABERSTAFF_STANCE;
+		case SS_FAST:		return BOTH_SABERFAST_STANCE;
+		case SS_TAVION:		return BOTH_SABERTAVION_STANCE;
+		case SS_STRONG:		return BOTH_SABERSLOW_STANCE;
+		case SS_MEDIUM:		return BOTH_STAND2;
+		case SS_DESANN:		return BOTH_SABERDESANN_STANCE;
+		default:			return BOTH_STAND2;
 	}
-	else
-	{
-		anim = PM_GetSaberBlockAnim(pm->ps->fd.saberAnimLevel);
-	}
+
 	return anim;
 }
 
@@ -1929,6 +2001,8 @@ float forceJumpHeightMax[NUM_FORCE_POWER_LEVELS] =
 	66,//normal jump (32+stepheight(18)+crouchdiff(24) = 74)
 	130,//(96+stepheight(18)+crouchdiff(24) = 138)
 	226,//(192+stepheight(18)+crouchdiff(24) = 234)
+	418,//(384+stepheight(18)+crouchdiff(24) = 426)
+	418,//(384+stepheight(18)+crouchdiff(24) = 426)
 	418//(384+stepheight(18)+crouchdiff(24) = 426)
 };
 
@@ -5073,6 +5147,8 @@ qboolean PM_AdjustStandAnimForSlope( void )
 	case BOTH_STAND2:
 	case BOTH_SABERFAST_STANCE:
 	case BOTH_SABERSLOW_STANCE:
+	case BOTH_SABERTAVION_STANCE:
+	case BOTH_SABERDESANN_STANCE:
 	case BOTH_CROUCH1IDLE:
 	case BOTH_CROUCH1:
 	case LEGS_LEFTUP1:			//# On a slope with left foot 4 higher than right
@@ -5208,6 +5284,8 @@ qboolean PM_AdjustStandAnimForSlope( void )
 		case BOTH_STAND2:
 		case BOTH_SABERFAST_STANCE:
 		case BOTH_SABERSLOW_STANCE:
+		case BOTH_SABERTAVION_STANCE:
+		case BOTH_SABERDESANN_STANCE:
 		case BOTH_CROUCH1IDLE:
 			if ( destAnim >= LEGS_LEFTUP1 && destAnim <= LEGS_LEFTUP5 )
 			{//going into left side up
@@ -5368,6 +5446,8 @@ static void PM_Footsteps( void ) {
 		|| (pm->ps->legsAnim) == BOTH_STAND2
 		|| (pm->ps->legsAnim) == BOTH_SABERFAST_STANCE
 		|| (pm->ps->legsAnim) == BOTH_SABERSLOW_STANCE
+		|| (pm->ps->legsAnim) == BOTH_SABERTAVION_STANCE
+		|| (pm->ps->legsAnim) == BOTH_SABERDESANN_STANCE
 		|| (pm->ps->legsAnim) == BOTH_BUTTON_HOLD
 		|| (pm->ps->legsAnim) == BOTH_BUTTON_RELEASE
 		|| PM_LandingAnim( (pm->ps->legsAnim) )
@@ -5766,7 +5846,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+						if (pm->ps->isBlock)
 						{
 							desiredAnim = BOTH_WALKBACK_STAFF;
 						}
@@ -5791,7 +5871,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+						if (pm->ps->isBlock)
 						{
 							desiredAnim = BOTH_WALKBACK_DUAL;
 						}
@@ -5812,7 +5892,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+						if (pm->ps->isBlock)
 						{
 							desiredAnim = BOTH_WALKBACK1; // We need to introduce a new anim for this...
 						}
@@ -5858,7 +5938,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+							if (pm->ps->isBlock)
 							{
 								desiredAnim = BOTH_WALK_STAFF;
 							}
@@ -5883,7 +5963,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+							if (pm->ps->isBlock)
 							{
 								desiredAnim = BOTH_WALK_DUAL;
 							}
@@ -5904,7 +5984,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							if (pm->cmd.buttons & BUTTON_JKU_BLOCK)
+							if (pm->ps->isBlock)
 							{
 								desiredAnim = BOTH_WALK2;
 							}
@@ -8637,19 +8717,49 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 		ps->speed = 0;
 	}
 
-	//running backwards is slower than running forwards
-	//running backwards and strafing is slower as well
-	if ( cmd->forwardmove < 0 && 
-		!(cmd->buttons&BUTTON_WALKING) && 
-		pm->ps->groundEntityNum != ENTITYNUM_NONE ||
-		(cmd->forwardmove < 0 && 
-		!(cmd->buttons&BUTTON_WALKING) && 
-		pm->ps->groundEntityNum != ENTITYNUM_NONE) &&
-		(cmd->rightmove < 0 || 
-		cmd->rightmove > 0) )
-
+	if (cmd->forwardmove < 0 && !(cmd->buttons & BUTTON_WALKING) && pm->ps->groundEntityNum != ENTITYNUM_NONE)
 	{
-		ps->speed *= 0.75f;
+		ps->speed *= 0.85f;
+	}
+
+	if (cmd->forwardmove < 0 && !(cmd->buttons & BUTTON_WALKING) && pm->ps->groundEntityNum != ENTITYNUM_NONE && cmd->rightmove < 0)
+	{
+		ps->speed *= 0.85f;
+	}
+
+	if (cmd->forwardmove < 0 && !(cmd->buttons & BUTTON_WALKING) && pm->ps->groundEntityNum != ENTITYNUM_NONE && cmd->rightmove > 0)
+	{
+		ps->speed *= 0.85f;
+	}
+
+	if (BG_InRoll(ps, ps->legsAnim) && ps->speed > 50)
+	{ 
+		if ((ps->legsAnim) == BOTH_ROLL_B)
+		{ 
+			if (ps->legsTimer > 800)
+			{
+				ps->speed = ps->legsTimer / 2.5;
+			}
+			else
+			{
+				ps->speed = ps->legsTimer / 6.0;
+			}
+		}
+		else
+		{
+			if (ps->legsTimer > 800)
+			{
+				ps->speed = ps->legsTimer / 1.5;
+			}
+			else
+			{
+				ps->speed = ps->legsTimer / 5.0;
+			}
+		}
+		if (ps->speed > 600)
+		{
+			ps->speed = 600;
+		}
 	}
 
 	if (ps->fd.forcePowersActive & (1 << FP_GRIP))
@@ -8691,96 +8801,6 @@ void BG_AdjustClientSpeed(playerState_t *ps, usercmd_t *cmd, int svTime)
 			ps->speed *= 0.2f;
 		}
 	}
-
-	// JKU-Bunisher: Removing this
-	// if ( BG_SaberInAttack( ps->saberMove ) && cmd->forwardmove < 0 )
-	// {//if running backwards while attacking, don't run as fast.
-	// 	switch( ps->fd.saberAnimLevel )
-	// 	{
-	// 	case FORCE_LEVEL_1:
-	// 		ps->speed *= 0.75f;
-	// 		break;
-	// 	case FORCE_LEVEL_2:
-	// 	case SS_DUAL:
-	// 	case SS_STAFF:
-	// 		ps->speed *= 0.60f;
-	// 		break;
-	// 	case FORCE_LEVEL_3:
-	// 		ps->speed *= 0.45f;
-	// 		break;
-	// 	default:
-	// 		break;
-	// 	}
-	// }
-	//else if ( BG_SpinningSaberAnim( ps->legsAnim ) )
-	//{
-	//	if (ps->fd.saberAnimLevel == FORCE_LEVEL_3)
-	//	{
-	//		ps->speed *= 0.3f;
-	//	}
-	//	else
-	//	{
-	//		ps->speed *= 0.5f;
-	//	}
-	//}
-	//else if ( ps->weapon == WP_SABER && BG_SaberInAttack( ps->saberMove ) )
-	//{//if attacking with saber while running, drop your speed
-	//	switch( ps->fd.saberAnimLevel )
-	//	{
-	//	case FORCE_LEVEL_2:
-	//	case SS_DUAL:
-	//	case SS_STAFF:
-	//		ps->speed *= 0.85f;
-	//		break;
-	//	case FORCE_LEVEL_3:
-	//		ps->speed *= 0.55f;
-	//		break;
-	//	default:
-	//		break;
-	//	}
-	//}
-	//else if (ps->weapon == WP_SABER && ps->fd.saberAnimLevel == FORCE_LEVEL_3 &&
-	//	PM_SaberInTransition(ps->saberMove))
-	//{ //Now, we want to even slow down in transitions for level 3 (since it has chains and stuff now)
-	//	if (cmd->forwardmove < 0)
-	//	{
-	//		ps->speed *= 0.4f;
-	//	}
-	//	else
-	//	{
-	//		ps->speed *= 0.6f;
-	//	}
-	//}
-	//if ( BG_InRoll( ps, ps->legsAnim ) && ps->speed > 50 )
-	//{ //can't roll unless you're able to move normally
-	//	if ((ps->legsAnim) == BOTH_ROLL_B)
-	//	{ //backwards roll is pretty fast, should also be slower
-	//		if (ps->legsTimer > 800)
-	//		{
-	//			ps->speed = ps->legsTimer/2.5;
-	//		}
-	//		else
-	//		{
-	//			ps->speed = ps->legsTimer/6.0;//450;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		if (ps->legsTimer > 800)
-	//		{
-	//			ps->speed = ps->legsTimer/1.5;//450;
-	//		}
-	//		else
-	//		{
-	//			ps->speed = ps->legsTimer/5.0;//450;
-	//		}
-	//	}
-	//	if (ps->speed > 600)
-	//	{
-	//		ps->speed = 600;
-	//	}
-	//	//Automatically slow down as the roll ends.
-	//}
 
 	saber = BG_MySaber( ps->clientNum, 0 );
 	if ( saber

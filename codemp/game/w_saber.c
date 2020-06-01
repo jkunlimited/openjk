@@ -3820,20 +3820,19 @@ void WP_SaberBounceSound(gentity_t *ent, int saberNum, int bladeNum)
 
 static QINLINE int JKU_checkSaberBlockForceCost(gentity_t* self, saber_styles_t saberStyleAttacker)
 {
-   if (self && self->client &&
-       self->client->ps.fd.forcePower < JKU_SABER_BLOCK_DEFAULT_FORCE_COST)
-   {
-      return 0;
-   }
-
-   return 1;
+	int minimumForcePower = 8;
+	if (self && self->client && self->client->ps.fd.forcePower <= minimumForcePower)
+	{
+		return 0;
+	}
+	return 1;
 }
 
 // [Custom Saber Can Block Function]
 extern float JKU_calculateSaberHitAngle(gentity_t* self, gentity_t* other);
 extern float JKU_calculateAttackAngle(gentity_t* self, gentity_t* other);
 extern float JKU_radToDeg(float radians);
-int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int dflags, int mod, qboolean projectile)
+int WP_SaberCanArcBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int dflags, int mod, qboolean projectile)
 {
    if (!self || !self->client || !point)
    {
@@ -3890,78 +3889,217 @@ int JKU_SaberCanBlock(gentity_t *self, gentity_t* attacker, vec3_t point, int df
       WP_SaberBlockNonRandom(self, point, projectile);
    }
 
-   if (self->client->enableBlockingTimer < level.time)
-   {
-      return 0;
-   }
-
-   float cosAngle = JKU_calculateSaberHitAngle(self, attacker);
-   float degAngle = JKU_radToDeg(cosAngle);
-
-   if (degAngle < JKU_BLOCKABLE_ANGLE_STATIONARY)
-   {
-	   // The angle with which the defender was hit was outside the 60*2*2 cone radius 
-	   // Therefore, the attack is unblockable... however...
-	   if (InFront(attacker->client->ps.origin, self->client->ps.origin, self->client->ps.viewangles, -.7f))
-	   {
-		   // If the attacker was actually infront of him...
-		   // That means that the attacker is likely excessively yawing or angling his attacks...
-		   // Therefore, we will allow blocking it
-		   Com_Printf("CosineAngle: %f, Degrees: %f, Penetrated Defensive Arc, Hit InFront - Enabling Blocking...\n", cosAngle, degAngle);
-		   return 1;
-	   }
-	   else
-	   {
-		   // The attacker was behind him.
-		   // Therefore, we will not allow blocking it
-		   Com_Printf("CosineAngle: %f, Degrees: %f, Penetrated Defensive Arc, Disabling Blocking...\n", cosAngle, degAngle);
-		   return 0;
-	   }
-   }
-
    if (!JKU_checkSaberBlockForceCost(self, attacker->client->saber->singleBladeStyle))
    {
 	   return 0;
    }
 
-   /*if (cosAngle > 0)
-   {
-   degAngle -= 180.0f;
+   float cosAngle = JKU_calculateSaberHitAngle(self, attacker);
+   float degAngle = JKU_radToDeg(cosAngle);
 
-   if (degAngle < 0)
-   degAngle *= -1.0f;
+   if (degAngle < jku_angle_blockable.integer)
+   {
+	   if (InFront(attacker->client->ps.origin, self->client->ps.origin, self->client->ps.viewangles, -.7f))
+	   {
+		   return 1;
+	   }
+	   else
+	   {
+		   return 0;
+	   }
    }
-
-   /*if (degAngle < JKU_UNBLOCKABLE_ANGLE) 
-   {
-   return 0;
-   }*/
-
-   // else if (self->client->pers.cmd.rightmove > 0 &&
-   //    cosAngle < 0)
-   // {  
-   //    //Blocking right, receiving attack left
-   //    return 0;
-   // }
-   // else if (self->client->pers.cmd.rightmove < 0 &&
-   //    cosAngle >= 0)
-   // {
-   //    //Blocking left, receiving attack right
-   //    return 0;
-   // }
-
-   // else if (!projectile && self->client->pers.cmd.rightmove == 0 &&
-   //    self->client->pers.cmd.forwardmove == 0)
-   // {
-   //    //Cant block sabers standing still
-   //    return 0;
-   // }
 
    return 1;
 }
 
+qboolean WP_SaberCanPerfectBlock(gentity_t *self, vec3_t hitloc, qboolean missileBlock)
+{
+	vec3_t diff, fwdangles = { 0,0,0 }, right;
+	vec3_t clEye;
+	float rightdot;
+	float zdiff;
+
+	VectorCopy(self->client->ps.origin, clEye);
+	clEye[2] += self->client->ps.viewheight;
+
+	VectorSubtract(hitloc, clEye, diff);
+	diff[2] = 0;
+	VectorNormalize(diff);
+
+	fwdangles[1] = self->client->ps.viewangles[1];
+	AngleVectors(fwdangles, NULL, right, NULL);
+
+	rightdot = DotProduct(right, diff);
+	zdiff = hitloc[2] - clEye[2];
+
+	trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f\n\"", rightdot, zdiff));
+
+	if (zdiff > 0)
+	{
+		if (rightdot > 0.3)
+		{
+			if (self->client->pers.cmd.forwardmove > 0 && // Forward-Right
+				self->client->pers.cmd.rightmove > 0 &&
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				!(self->client->pers.cmd.rightmove < 0))
+			{
+				// BLOCKED_UPPER_RIGHT
+				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> upper-right perfect block\n\"", rightdot, zdiff));
+				return qtrue;
+			}
+			else
+			{
+				return qfalse;
+			}
+		}
+		else if (rightdot < -0.3)
+		{
+			if (self->client->pers.cmd.forwardmove > 0 && // Forward-Left
+			    self->client->pers.cmd.rightmove < 0 &&
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				!(self->client->pers.cmd.rightmove > 0))
+			{
+				// BLOCKED_UPPER_LEFT
+				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> upper-left perfect block\n\"", rightdot, zdiff));
+				return qtrue;
+			}
+			else
+			{
+				return qfalse;
+			}
+		}
+		else
+		{
+			
+			if ((self->client->pers.cmd.forwardmove > 0 && // Forward
+				!(self->client->pers.cmd.forwardmove < 0) && 
+				!(self->client->pers.cmd.rightmove < 0) &&
+				!(self->client->pers.cmd.rightmove > 0)) ||
+				(self->client->pers.cmd.forwardmove > 0 && // Forward & Right
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				self->client->pers.cmd.rightmove > 0 &&
+				!(self->client->pers.cmd.rightmove < 0)) ||
+				(self->client->pers.cmd.forwardmove > 0 && // Forward & Left
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				self->client->pers.cmd.rightmove < 0 &&
+				!(self->client->pers.cmd.rightmove > 0)))
+			{
+				// BLOCKED_TOP
+				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> top perfect block\n\"", rightdot, zdiff));
+				return qtrue;
+			}
+			else
+			{
+				return qfalse;
+			}
+		}
+	}
+	else if (zdiff > -20)
+	{
+		if (rightdot > 0.1)
+		{
+			if (self->client->pers.cmd.forwardmove > 0 && // Forward Right
+				self->client->pers.cmd.rightmove > 0 &&
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				!(self->client->pers.cmd.rightmove < 0))
+			{
+				// BLOCKED_UPPER_RIGHT
+				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> upper-right perfect block\n\"", rightdot, zdiff));
+				return qtrue;
+			}
+			else
+			{
+				return qfalse;
+			}
+		}
+		else if (rightdot < -0.1)
+		{
+			if (self->client->pers.cmd.forwardmove > 0 && // Forward Left
+				self->client->pers.cmd.rightmove < 0 &&
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				!(self->client->pers.cmd.rightmove > 0))
+			{
+				// BLOCKED_UPPER_LEFT
+				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> upper-left perfect block\n\"", rightdot, zdiff));
+				return qtrue;
+			}
+			else
+			{
+				return qfalse;
+			}
+		}
+		else
+		{
+			if ((self->client->pers.cmd.forwardmove > 0 && // Forward
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				!(self->client->pers.cmd.rightmove < 0) &&
+				!(self->client->pers.cmd.rightmove > 0)) ||
+				(self->client->pers.cmd.forwardmove > 0 && // Forward & Right
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				self->client->pers.cmd.rightmove > 0 &&
+				!(self->client->pers.cmd.rightmove < 0)) ||
+				(self->client->pers.cmd.forwardmove > 0 && // Forward & Left
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				self->client->pers.cmd.rightmove < 0 &&
+				!(self->client->pers.cmd.rightmove > 0)))
+			{
+				// BLOCKED_TOP
+				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> top perfect block\n\"", rightdot, zdiff));
+				return qtrue;
+			}
+			else
+			{
+				return qfalse;
+			}
+		}
+	}
+	else
+	{
+		if (rightdot >= 0)
+		{
+			if ((self->client->pers.cmd.rightmove > 0 && // Right
+				!(self->client->pers.cmd.rightmove < 0) &&
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				!(self->client->pers.cmd.forwardmove > 0)) ||
+				(self->client->pers.cmd.forwardmove < 0 && // Back & Right
+				self->client->pers.cmd.rightmove > 0 &&
+				!(self->client->pers.cmd.forwardmove > 0) &&
+				!(self->client->pers.cmd.rightmove < 0)))
+			{
+				// BLOCKED_LOWER_RIGHT
+				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> lower-right perfect block\n\"", rightdot, zdiff));
+				return qtrue;
+			}
+			else
+			{
+				return qfalse;
+			}
+		}
+		else
+		{
+			if ((self->client->pers.cmd.rightmove < 0 && // Left
+				!(self->client->pers.cmd.rightmove > 0) &&
+				!(self->client->pers.cmd.forwardmove < 0) &&
+				!(self->client->pers.cmd.forwardmove > 0)) ||
+				(self->client->pers.cmd.forwardmove < 0 && // Back & Left
+				self->client->pers.cmd.rightmove < 0 &&
+				!(self->client->pers.cmd.forwardmove > 0) &&
+				!(self->client->pers.cmd.rightmove > 0)))
+			{
+				// BLOCKED_LOWER_LEFT
+				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> lower-left perfect block\n\"", rightdot, zdiff));
+				return qtrue;
+			}
+			else
+			{
+				return qfalse;
+			}
+		}
+	}
+}
+
 // Do saber block effect
-static QINLINE void JKU_saberDoBlockEffect(gentity_t* self, gentity_t* enemy, trace_t* tr, int rSaberNum, int rBladeNum)
+static QINLINE void WP_SaberClashEffect(gentity_t* self, gentity_t* enemy, trace_t* tr, int rSaberNum, int rBladeNum)
 {
    if (self && enemy && tr)
    {
@@ -3981,47 +4119,91 @@ static QINLINE void JKU_saberDoBlockEffect(gentity_t* self, gentity_t* enemy, tr
    }
 }
 
-static QINLINE void JKU_saberDoBlockForceCost(gentity_t* self, saber_styles_t saberStyleAttacker)
-{
-   if (self && self->client)
-   {
-      self->client->ps.fd.forcePower -= JKU_SABER_BLOCK_DEFAULT_FORCE_COST;
-      if (self->client->ps.fd.forcePower <= 0)
-      {
-         self->client->ps.fd.forcePower = 0;
-      }
-   }
-}
-
-static QINLINE void JKU_saberExtendBlockTimers(gentity_t* ent)
-{
-   if (ent && ent->client)
-   {
-      ent->client->enableBlockingTimer = level.time + JKU_EXTEND_BLOCKING_FOR_MSECS;
-   }
-}
-
-static QINLINE void JKU_saberDoBlockFeedback(gentity_t *self, vec3_t trace)
-{
-	if (!PM_SaberInKnockaway(self->client->ps.saberMove) && 
-		!PM_InKnockDown(&self->client->ps)) 
-	{	
-		if (!PM_SaberInParry(self->client->ps.saberMove))
+static QINLINE void WP_SaberBreakParry(gentity_t *self, vec3_t trace)
+{	
+	if (!PM_SaberInBrokenParry(self->client->ps.saberMove)
+		&& !PM_InKnockDown(&self->client->ps))
+	{
+		if (!PM_SaberInParry(G_GetParryForBlock(self->client->ps.saberBlocked)))
 		{
 			WP_SaberBlockNonRandom(self, trace, qfalse);
-			self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
-			self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
 		}
-		else
-		{
-			self->client->ps.saberMove = G_KnockawayForParry(self->client->ps.saberMove);
-			self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE;
-		}
+		self->client->ps.saberMove = BG_BrokenParryForParry(G_GetParryForBlock(self->client->ps.saberBlocked));
+		self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
 	}
+
 	if (self->client->ps.torsoAnim == self->client->ps.legsAnim) 
 	{
 		int anim = saberMoveData[self->client->ps.saberMove].animToUse;
 		G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, anim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+	}
+}
+
+static QINLINE void WP_SaberKnockaway(gentity_t *self, vec3_t trace)
+{
+	if (!PM_SaberInKnockaway(self->client->ps.saberMove) && !PM_InKnockDown(&self->client->ps))
+	{
+		if (!PM_SaberInParry(self->client->ps.saberMove))
+		{
+			WP_SaberBlockNonRandom(self, trace, qfalse);
+			self->client->ps.saberMove = BG_KnockawayForParry(self->client->ps.saberBlocked);
+			self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE; // BLOCK BOUNCE MOVE
+		}
+		else
+		{
+			self->client->ps.saberMove = G_KnockawayForParry(self->client->ps.saberMove);
+			self->client->ps.saberBlocked = BLOCKED_BOUNCE_MOVE; // BLOCK BOUNCE MOVE
+		}
+	}
+	if (self->client->ps.torsoAnim == self->client->ps.legsAnim)
+	{
+		int anim = saberMoveData[self->client->ps.saberMove].animToUse;
+		G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, anim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
+	}
+}
+
+static QINLINE void WP_SaberHitFeedback(gentity_t *self)
+{
+	self->client->ps.saberBlocked = BLOCKED_ATK_BOUNCE;
+	G_ScreenShake(self->s.origin, self, 2.0f, 500, qfalse);
+}
+
+static QINLINE void FP_SubtractVictimForcePower(gentity_t *hitEntity, qboolean perfectBlock, qboolean didHit)
+{
+	int baseSubtraction = 8;
+
+	if (didHit)
+	{
+		// hitEntity did not block therefore we apply maximum penalty
+		hitEntity->client->ps.fd.forcePower =- (baseSubtraction * 10.0f);
+	}
+
+	else
+	{
+		if (!(hitEntity->client->pers.cmd.buttons & BUTTON_WALKING) && hitEntity->client->pers.cmd.forwardmove != 0 || hitEntity->client->pers.cmd.rightmove != 0)
+		{
+			// Punish running by 2.0f
+			hitEntity->client->ps.fd.forcePower = hitEntity->client->ps.fd.forcePower - (baseSubtraction * 2.0f);
+		}
+		else
+		{
+			if (perfectBlock)
+			{
+				// Divide subtraction by half because they perfect blocked it
+				hitEntity->client->ps.fd.forcePower = hitEntity->client->ps.fd.forcePower - (baseSubtraction * 0.5f);
+			}
+			else
+			{
+				// Regular block subtracts baseSubtraction
+				hitEntity->client->ps.fd.forcePower = hitEntity->client->ps.fd.forcePower - baseSubtraction;
+			}
+		}
+	}
+
+	if (hitEntity->client->ps.fd.forcePower <= 0)
+	{
+		// Set to make sure forcePower doesn't go below zero
+		hitEntity->client->ps.fd.forcePower = 0;
 	}
 }
 
@@ -4043,226 +4225,90 @@ extern int JKU_calculateSaberDamage(gentity_t *self);
 
 static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBladeNum, vec3_t saberStart, vec3_t saberEnd, qboolean doInterpolate, int trMask, qboolean extrapolate)
 {
-   static trace_t tr;
-   static vec3_t dir;
-   static vec3_t saberTrMins, saberTrMaxs;
-   static vec3_t lastValidStart, lastValidEnd;
-   int dmg = 0;
-   qboolean didHit = qfalse;
-   //int attackStr = 0;
-   //qboolean idleDamage = qfalse;
-   //qboolean sabersClashed = qfalse;
-   //qboolean unblockable = qfalse;
-   //qboolean didDefense = qfalse;
-   //qboolean didOffense = qfalse;
-   //qboolean saberTraceDone = qfalse;
-   //qboolean otherUnblockable = qfalse;
-   //qboolean tryDeflectAgain = qfalse;
+	static trace_t tr;
+	static vec3_t dir;
+	static vec3_t saberTrMins, saberTrMaxs;
+	static vec3_t lastValidStart, lastValidEnd;
 
-   //JKU-Fnuki: Make blocking timing based
+	qboolean didHit = qfalse;
+	qboolean passThrough = qfalse;
+	qboolean perfectBlock = qfalse;
 
-   if (!self->client->ps.canBlock &&
-      self->client->disableBlockingTimer <= level.time)
-   {
-      self->client->ps.canBlock = qtrue;
-   }
-   else if (self->client->ps.canBlock &&
-      self->client->disableBlockingTimer > level.time &&
-      self->client->enableBlockingTimer < level.time)
-   {
-      self->client->ps.canBlock = qfalse;
-   }
+	int dmg = 0;
+	int knockbackFlags = 0;
 
-   if (self->client->buttons & BUTTON_JKU_BLOCK &&
-      self->client->disableBlockingTimer <= level.time &&
-      self->client->enableBlockingTimer <= level.time)
-   {
-      self->client->enableBlockingTimer = level.time + JKU_ENABLE_BLOCKING_FOR_MSECS;
-      self->client->disableBlockingTimer = level.time + JKU_DISABLE_BLOCKING_FOR_MSECS;
-      self->client->ps.canBlock = qtrue;
-   }
+	// JKU-Bunisher: Don't begin calculating damage when you're not attacking or your saber is off.
+	if (!SaberAttacking(self) || (BG_SabersOff(&self->client->ps))) 
+	{
+		return qfalse;
+	}
 
-   // JKU-Bunisher: Hideous attempt at making blocks unavailable during attacks but not wind-up
-   if (BG_SaberInAttack(self->client->ps.saberMove) || BG_SaberInReturn(self->client->ps.saberMove))
-   {
-	   self->client->enableBlockingTimer = level.time;
-	   self->client->disableBlockingTimer = level.time;
-	   self->client->ps.canBlock = qfalse;
-   }
+	//JKU-Fnuki: Calculate SaberTrace
+	JKU_calculateSaberTrace(self, rSaberNum, rBladeNum, saberStart, saberEnd, doInterpolate, trMask, extrapolate, saberTrMins, saberTrMaxs, lastValidStart, lastValidEnd, &tr);
+	VectorSubtract(saberEnd, saberStart, dir);
+	VectorNormalize(dir);
 
-   // JKU-Bunisher: Don't even begin calculating damage when you're not attacking.
-   // JKU-Bunisher: This disables poke/area of effect damage when walking around with your saber ignited. 
-   if (!SaberAttacking(self)) {
-	   return qfalse;
-   }
+	//JKU-Fnuki: New damage calculation and implementation of collision handling
+	dmg = JKU_calculateSaberDamage(self);
+	gentity_t* hitEntity = &g_entities[tr.entityNum];
 
-   // JKU-Bunisher: Don't begin calculating damage when your saber isn't on.
-   // JKU-Bunisher: There's no purpose. 
-   if (BG_SabersOff(&self->client->ps))
-   {
-	   return qfalse;
-   }
-
-   //JKU-Fnuki: Calculate SaberTrace
-   JKU_calculateSaberTrace(self, rSaberNum, rBladeNum, saberStart, saberEnd, doInterpolate,
-      trMask, extrapolate, saberTrMins, saberTrMaxs, lastValidStart, lastValidEnd, &tr);
-
-   //JKU-Fnuki: New damage calculation
-   dmg = JKU_calculateSaberDamage(self);
-
-   VectorSubtract(saberEnd, saberStart, dir);
-   VectorNormalize(dir);
-
-   if (tr.entityNum == ENTITYNUM_WORLD ||
-      g_entities[tr.entityNum].s.eType == ET_TERRAIN)
-   { //register this as a wall hit for jedi AI
-      self->client->ps.saberEventFlags |= SEF_HITWALL;
-      saberHitWall = qtrue;
-   }
-
-   if (saberHitWall
-      && (self->client->saber[rSaberNum].saberFlags & SFL_BOUNCE_ON_WALLS)
-      && (BG_SaberInAttackPure(self->client->ps.saberMove) //only in a normal attack anim
-         || self->client->ps.saberMove == LS_A_JUMP_T__B_) //or in the strong jump-fwd-attack "death from above" move
-      )
-   { //then bounce off
-
-      gentity_t *te = NULL;
-
-      self->client->ps.saberMove = BG_BrokenParryForAttack(self->client->ps.saberMove);
-      self->client->ps.saberBlocked = BLOCKED_PARRY_BROKEN;
-      if (self->client->ps.torsoAnim == self->client->ps.legsAnim)
-      { //set anim now on both parts
-         int anim = saberMoveData[self->client->ps.saberMove].animToUse;
-         G_SetAnim(self, &self->client->pers.cmd, SETANIM_BOTH, anim, SETANIM_FLAG_OVERRIDE | SETANIM_FLAG_HOLD, 0);
-      }
-
-      //do bounce sound & force feedback
-      WP_SaberBounceSound(self, rSaberNum, rBladeNum);
-      //do hit effect
-      te = G_TempEntity(tr.endpos, EV_SABER_HIT);
-      te->s.otherEntityNum = ENTITYNUM_NONE;//we didn't hit anyone in particular
-      te->s.otherEntityNum2 = self->s.number;//send this so it knows who we are
-      te->s.weapon = rSaberNum;
-      te->s.legsAnim = rBladeNum;
-      VectorCopy(tr.endpos, te->s.origin);
-      VectorCopy(tr.plane.normal, te->s.angles);
-      if (!te->s.angles[0] && !te->s.angles[1] && !te->s.angles[2])
-      { //don't let it play with no direction
-         te->s.angles[1] = 1;
-      }
-      //do radius damage/knockback, if any
-		 
-      if (!WP_SaberBladeUseSecondBladeStyle(&self->client->saber[rSaberNum], rBladeNum))
-      {
-         WP_SaberRadiusDamage(self, tr.endpos, self->client->saber[rSaberNum].splashRadius, self->client->saber[rSaberNum].splashDamage, self->client->saber[rSaberNum].splashKnockback);
-      }
-      else
-      {
-         WP_SaberRadiusDamage(self, tr.endpos, self->client->saber[rSaberNum].splashRadius2, self->client->saber[rSaberNum].splashDamage2, self->client->saber[rSaberNum].splashKnockback2);
-      }
-
-      return qtrue;
-   }
-
-   //rww - I'm saying || tr.startsolid here, because otherwise your saber tends to skip positions and go through
-   //people, and the compensation traces start in their bbox too. Which results in the saber passing through people
-   //when you visually cut right through them. Which sucks.
-
-   //JKU-Fnuki: New implementation of collision handling
-   gentity_t* hitEntity = &g_entities[tr.entityNum];
-
-	if ((tr.fraction != 1 || 
-		tr.startsolid) && 
-		hitEntity->takedamage && 
-		(hitEntity->health > 0 || 
-		!(hitEntity->s.eFlags & EF_DISINTEGRATION)) &&
-		hitEntity->s.number != self->s.number &&  
-		hitEntity->inuse) {
-
-		if (hitEntity->client && 
-			(hitEntity->client->buttons & BUTTON_JKU_BLOCK) && 
-			JKU_SaberCanBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse)) {
-
+	if ((tr.fraction != 1 || tr.startsolid) && hitEntity->takedamage && (hitEntity->health > 0 || !(hitEntity->s.eFlags & EF_DISINTEGRATION)) && hitEntity->s.number != self->s.number && hitEntity->inuse) 
+	{
+		if (hitEntity->client && (hitEntity->client->ps.isBlock) && WP_SaberCanArcBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse)) 
+		{
+			if (WP_SaberCanPerfectBlock(hitEntity, tr.endpos, qfalse))
+			{
+				// Perfect block
+				perfectBlock = qtrue;
+			}
+			else
+			{
+				// Arc block
+				perfectBlock = qfalse;
+			}
 			WP_SaberBlockNonRandom(hitEntity, tr.endpos, qfalse);
-			WP_SaberBounceSound(self, rSaberNum, rBladeNum);
-
-			JKU_saberDoBlockFeedback(self, tr.endpos);
-			JKU_saberDoBlockEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
-			JKU_saberDoBlockForceCost(hitEntity, self->client->saber->singleBladeStyle);
-			JKU_saberExtendBlockTimers(hitEntity);
-
+			WP_SaberBreakParry(self, tr.endpos);
+			WP_SaberClashEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
+			FP_SubtractVictimForcePower(hitEntity, perfectBlock, qfalse);
 			didHit = qfalse;
 		}
 		else 
 		{
-			// JKU-Bunisher: Time for some fun...
-			// Let's shake them up a little... they need to step up their game.
-			G_ScreenShake(hitEntity->s.origin, hitEntity, 1.0f /* 1/4 the intensity of rancor AI */, 500 /* Half the duration of rancor AI */, qfalse);
 			didHit = qtrue;
 		}
-   }
+	}
 
-   if (didHit)
-   {
-      //JKU-Fnuki: Apply the damage to the target
-      int knockbackFlags = 0;
-
-	  //JKU-Bunisher: Don't give NPCs special treatment.
-      //if (self->s.eType == ET_NPC &&
-      //   g_entities[tr.entityNum].client &&
-      //   self->client->playerTeam == g_entities[tr.entityNum].client->playerTeam)
-      //{ //Oops. Since he's an NPC, we'll be forgiving and cut the damage down.
-      //   dmg *= 0.2f;
-      //}
-
-      if (!WP_SaberBladeUseSecondBladeStyle(&self->client->saber[rSaberNum], rBladeNum)
-         && self->client->saber[rSaberNum].knockbackScale > 0.0f)
-      {
-         if (rSaberNum < 1)
-         {
-            knockbackFlags = DAMAGE_SABER_KNOCKBACK1;
-         }
-         else
-         {
-            knockbackFlags = DAMAGE_SABER_KNOCKBACK2;
-         }
-      }
-
-      if (WP_SaberBladeUseSecondBladeStyle(&self->client->saber[rSaberNum], rBladeNum)
-         && self->client->saber[rSaberNum].knockbackScale > 0.0f)
-      {
-         if (rSaberNum < 1)
-         {
-            knockbackFlags = DAMAGE_SABER_KNOCKBACK1_B2;
-         }
-         else
-         {
-            knockbackFlags = DAMAGE_SABER_KNOCKBACK2_B2;
-         }
-      }
-
-      if (g_entities[tr.entityNum].client)
-      {
-         if (g_entities[tr.entityNum].client->ps.saberAttackWound < level.time)
-         {
-            g_entities[tr.entityNum].client->ps.saberAttackWound = level.time + JKU_INVULNERABLE_TIMER;
-            //Disable dismemberment
-            WP_SaberDamageAdd(tr.entityNum, dir, tr.endpos, dmg, qfalse, knockbackFlags);
-         }
-
-         //Let jedi AI know if it hit an enemy
-         if (self->enemy && self->enemy == &g_entities[tr.entityNum])
-         {
-            self->client->ps.saberEventFlags |= SEF_HITENEMY;
-         }
-         else
-         {
-            self->client->ps.saberEventFlags |= SEF_HITOBJECT;
-         }
-      }
-   }
-   return didHit;
+	if (didHit) 
+	{
+		if (g_entities[tr.entityNum].client) 
+		{
+			if (g_entities[tr.entityNum].client->ps.saberAttackWound < level.time) 
+			{
+				g_entities[tr.entityNum].client->ps.saberAttackWound = level.time + jku_timer_damage_invulnerability.integer;
+				G_Damage(hitEntity, self, self, dir, tr.endpos, dmg, knockbackFlags, MOD_SABER);
+			}
+			if (hitEntity->health <= 0) 
+			{
+				passThrough = qtrue;
+			}
+			if (self->enemy && self->enemy == &g_entities[tr.entityNum]) 
+			{
+				self->client->ps.saberEventFlags |= SEF_HITENEMY;
+			}
+			else 
+			{
+				self->client->ps.saberEventFlags |= SEF_HITOBJECT;
+			}
+			if (!passThrough) 
+			{
+				WP_SaberKnockaway(self, tr.endpos);
+			}
+			WP_SaberHitFeedback(hitEntity);
+			WP_SaberClashEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
+			FP_SubtractVictimForcePower(hitEntity, perfectBlock, qtrue);
+		}
+	}
+	return didHit;
 }
 
 #define MAX_SABER_SWING_INC 0.33f
@@ -8425,7 +8471,7 @@ int WP_SaberCanBlock(gentity_t *self, vec3_t point, int dflags, int mod, qboolea
       return 0;
    }
 
-   if (self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] == FORCE_LEVEL_3)
+   if (self->client->ps.fd.forcePowerLevel[FP_SABER_DEFENSE] >= FORCE_LEVEL_3)
    {
       if (d_saberGhoul2Collision.integer)
       {

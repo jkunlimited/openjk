@@ -1866,26 +1866,28 @@ void G_SetTauntAnim( gentity_t *ent, int taunt )
 // [Block Functions]
 void JKU_ActivateBlockButton(gentity_t *ent)
 {
-	if (!ent->client) {
+	// If we're not a client...
+	if (!ent->client)
+	{
 		return;
 	}
-	else {
-      ent->client->buttons |= BUTTON_JKU_BLOCK;
-#ifdef DEBUG
-		trap->Print("Saber block activated for client %s\n", ent->client->pers.netname);
-#endif // DEBUG
+	else 
+	{
+		// Initiate blocking (this is then picked up in clientthink_real in g_active.c
+		ent->client->ps.isBlockInitiated = qtrue;
 	}
 }
+
 void JKU_DisableBlockButton(gentity_t *ent)
 {
-	if (!ent->client) {
+	if (!ent->client) 
+	{
 		return;
 	}
-	else {
-		ent->client->buttons &= ~BUTTON_JKU_BLOCK;
-#ifdef DEBUG
-		trap->Print("Saber block disabled for client %s\n", ent->client->pers.netname);
-#endif // DEBUG
+	else 
+	{
+		// Disable blocking (this is then picked up in clientthink_real in g_active.c
+		ent->client->ps.isBlockInitiated = qfalse;
 	}
 }
 // [/Jedi Knight: Unlimited]
@@ -1911,6 +1913,8 @@ void ClientThink_real( gentity_t *ent ) {
 	qboolean	controlledByPlayer = qfalse;
 	qboolean	killJetFlags = qtrue;
 	qboolean	isFollowing;
+
+	qboolean	isBlockInitiated;
 
 	client = ent->client;
 
@@ -1946,6 +1950,44 @@ void ClientThink_real( gentity_t *ent ) {
 				}
 			}
 		}
+	}
+
+	isBlockInitiated = (client->ps.isBlockInitiated) ? qtrue : qfalse;
+
+	if (isBlockInitiated)
+	{
+		// Minimum block criteria
+		if (!BG_SabersOff(&ent->client->ps) &&
+			!BG_SaberInAttack(client->ps.saberMove) &&
+			!BG_SaberInSpecial(client->ps.saberMove) &&
+			!BG_SaberInSpecialAttack(client->ps.saberMove) &&
+			!BG_InSaberLock(client->ps.saberMove) &&
+			!BG_SaberInKata(client->ps.saberMove) &&
+			!PM_SaberInStart(client->ps.saberMove) &&
+			!PM_SaberInTransition(client->ps.saberMove)) 
+		{
+			if (client->ps.fd.forcePower >= 8) // Minimum block criteria
+			{
+				// Met criteria
+				client->ps.isBlock = qtrue;
+			}
+			else
+			{
+				// Didn't meet criteria
+				client->ps.isBlock = qfalse;
+			}
+		}
+		else
+		{
+			// Didn't meet criteria
+			client->ps.isBlock = qfalse;
+		}
+	}
+	else if (!isBlockInitiated)
+	{
+		// Yeah... what do we want to do then? Probably nothing...
+		// This is not the conditional you're looking for. Move along.
+		client->ps.isBlock = qfalse;
 	}
 
 	isFollowing = (client->ps.pm_flags & PMF_FOLLOW) ? qtrue : qfalse;
@@ -3355,7 +3397,7 @@ void ClientThink_real( gentity_t *ent ) {
 			JKU_ActivateBlockButton( ent );
 			break;
 		case GENCMD_BLOCK_STOP:
-			JKU_DisableBlockButton ( ent );
+			JKU_DisableBlockButton(ent);
 		default:
 			break;
 		}

@@ -238,17 +238,17 @@ void JKU_DrawBlockStatus(centity_t *cent)
 	}
 
 	// if block is possible
-	if (cg.snap->ps.canBlock == qtrue)
+	if (cg.snap->ps.isBlock == qtrue)
 	{
 		trap->R_SetColor(colorTable[CT_GREEN]);
-		CG_DrawScaledProportionalString(320, 240, "BLOCK POSSIBLE", UI_CENTER, colorTable[CT_GREEN], 0.5f);
+		CG_DrawScaledProportionalString(320, 240, "BLOCKING", UI_CENTER, colorTable[CT_GREEN], 0.5f);
 	}
 
 	// if not
-	else if (cg.snap->ps.canBlock == qfalse)
+	else if (cg.snap->ps.isBlock == qfalse)
 	{
 		trap->R_SetColor(colorTable[CT_RED]);
-		CG_DrawScaledProportionalString(320, 240, "BLOCK NOT POSSIBLE", UI_CENTER, colorTable[CT_RED], 0.5f);
+		CG_DrawScaledProportionalString(320, 240, "NOT BLOCKING", UI_CENTER, colorTable[CT_RED], 0.5f);
 	}
 }
 

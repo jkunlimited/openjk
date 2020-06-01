@@ -1638,8 +1638,12 @@ typedef enum //# animNumber_e
 	BOTH_SIT6,
 	BOTH_SIT7,
 
-	// JKU Animations
+	//JKU Animations
 	BOTH_MENU_IDLE,
+
+	//Hidden stance ready-anims
+	BOTH_SABERTAVION_STANCE,
+	BOTH_SABERDESANN_STANCE,
 
 	//=================================================
 	//ANIMS IN WHICH ONLY THE UPPER OBJECTS ARE IN MD3

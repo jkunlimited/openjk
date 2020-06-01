@@ -3974,7 +3974,7 @@ static void Q3_SetForcePowerLevel ( int entID, int forcePower, int forceLevel )
 	{
 		if ( forcePower != FP_SABER_OFFENSE || forceLevel >= SS_NUM_SABER_STYLES )
 		{
-			G_DebugPrint( WL_ERROR, "Q3_SetForcePowerLevel: Force power setting %d out of range (0-3)\n", forceLevel );
+			G_DebugPrint( WL_ERROR, "Q3_SetForcePowerLevel: Force power setting %d out of range (0-5)\n", forceLevel );
 			return;
 		}
 	}

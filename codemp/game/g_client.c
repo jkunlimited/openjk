@@ -469,7 +469,7 @@ void JMSaberTouch(gentity_t *self, gentity_t *other, trace_t *trace)
 	while (i < NUM_FORCE_POWERS)
 	{
 		other->client->ps.fd.forcePowersKnown |= (1 << i);
-		other->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_3;
+		other->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_5;
 
 		i++;
 	}
@@ -3112,6 +3112,11 @@ tryTorso:
 
 void JKU_ArrangeStartingWeapons(gentity_t *ent, clientSession_t clientSavedSess)
 {
+	// Reset block logic timers
+	ent->client->ps.isBlockInitiated = qfalse;
+	ent->client->enableBlockingTimer = level.time;
+	ent->client->disableBlockingTimer = level.time;
+	
 	// Tidy up the code so it's easy to read and doesn't consume too much space
 	int selectedClass;
 	int selectedClassPerk;
@@ -3336,7 +3341,8 @@ void ClientSpawn(gentity_t *ent)
 		ent->client->ps.fd.saberAnimLevel == ent->client->ps.fd.saberDrawAnimLevel &&
 		ent->client->ps.fd.saberAnimLevel == ent->client->sess.saberLevel)
 	{
-		ent->client->sess.saberLevel = Com_Clampi(SS_FAST, SS_STRONG, ent->client->sess.saberLevel);
+		// JKU-Bunisher: Re-implemented Desann & Tavion stance
+		ent->client->sess.saberLevel = Com_Clampi(SS_FAST, SS_TAVION, ent->client->sess.saberLevel);
 		ent->client->ps.fd.saberAnimLevel = ent->client->ps.fd.saberDrawAnimLevel = ent->client->sess.saberLevel;
 
 		// limit our saber style to our force points allocated to saber offense
