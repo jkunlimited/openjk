@@ -4252,23 +4252,14 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 	dmg = JKU_calculateSaberDamage(self);
 	gentity_t* hitEntity = &g_entities[tr.entityNum];
 
+	// The following actions need to happen if the hitentity successfully parried the attack
 	if ((tr.fraction != 1 || tr.startsolid) && hitEntity->takedamage && (hitEntity->health > 0 || !(hitEntity->s.eFlags & EF_DISINTEGRATION)) && hitEntity->s.number != self->s.number && hitEntity->inuse) 
 	{
 		if (hitEntity->client && (hitEntity->client->ps.isBlock) && WP_SaberCanArcBlock(hitEntity, self, tr.endpos, 0, MOD_SABER, qfalse)) 
 		{
-			if (WP_SaberCanPerfectBlock(hitEntity, tr.endpos, qfalse))
-			{
-				// Perfect block
-				perfectBlock = qtrue;
-			}
-			else
-			{
-				// Arc block
-				perfectBlock = qfalse;
-			}
+			perfectBlock = WP_SaberCanPerfectBlock(hitEntity, tr.endpos, qfalse) ? qtrue: qfalse;
 			WP_SaberBlockNonRandom(hitEntity, tr.endpos, qfalse);
 			WP_SaberBreakParry(self, tr.endpos);
-			WP_SaberClashEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
 			FP_SubtractVictimForcePower(hitEntity, perfectBlock, qfalse);
 			didHit = qfalse;
 		}
@@ -4278,6 +4269,7 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 		}
 	}
 
+	// The following actions need to happen if the hitentity failed to parry the attack
 	if (didHit) 
 	{
 		if (g_entities[tr.entityNum].client) 
@@ -4287,27 +4279,25 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 				g_entities[tr.entityNum].client->ps.saberAttackWound = level.time + jku_timer_damage_invulnerability.integer;
 				G_Damage(hitEntity, self, self, dir, tr.endpos, dmg, knockbackFlags, MOD_SABER);
 			}
-			if (hitEntity->health <= 0) 
-			{
-				passThrough = qtrue;
-			}
-			if (self->enemy && self->enemy == &g_entities[tr.entityNum]) 
-			{
-				self->client->ps.saberEventFlags |= SEF_HITENEMY;
-			}
-			else 
-			{
-				self->client->ps.saberEventFlags |= SEF_HITOBJECT;
-			}
+			passThrough = (hitEntity->health <= 0) ? qtrue : qfalse;
+			self->client->ps.saberEventFlags |= (self->enemy && self->enemy == &g_entities[tr.entityNum]) ? SEF_HITENEMY : SEF_HITOBJECT;
 			if (!passThrough) 
 			{
 				WP_SaberKnockaway(self, tr.endpos);
 			}
 			WP_SaberHitFeedback(hitEntity);
-			WP_SaberClashEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
 			FP_SubtractVictimForcePower(hitEntity, perfectBlock, qtrue);
 		}
 	}
+
+	// The following actions need to happen regardless of the initial assessment of victim/attacker entities
+	// There still needs to be a client self and a client hitentity to avoid crashing due to non-player entities being referenced
+	if (self->client && hitEntity->client)
+	{
+		WP_SaberBounceSound(self, rSaberNum, rBladeNum);
+		WP_SaberClashEffect(self, hitEntity, &tr, rSaberNum, rBladeNum);
+	}
+
 	return didHit;
 }
 
