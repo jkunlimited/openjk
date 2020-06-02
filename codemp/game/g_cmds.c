@@ -390,6 +390,37 @@ void Cmd_GiveOther_f( gentity_t *ent )
 	G_Give( otherEnt, name, ConcatArgs( 3 ), trap->Argc()-1 );
 }
 
+
+/*
+=================
+Dice roll command by Bart
+=================
+*/
+
+void Cmd_Roll_F(gentity_t* ent)
+{
+	int max;
+	char roll[MAX_STRING_CHARS];
+
+	if (trap->Argc() != 2)
+	{
+		trap->SendServerCommand(ent - g_entities, "print \"^2Syntax: /roll <max number>. Command prints a random number in range of 1-your max number.\n\"");
+		return;
+	}
+	trap->Argv(1, roll, sizeof(roll));
+	max = atoi(roll);
+
+	if (trap->Argc() == 2)
+	{
+		int randomNum = Q_irand(1, max);
+		trap->SendServerCommand(-1, va("chat \"%s ^7rolled %i in a roll of D%i.\"", ent->client->pers.netname, randomNum, max));
+		G_LogPrintf("Roll: %s rolled %i in a roll of D%i.\n", ent->client->pers.netname, randomNum, max);
+		return;
+	}
+	return;
+}
+
+
 /*
 ==================
 Cmd_God_f
@@ -3550,6 +3581,8 @@ command_t commands[] = {
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
+	{ "roll",				Cmd_Roll_F,					CMD_NOINTERMISSION },
+
 };
 static const size_t numCommands = ARRAY_LEN( commands );
 
