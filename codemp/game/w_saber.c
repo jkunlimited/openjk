@@ -3932,166 +3932,120 @@ qboolean WP_SaberCanPerfectBlock(gentity_t *self, vec3_t hitloc, qboolean missil
 	rightdot = DotProduct(right, diff);
 	zdiff = hitloc[2] - clEye[2];
 
-	trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f\n\"", rightdot, zdiff));
-
-	if (zdiff > 0)
-	{
-		if (rightdot > 0.3)
-		{
-			if (self->client->pers.cmd.forwardmove > 0 && // Forward-Right
-				self->client->pers.cmd.rightmove > 0 &&
-				!(self->client->pers.cmd.forwardmove < 0) &&
-				!(self->client->pers.cmd.rightmove < 0))
-			{
-				// BLOCKED_UPPER_RIGHT
-				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> upper-right perfect block\n\"", rightdot, zdiff));
-				return qtrue;
-			}
-			else
-			{
-				return qfalse;
-			}
-		}
-		else if (rightdot < -0.3)
-		{
-			if (self->client->pers.cmd.forwardmove > 0 && // Forward-Left
-			    self->client->pers.cmd.rightmove < 0 &&
-				!(self->client->pers.cmd.forwardmove < 0) &&
-				!(self->client->pers.cmd.rightmove > 0))
-			{
-				// BLOCKED_UPPER_LEFT
-				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> upper-left perfect block\n\"", rightdot, zdiff));
-				return qtrue;
-			}
-			else
-			{
-				return qfalse;
-			}
-		}
-		else
-		{
-			
-			if ((self->client->pers.cmd.forwardmove > 0 && // Forward
+	if (zdiff > 0) {
+		if (rightdot > 0.3) {
+			if (self->client->pers.cmd.forwardmove > 0 && 
+				self->client->pers.cmd.rightmove > 0 && 
 				!(self->client->pers.cmd.forwardmove < 0) && 
-				!(self->client->pers.cmd.rightmove < 0) &&
-				!(self->client->pers.cmd.rightmove > 0)) ||
-				(self->client->pers.cmd.forwardmove > 0 && // Forward & Right
-				!(self->client->pers.cmd.forwardmove < 0) &&
-				self->client->pers.cmd.rightmove > 0 &&
-				!(self->client->pers.cmd.rightmove < 0)) ||
-				(self->client->pers.cmd.forwardmove > 0 && // Forward & Left
-				!(self->client->pers.cmd.forwardmove < 0) &&
-				self->client->pers.cmd.rightmove < 0 &&
-				!(self->client->pers.cmd.rightmove > 0)))
-			{
-				// BLOCKED_TOP
-				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> top perfect block\n\"", rightdot, zdiff));
+				!(self->client->pers.cmd.rightmove < 0)) {
 				return qtrue;
 			}
-			else
-			{
+			else {
+				return qfalse;
+			}
+		}
+		else if (rightdot < -0.3) {
+			if (self->client->pers.cmd.forwardmove > 0 && 
+				self->client->pers.cmd.rightmove < 0 && 
+				!(self->client->pers.cmd.forwardmove < 0) && 
+				!(self->client->pers.cmd.rightmove > 0)) {
+				return qtrue;
+			}
+			else {
+				return qfalse;
+			}
+		}
+		else {
+			if ((self->client->pers.cmd.forwardmove > 0 && 
+				!(self->client->pers.cmd.forwardmove < 0) && 
+				!(self->client->pers.cmd.rightmove < 0) && 
+				!(self->client->pers.cmd.rightmove > 0)) ||
+				(self->client->pers.cmd.forwardmove > 0 && 
+				!(self->client->pers.cmd.forwardmove < 0) &&	
+				self->client->pers.cmd.rightmove > 0 &&	
+				!(self->client->pers.cmd.rightmove < 0)) ||
+				(self->client->pers.cmd.forwardmove > 0 && 
+				!(self->client->pers.cmd.forwardmove < 0) && 
+				self->client->pers.cmd.rightmove < 0 && 
+				!(self->client->pers.cmd.rightmove > 0))) {
+				return qtrue;
+			}
+			else {
 				return qfalse;
 			}
 		}
 	}
-	else if (zdiff > -20)
-	{
-		if (rightdot > 0.1)
-		{
-			if (self->client->pers.cmd.forwardmove > 0 && // Forward Right
+	else if (zdiff > -20) {
+		if (rightdot > 0.1) {
+			if (self->client->pers.cmd.forwardmove > 0 &&
 				self->client->pers.cmd.rightmove > 0 &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
-				!(self->client->pers.cmd.rightmove < 0))
-			{
-				// BLOCKED_UPPER_RIGHT
-				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> upper-right perfect block\n\"", rightdot, zdiff));
+				!(self->client->pers.cmd.rightmove < 0)) {
 				return qtrue;
 			}
-			else
-			{
+			else {
 				return qfalse;
 			}
 		}
-		else if (rightdot < -0.1)
-		{
-			if (self->client->pers.cmd.forwardmove > 0 && // Forward Left
+		else if (rightdot < -0.1) {
+			if (self->client->pers.cmd.forwardmove > 0 &&
 				self->client->pers.cmd.rightmove < 0 &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
-				!(self->client->pers.cmd.rightmove > 0))
-			{
-				// BLOCKED_UPPER_LEFT
-				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> upper-left perfect block\n\"", rightdot, zdiff));
+				!(self->client->pers.cmd.rightmove > 0)) {
 				return qtrue;
 			}
-			else
-			{
+			else {
 				return qfalse;
 			}
 		}
-		else
-		{
-			if ((self->client->pers.cmd.forwardmove > 0 && // Forward
+		else {
+			if ((self->client->pers.cmd.forwardmove > 0 &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
 				!(self->client->pers.cmd.rightmove < 0) &&
 				!(self->client->pers.cmd.rightmove > 0)) ||
-				(self->client->pers.cmd.forwardmove > 0 && // Forward & Right
+				(self->client->pers.cmd.forwardmove > 0 &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
 				self->client->pers.cmd.rightmove > 0 &&
 				!(self->client->pers.cmd.rightmove < 0)) ||
-				(self->client->pers.cmd.forwardmove > 0 && // Forward & Left
+				(self->client->pers.cmd.forwardmove > 0 &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
 				self->client->pers.cmd.rightmove < 0 &&
-				!(self->client->pers.cmd.rightmove > 0)))
-			{
-				// BLOCKED_TOP
-				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> top perfect block\n\"", rightdot, zdiff));
+				!(self->client->pers.cmd.rightmove > 0))) {
 				return qtrue;
 			}
-			else
-			{
+			else {
 				return qfalse;
 			}
 		}
 	}
-	else
-	{
-		if (rightdot >= 0)
-		{
-			if ((self->client->pers.cmd.rightmove > 0 && // Right
+	else {
+		if (rightdot >= 0) {
+			if ((self->client->pers.cmd.rightmove > 0 &&
 				!(self->client->pers.cmd.rightmove < 0) &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
 				!(self->client->pers.cmd.forwardmove > 0)) ||
-				(self->client->pers.cmd.forwardmove < 0 && // Back & Right
+				(self->client->pers.cmd.forwardmove < 0 &&
 				self->client->pers.cmd.rightmove > 0 &&
 				!(self->client->pers.cmd.forwardmove > 0) &&
-				!(self->client->pers.cmd.rightmove < 0)))
-			{
-				// BLOCKED_LOWER_RIGHT
-				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> lower-right perfect block\n\"", rightdot, zdiff));
+				!(self->client->pers.cmd.rightmove < 0))) {
 				return qtrue;
 			}
-			else
-			{
+			else {
 				return qfalse;
 			}
 		}
-		else
-		{
-			if ((self->client->pers.cmd.rightmove < 0 && // Left
+		else {
+			if ((self->client->pers.cmd.rightmove < 0 &&
 				!(self->client->pers.cmd.rightmove > 0) &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
 				!(self->client->pers.cmd.forwardmove > 0)) ||
-				(self->client->pers.cmd.forwardmove < 0 && // Back & Left
+				(self->client->pers.cmd.forwardmove < 0 &&
 				self->client->pers.cmd.rightmove < 0 &&
 				!(self->client->pers.cmd.forwardmove > 0) &&
-				!(self->client->pers.cmd.rightmove > 0)))
-			{
-				// BLOCKED_LOWER_LEFT
-				trap->SendServerCommand(-1, va("print \"rightdot: %f, zdiff: %f -> lower-left perfect block\n\"", rightdot, zdiff));
+				!(self->client->pers.cmd.rightmove > 0))) {
 				return qtrue;
 			}
-			else
-			{
+			else {
 				return qfalse;
 			}
 		}

@@ -1270,7 +1270,6 @@ void CG_DrawHUD(centity_t	*cent)
 			// JKU-Bunisher: Lightsaber Stance / Ammunition Differentiation
 			if (cent->currentState.weapon == WP_SABER) {
 				CG_DrawSaberStyle(cent, menuHUD);
-				JKU_DrawBlockStatus(cent);
 			}
 			else {
 				// JKU-Bunisher: New Ammo & Ammo Clip Reserve Indicators

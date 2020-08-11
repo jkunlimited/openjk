@@ -1890,6 +1890,12 @@ void JKU_DisableBlockButton(gentity_t *ent)
 		ent->client->ps.isBlockInitiated = qfalse;
 	}
 }
+
+qboolean PM_PlayerInRun(gclient_t *client)
+{
+	if (client->pers.cmd.buttons & BUTTON_WALKING) return qfalse;
+	else return qtrue;
+}
 // [/Jedi Knight: Unlimited]
 
 /*
@@ -1956,7 +1962,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 	if (isBlockInitiated)
 	{
-		// Minimum block criteria
 		if (!BG_SabersOff(&ent->client->ps) &&
 			!BG_SaberInAttack(client->ps.saberMove) &&
 			!BG_SaberInSpecial(client->ps.saberMove) &&
@@ -1964,29 +1969,20 @@ void ClientThink_real( gentity_t *ent ) {
 			!BG_InSaberLock(client->ps.saberMove) &&
 			!BG_SaberInKata(client->ps.saberMove) &&
 			!PM_SaberInStart(client->ps.saberMove) &&
-			!PM_SaberInTransition(client->ps.saberMove)) 
-		{
-			if (client->ps.fd.forcePower >= 8) // Minimum block criteria
-			{
-				// Met criteria
+			!PM_SaberInTransition(client->ps.saberMove) &&
+			!PM_PlayerInRun(client)) {
+			if (client->ps.fd.forcePower >= 8) {
 				client->ps.isBlock = qtrue;
 			}
-			else
-			{
-				// Didn't meet criteria
+			else {
 				client->ps.isBlock = qfalse;
 			}
 		}
-		else
-		{
-			// Didn't meet criteria
+		else {
 			client->ps.isBlock = qfalse;
 		}
 	}
-	else if (!isBlockInitiated)
-	{
-		// Yeah... what do we want to do then? Probably nothing...
-		// This is not the conditional you're looking for. Move along.
+	else if (!isBlockInitiated) {
 		client->ps.isBlock = qfalse;
 	}
 

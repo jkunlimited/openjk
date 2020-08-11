@@ -229,29 +229,6 @@ void JKU_DrawForceCircle(centity_t *cent, menuDef_t *menuHUD)
 	}
 }
 
-void JKU_DrawBlockStatus(centity_t *cent)
-{
-	// don't display if dead
-	if (cg.snap->ps.stats[STAT_HEALTH] <= 0)
-	{
-		return;
-	}
-
-	// if block is possible
-	if (cg.snap->ps.isBlock == qtrue)
-	{
-		trap->R_SetColor(colorTable[CT_GREEN]);
-		CG_DrawScaledProportionalString(320, 240, "BLOCKING", UI_CENTER, colorTable[CT_GREEN], 0.5f);
-	}
-
-	// if not
-	else if (cg.snap->ps.isBlock == qfalse)
-	{
-		trap->R_SetColor(colorTable[CT_RED]);
-		CG_DrawScaledProportionalString(320, 240, "NOT BLOCKING", UI_CENTER, colorTable[CT_RED], 0.5f);
-	}
-}
-
 void JKU_DrawForcePower(centity_t *cent, menuDef_t *menuHUD)
 {
 	float x = 287.5;
