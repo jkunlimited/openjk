@@ -172,48 +172,6 @@ int forcePowerNeeded[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] =
 		0,//FP_SABER_DEFENSE,
 		20//FP_SABERTHROW,
 		//NUM_FORCE_POWERS
-	},
-	{
-		50,//FP_HEAL,//instant //You get 5 points of health.. for 50 force points!
-		10,//FP_LEVITATION,//hold/duration
-		50,//FP_SPEED,//duration
-		20,//FP_PUSH,//hold/duration
-		20,//FP_PULL,//hold/duration
-		20,//FP_TELEPATHY,//instant
-		60,//FP_GRIP,//hold/duration
-		1,//FP_LIGHTNING,//hold/duration
-		50,//FP_RAGE,//duration
-		10,//FP_PROTECT,//duration
-		10,//FP_ABSORB,//duration
-		25,//FP_TEAM_HEAL,//instant
-		25,//FP_TEAM_FORCE,//instant
-		20,//FP_DRAIN,//hold/duration
-		20,//FP_SEE,//duration
-		0,//FP_SABER_OFFENSE,
-		0,//FP_SABER_DEFENSE,
-		20//FP_SABERTHROW,
-		  //NUM_FORCE_POWERS
-	},
-	{
-		50,//FP_HEAL,//instant //You get 5 points of health.. for 50 force points!
-		10,//FP_LEVITATION,//hold/duration
-		50,//FP_SPEED,//duration
-		20,//FP_PUSH,//hold/duration
-		20,//FP_PULL,//hold/duration
-		20,//FP_TELEPATHY,//instant
-		60,//FP_GRIP,//hold/duration
-		1,//FP_LIGHTNING,//hold/duration
-		50,//FP_RAGE,//duration
-		10,//FP_PROTECT,//duration
-		10,//FP_ABSORB,//duration
-		25,//FP_TEAM_HEAL,//instant
-		25,//FP_TEAM_FORCE,//instant
-		20,//FP_DRAIN,//hold/duration
-		20,//FP_SEE,//duration
-		0,//FP_SABER_OFFENSE,
-		0,//FP_SABER_DEFENSE,
-		20//FP_SABERTHROW,
-		  //NUM_FORCE_POWERS
 	}
 };
 
@@ -223,8 +181,6 @@ float forceJumpHeight[NUM_FORCE_POWER_LEVELS] =
 	96,//(+stepheight+crouchdiff = 130)
 	192,//(+stepheight+crouchdiff = 226)
 	384,//(+stepheight+crouchdiff = 418)
-	384,//(+stepheight+crouchdiff = 418)
-	384//(+stepheight+crouchdiff = 418)
 };
 
 float forceJumpStrength[NUM_FORCE_POWER_LEVELS] =
@@ -232,8 +188,6 @@ float forceJumpStrength[NUM_FORCE_POWER_LEVELS] =
 	JUMP_VELOCITY,//normal jump
 	420,
 	590,
-	840,
-	840,
 	840
 };
 
@@ -549,7 +503,7 @@ int PM_GetSaberBlockAnim(int saberAnimLevel)
 //  		return BOTH_STAND1;
 //  	}
 //  
-//  	if (!pm->ps->isBlock)
+//  	if (!pm->ps->userInt1)
 //  	{
 //  		switch (pm->ps->fd.saberAnimLevel)
 //  		{
@@ -2001,8 +1955,6 @@ float forceJumpHeightMax[NUM_FORCE_POWER_LEVELS] =
 	66,//normal jump (32+stepheight(18)+crouchdiff(24) = 74)
 	130,//(96+stepheight(18)+crouchdiff(24) = 138)
 	226,//(192+stepheight(18)+crouchdiff(24) = 234)
-	418,//(384+stepheight(18)+crouchdiff(24) = 426)
-	418,//(384+stepheight(18)+crouchdiff(24) = 426)
 	418//(384+stepheight(18)+crouchdiff(24) = 426)
 };
 
@@ -5846,7 +5798,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						if (pm->ps->isBlock)
+						if (pm->ps->userInt1)
 						{
 							desiredAnim = BOTH_WALKBACK_STAFF;
 						}
@@ -5871,7 +5823,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						if (pm->ps->isBlock)
+						if (pm->ps->userInt1)
 						{
 							desiredAnim = BOTH_WALKBACK_DUAL;
 						}
@@ -5892,7 +5844,7 @@ static void PM_Footsteps( void ) {
 					}
 					else
 					{
-						if (pm->ps->isBlock)
+						if (pm->ps->userInt1)
 						{
 							desiredAnim = BOTH_WALKBACK1; // We need to introduce a new anim for this...
 						}
@@ -5938,7 +5890,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							if (pm->ps->isBlock)
+							if (pm->ps->userInt1)
 							{
 								desiredAnim = BOTH_WALK_STAFF;
 							}
@@ -5963,7 +5915,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							if (pm->ps->isBlock)
+							if (pm->ps->userInt1)
 							{
 								desiredAnim = BOTH_WALK_DUAL;
 							}
@@ -5984,7 +5936,7 @@ static void PM_Footsteps( void ) {
 						}
 						else
 						{
-							if (pm->ps->isBlock)
+							if (pm->ps->userInt1)
 							{
 								desiredAnim = BOTH_WALK2;
 							}

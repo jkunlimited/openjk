@@ -472,11 +472,6 @@ typedef struct clientSession_s {
 
 	char		IP[NET_ADDRSTRMAXLEN];
 
-	// [ClassSystem]
-	int			selectedClass;
-	int			selectedClassPerk;
-	// [/ClassSystem]
-
 } clientSession_t;
 
 // playerstate mGameFlags
@@ -802,10 +797,6 @@ struct gclient_s {
 		int		drainDebounce;
 		int		lightningDebounce;
 	} force;
-
-   //JKU-Fnuki: Add new timers for enabling/disabling blocking
-   int enableBlockingTimer;
-   int disableBlockingTimer;
 };
 
 //Interest points

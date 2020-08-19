@@ -144,48 +144,6 @@ const int forcePowerMinRank[NUM_FORCE_POWER_LEVELS][NUM_FORCE_POWERS] = //0 == n
 		10,//FP_SABER_DEFENSE,
 		10//FP_SABERTHROW,
 		//NUM_FORCE_POWERS
-	},
-	{
-		10,//FP_HEAL,//instant
-		0,//FP_LEVITATION,//hold/duration
-		0,//FP_SPEED,//duration
-		0,//FP_PUSH,//hold/duration
-		0,//FP_PULL,//hold/duration
-		10,//FP_TELEPATHY,//instant
-		15,//FP_GRIP,//hold/duration
-		10,//FP_LIGHTNING,//hold/duration
-		15,//FP_RAGE,//duration
-		15,//FP_PROTECT,//duration
-		15,//FP_ABSORB,//duration
-		10,//FP_TEAM_HEAL,//instant
-		10,//FP_TEAM_FORCE,//instant
-		10,//FP_DRAIN,//hold/duration
-		5,//FP_SEE,//duration
-		10,//FP_SABER_OFFENSE,
-		10,//FP_SABER_DEFENSE,
-		10//FP_SABERTHROW,
-		  //NUM_FORCE_POWERS
-	},
-	{
-		10,//FP_HEAL,//instant
-		0,//FP_LEVITATION,//hold/duration
-		0,//FP_SPEED,//duration
-		0,//FP_PUSH,//hold/duration
-		0,//FP_PULL,//hold/duration
-		10,//FP_TELEPATHY,//instant
-		15,//FP_GRIP,//hold/duration
-		10,//FP_LIGHTNING,//hold/duration
-		15,//FP_RAGE,//duration
-		15,//FP_PROTECT,//duration
-		15,//FP_ABSORB,//duration
-		10,//FP_TEAM_HEAL,//instant
-		10,//FP_TEAM_FORCE,//instant
-		10,//FP_DRAIN,//hold/duration
-		5,//FP_SEE,//duration
-		10,//FP_SABER_OFFENSE,
-		10,//FP_SABER_DEFENSE,
-		10//FP_SABERTHROW,
-		  //NUM_FORCE_POWERS
 	}
 };
 
@@ -194,8 +152,6 @@ const int mindTrickTime[NUM_FORCE_POWER_LEVELS] =
 	0,//none
 	5000,
 	10000,
-	15000,
-	15000,
 	15000
 };
 
@@ -216,7 +172,7 @@ void WP_InitForcePowers( gentity_t *ent ) {
 
 	ent->client->ps.fd.saberAnimLevel = ent->client->sess.saberLevel;
 
-	if ( ent->client->ps.fd.saberAnimLevel < FORCE_LEVEL_1 || ent->client->ps.fd.saberAnimLevel > FORCE_LEVEL_5 )
+	if ( ent->client->ps.fd.saberAnimLevel < FORCE_LEVEL_1 || ent->client->ps.fd.saberAnimLevel > FORCE_LEVEL_3 )
 		ent->client->ps.fd.saberAnimLevel = FORCE_LEVEL_1;
 
 	// so that the client configstring is already modified with this when we need it
@@ -892,25 +848,28 @@ int WP_AbsorbConversion(gentity_t *attacked, int atdAbsLevel, gentity_t *attacke
 }
 
 void WP_ForcePowerRegenerate( gentity_t *self, int overrideAmt )
-{ 
-	//called on a regular interval to regenerate force power.
-	if ( !self->client || self->client->ps.isBlock )
+{ //called on a regular interval to regenerate force power.
+	if ( !self->client )
 	{
 		return;
 	}
+
+	if (self->client->ps.userInt1)
+	{ // no regen if manually blocking
+		return;
+	}
+
 	if ( overrideAmt )
-	{ 
-		//custom regen amount
+	{ //custom regen amount
 		self->client->ps.fd.forcePower += overrideAmt;
 	}
 	else
-	{
-		//otherwise, just 1
+	{ //otherwise, just 1
 		self->client->ps.fd.forcePower++;
 	}
+
 	if ( self->client->ps.fd.forcePower > self->client->ps.fd.forcePowerMax )
-	{ 
-		//cap it off at the max (default 100)
+	{ //cap it off at the max (default 100)
 		self->client->ps.fd.forcePower = self->client->ps.fd.forcePowerMax;
 	}
 }
@@ -959,7 +918,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 		{
 			duration = 15000;
 		}
-		else if (self->client->ps.fd.forcePowerLevel[FP_SPEED] >= FORCE_LEVEL_3)
+		else if (self->client->ps.fd.forcePowerLevel[FP_SPEED] == FORCE_LEVEL_3)
 		{
 			duration = 20000;
 		}
@@ -994,7 +953,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 		{
 			duration = 25000;
 		}
-		else if (self->client->ps.fd.forcePowerLevel[FP_TELEPATHY] >= FORCE_LEVEL_3)
+		else if (self->client->ps.fd.forcePowerLevel[FP_TELEPATHY] == FORCE_LEVEL_3)
 		{
 			duration = 30000;
 		}
@@ -1030,7 +989,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 		{
 			duration = 14000;
 		}
-		else if (self->client->ps.fd.forcePowerLevel[FP_RAGE] >= FORCE_LEVEL_3)
+		else if (self->client->ps.fd.forcePowerLevel[FP_RAGE] == FORCE_LEVEL_3)
 		{
 			duration = 20000;
 		}
@@ -1082,7 +1041,7 @@ void WP_ForcePowerStart( gentity_t *self, forcePowers_t forcePower, int override
 		{
 			duration = 20000;
 		}
-		else if (self->client->ps.fd.forcePowerLevel[FP_SEE] >= FORCE_LEVEL_3)
+		else if (self->client->ps.fd.forcePowerLevel[FP_SEE] == FORCE_LEVEL_3)
 		{
 			duration = 30000;
 		}
@@ -1147,7 +1106,7 @@ void ForceHeal( gentity_t *self )
 		return;
 	}
 
-	if (self->client->ps.fd.forcePowerLevel[FP_HEAL] >= FORCE_LEVEL_3)
+	if (self->client->ps.fd.forcePowerLevel[FP_HEAL] == FORCE_LEVEL_3)
 	{
 		self->health += 25; //This was 50, but that angered the Balance God.
 
@@ -1243,7 +1202,7 @@ void ForceTeamHeal( gentity_t *self )
 	{
 		radius *= 1.5;
 	}
-	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] >= FORCE_LEVEL_3)
+	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_HEAL] == FORCE_LEVEL_3)
 	{
 		radius *= 2;
 	}
@@ -1348,7 +1307,7 @@ void ForceTeamForceReplenish( gentity_t *self )
 	{
 		radius *= 1.5;
 	}
-	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] >= FORCE_LEVEL_3)
+	if (self->client->ps.fd.forcePowerLevel[FP_TEAM_FORCE] == FORCE_LEVEL_3)
 	{
 		radius *= 2;
 	}
@@ -1986,7 +1945,7 @@ void ForceDrainDamage( gentity_t *self, gentity_t *traceEnt, vec3_t dir, vec3_t 
 				{
 					dmg = 3;
 				}
-				else if (self->client->ps.fd.forcePowerLevel[FP_DRAIN] >= FORCE_LEVEL_3)
+				else if (self->client->ps.fd.forcePowerLevel[FP_DRAIN] == FORCE_LEVEL_3)
 				{
 					dmg = 4;
 				}
@@ -2683,7 +2642,7 @@ void ForceTelepathy(gentity_t *self)
 	{
 		visionArc = 180;
 	}
-	else if (self->client->ps.fd.forcePowerLevel[FP_TELEPATHY] >= FORCE_LEVEL_3)
+	else if (self->client->ps.fd.forcePowerLevel[FP_TELEPATHY] == FORCE_LEVEL_3)
 	{
 		visionArc = 360;
 		radius = MAX_TRICK_DISTANCE*2.0f;
@@ -2952,8 +2911,6 @@ float forcePushPullRadius[NUM_FORCE_POWER_LEVELS] =
 	0,//none
 	384,//256,
 	448,//384,
-	512,
-	512,
 	512
 };
 //rwwFIXMEFIXME: incorporate this into the below function? Currently it's only being used by jedi AI
@@ -3089,27 +3046,16 @@ void ForceThrow( gentity_t *self, qboolean pull )
 		maxs[i] = center[i] + radius;
 	}
 
-	// JKU-Bunisher: Cap push and pull multiplier intentionally at 3 * ps.fd.forcePowerLevel
-	// Since otherwise, they'd get smacked by a 2076 World Series baseball bat
+
 	if (pull)
 	{
 		powerLevel = self->client->ps.fd.forcePowerLevel[FP_PULL];
-		if (powerLevel <= FORCE_LEVEL_3) {
-			pushPower = 256 * self->client->ps.fd.forcePowerLevel[FP_PULL];
-		}
-		else {
-			pushPower = 256 * FORCE_LEVEL_3;
-		}
+		pushPower = 256*self->client->ps.fd.forcePowerLevel[FP_PULL];
 	}
-	else // if (push)
+	else
 	{
 		powerLevel = self->client->ps.fd.forcePowerLevel[FP_PUSH];
-		if (powerLevel <= FORCE_LEVEL_3) {
-			pushPower = 256 * self->client->ps.fd.forcePowerLevel[FP_PUSH];
-		}
-		else {
-			pushPower = 256 * FORCE_LEVEL_3;
-		}
+		pushPower = 256*self->client->ps.fd.forcePowerLevel[FP_PUSH];
 	}
 
 	if (!powerLevel)
@@ -3121,7 +3067,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 	{
 		visionArc = 60;
 	}
-	else if (powerLevel >= FORCE_LEVEL_3)
+	else if (powerLevel == FORCE_LEVEL_3)
 	{
 		visionArc = 180;
 	}
@@ -3510,7 +3456,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 						{
 							randfact = 7;
 						}
-						else if (modPowerLevel >= FORCE_LEVEL_3)
+						else if (modPowerLevel == FORCE_LEVEL_3)
 						{
 							randfact = 10;
 						}
@@ -3536,7 +3482,7 @@ void ForceThrow( gentity_t *self, qboolean pull )
 
 				if ((modPowerLevel > otherPushPower || push_list[x]->client->ps.m_iVehicleNum) && push_list[x]->client)
 				{
-					if (modPowerLevel >= FORCE_LEVEL_3 &&
+					if (modPowerLevel == FORCE_LEVEL_3 &&
 						push_list[x]->client->ps.forceHandExtend != HANDEXTEND_KNOCKDOWN)
 					{
 						dirLen = VectorLength(pushDir);
@@ -3918,7 +3864,8 @@ void DoGripAction(gentity_t *self, forcePowers_t forcePower)
 	}
 
 	if (tr.fraction != 1.0f &&
-		tr.entityNum != gripEnt->s.number)
+		tr.entityNum != gripEnt->s.number /*&&
+		gripLevel < FORCE_LEVEL_3*/)
 	{
 		WP_ForcePowerStop(self, forcePower);
 		return;
@@ -3983,7 +3930,7 @@ void DoGripAction(gentity_t *self, forcePowers_t forcePower)
 		return;
 	}
 
-	if (gripLevel >= FORCE_LEVEL_3)
+	if (gripLevel == FORCE_LEVEL_3)
 	{
 		gripEnt->client->ps.fd.forceGripBeingGripped = level.time + 1000;
 
@@ -4303,7 +4250,7 @@ static void WP_ForcePowerRun( gentity_t *self, forcePowers_t forcePower, usercmd
 			{
 				addTime = 300;
 			}
-			else if (self->client->ps.fd.forcePowerLevel[FP_RAGE] >= FORCE_LEVEL_3)
+			else if (self->client->ps.fd.forcePowerLevel[FP_RAGE] == FORCE_LEVEL_3)
 			{
 				addTime = 450;
 			}
@@ -4795,9 +4742,9 @@ void HolocronUpdate(gentity_t *self)
 	{
 		noHRank = FORCE_LEVEL_0;
 	}
-	if (noHRank > FORCE_LEVEL_5)
+	if (noHRank > FORCE_LEVEL_3)
 	{
-		noHRank = FORCE_LEVEL_5;
+		noHRank = FORCE_LEVEL_3;
 	}
 
 	trap->Cvar_Update(&g_maxHolocronCarry);
@@ -4808,7 +4755,7 @@ void HolocronUpdate(gentity_t *self)
 		{ //carrying it, make sure we have the power
 			self->client->ps.holocronBits |= (1 << i);
 			self->client->ps.fd.forcePowersKnown |= (1 << i);
-			self->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_5;
+			self->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_3;
 		}
 		else
 		{ //otherwise, make sure the power is cleared from us
@@ -4899,7 +4846,7 @@ void JediMasterUpdate(gentity_t *self)
 		if (self->client->ps.isJediMaster)
 		{
 			self->client->ps.fd.forcePowersKnown |= (1 << i);
-			self->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_5;
+			self->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_3;
 
 			if (i == FP_TEAM_HEAL || i == FP_TEAM_FORCE ||
 				i == FP_DRAIN || i == FP_ABSORB)
@@ -5264,7 +5211,7 @@ void WP_ForcePowersUpdate( gentity_t *self, usercmd_t *ucmd )
 				if (!forcePowerDarkLight[i] ||
 					self->client->ps.fd.forceSide == forcePowerDarkLight[i])
 				{
-					self->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_5;
+					self->client->ps.fd.forcePowerLevel[i] = FORCE_LEVEL_3;
 					self->client->ps.fd.forcePowersKnown |= (1 << i);
 				}
 

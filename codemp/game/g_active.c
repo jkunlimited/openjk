@@ -1862,35 +1862,6 @@ void G_SetTauntAnim( gentity_t *ent, int taunt )
 	}
 }
 
-// [Jedi Knight: Unlimited]
-// [Block Functions]
-void JKU_ActivateBlockButton(gentity_t *ent)
-{
-	// If we're not a client...
-	if (!ent->client)
-	{
-		return;
-	}
-	else 
-	{
-		// Initiate blocking (this is then picked up in clientthink_real in g_active.c
-		ent->client->ps.isBlockInitiated = qtrue;
-	}
-}
-
-void JKU_DisableBlockButton(gentity_t *ent)
-{
-	if (!ent->client) 
-	{
-		return;
-	}
-	else 
-	{
-		// Disable blocking (this is then picked up in clientthink_real in g_active.c
-		ent->client->ps.isBlockInitiated = qfalse;
-	}
-}
-
 qboolean PM_PlayerInRun(gclient_t *client)
 {
 	if (client->pers.cmd.buttons & BUTTON_WALKING) return qfalse;
@@ -1958,7 +1929,7 @@ void ClientThink_real( gentity_t *ent ) {
 		}
 	}
 
-	isBlockInitiated = (client->ps.isBlockInitiated) ? qtrue : qfalse;
+	isBlockInitiated = (client->pers.cmd.buttons & BUTTON_MANUAL_BLOCK) ? qtrue : qfalse;
 
 	if (isBlockInitiated)
 	{
@@ -1972,18 +1943,18 @@ void ClientThink_real( gentity_t *ent ) {
 			!PM_SaberInTransition(client->ps.saberMove) &&
 			!PM_PlayerInRun(client)) {
 			if (client->ps.fd.forcePower >= 8) {
-				client->ps.isBlock = qtrue;
+				client->ps.userInt1 = 1;
 			}
 			else {
-				client->ps.isBlock = qfalse;
+				client->ps.userInt1 = 0;
 			}
 		}
 		else {
-			client->ps.isBlock = qfalse;
+			client->ps.userInt1 = 0;
 		}
 	}
 	else if (!isBlockInitiated) {
-		client->ps.isBlock = qfalse;
+		client->ps.userInt1 = 0;
 	}
 
 	isFollowing = (client->ps.pm_flags & PMF_FOLLOW) ? qtrue : qfalse;
@@ -3389,11 +3360,6 @@ void ClientThink_real( gentity_t *ent ) {
 		case GENCMD_GLOAT:
 			G_SetTauntAnim( ent, TAUNT_GLOAT );
 			break;
-		case GENCMD_BLOCK:
-			JKU_ActivateBlockButton( ent );
-			break;
-		case GENCMD_BLOCK_STOP:
-			JKU_DisableBlockButton(ent);
 		default:
 			break;
 		}

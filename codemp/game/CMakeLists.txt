@@ -207,15 +207,6 @@ set(MPGameUiFiles
 source_group("ui" FILES ${MPGameUiFiles})
 set(MPGameFiles ${MPGameFiles} ${MPGameUiFiles})
 
-set(MPGameJkuUtilsFiles
-    "${MPDir}/jku_utils/saber_utils.h"
-	"${MPDir}/jku_utils/saber_utils.cpp"
-	"${MPDir}/jku_utils/class_utils.h"
-	"${MPDir}/jku_utils/class_utils.cpp"
-    )
-source_group("jku_utils" FILES ${MPGameJkuUtilsFiles})
-set(MPGameFiles ${MPGameFiles} ${MPGameJkuUtilsFiles})
-
 add_library(${MPGame} SHARED ${MPGameFiles})
 
 if(NOT MSVC)

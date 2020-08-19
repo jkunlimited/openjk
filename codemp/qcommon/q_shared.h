@@ -5,7 +5,6 @@ Copyright (C) 2000 - 2013, Raven Software, Inc.
 Copyright (C) 2001 - 2013, Activision, Inc.
 Copyright (C) 2005 - 2015, ioquake3 contributors
 Copyright (C) 2013 - 2015, OpenJK contributors
-Copyright (C) 2019 - 2020, Jedi Knight Unlimited
 
 This file is part of the OpenJK source code.
 
@@ -391,10 +390,11 @@ typedef enum forcePowerLevels_e {
 	FORCE_LEVEL_1,
 	FORCE_LEVEL_2,
 	FORCE_LEVEL_3,
-	FORCE_LEVEL_4,
-	FORCE_LEVEL_5,
 	NUM_FORCE_POWER_LEVELS
 } forcePowerLevels_t;
+
+#define	FORCE_LEVEL_4 (FORCE_LEVEL_3+1)
+#define	FORCE_LEVEL_5 (FORCE_LEVEL_4+1)
 
 //rww - a C-ified structure version of the class which fires off callbacks and gives arguments to update ragdoll status.
 enum sharedERagPhase
@@ -563,8 +563,8 @@ typedef struct wpobject_s
 #define	SCREEN_WIDTH		640
 #define	SCREEN_HEIGHT		480
 
-#define TINYCHAR_WIDTH		4
-#define TINYCHAR_HEIGHT		8
+#define TINYCHAR_WIDTH		(SMALLCHAR_WIDTH)
+#define TINYCHAR_HEIGHT		(SMALLCHAR_HEIGHT/2)
 
 #define SMALLCHAR_WIDTH		8
 #define SMALLCHAR_HEIGHT	16
@@ -1336,15 +1336,6 @@ typedef struct playerState_s {
 	int			deltaOneBits;
 	int			deltaNumBits;
 #endif
-
-   //JKU-Fnuki: Add new boolean indicating whether or not you are allowed to enter block animation
-   qboolean isBlockInitiated;
-   qboolean isBlock;
-
-   //JKU-Bunisher: Add new integers indicating selected class and selected class perk
-   int		selectedClass;
-   int		selectedClassPerk;
-
 } playerState_t;
 
 typedef struct siegePers_s
@@ -1382,7 +1373,7 @@ typedef struct siegePers_s
 
 #define BUTTON_FORCE_DRAIN		2048
 
-#define BUTTON_JKU_BLOCK		8192
+#define BUTTON_MANUAL_BLOCK		32768
 
 // Here's an interesting bit.  The bots in TA used buttons to do additional gestures.
 // I ripped them out because I didn't want too many buttons given the fact that I was already adding some for JK2.
@@ -1432,11 +1423,7 @@ typedef enum
 	GENCMD_BOW,
 	GENCMD_MEDITATE,
 	GENCMD_FLOURISH,
-	GENCMD_GLOAT,
-	// [Jedi Knight: Unlimited]
-	GENCMD_BLOCK,
-	GENCMD_BLOCK_STOP
-	// [/Jedi Knight: Unlimited]
+	GENCMD_GLOAT
 } genCmds_t;
 
 // usercmd_t is sent to the server each client frame
@@ -1740,19 +1727,10 @@ typedef struct entityState_s {
 	int			userInt2;
 	int			userInt3;
 	float		userFloat1;
-	float		userFloat2; 
+	float		userFloat2;
 	float		userFloat3;
 	vec3_t		userVec1;
 	vec3_t		userVec2;
-
-   //JKU-Fnuki: Add new JKU functionality
-   qboolean		isBlockInitiated;
-   qboolean		isBlock;
-
-   //JKU-Bunisher: Add new integers indicating selected class and selected class perk
-   int			selectedClass;
-   int			selectedClassPerk;
-
 } entityState_t;
 
 typedef enum {

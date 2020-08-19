@@ -4,7 +4,6 @@ Copyright (C) 1999 - 2005, Id Software, Inc.
 Copyright (C) 2000 - 2013, Raven Software, Inc.
 Copyright (C) 2001 - 2013, Activision, Inc.
 Copyright (C) 2013 - 2015, OpenJK contributors
-Copyright (C) 2019 - 2020, Jedi Knight Unlimited
 
 This file is part of the OpenJK source code.
 
@@ -76,7 +75,6 @@ kbutton_t	in_buttons[MAX_KBUTTONS];
 
 
 qboolean	in_mlooking;
-
 
 void IN_Button11Down(void);
 void IN_Button11Up(void);
@@ -514,9 +512,9 @@ float CL_KeyState( kbutton_t *key ) {
 }
 
 #define		AUTOMAP_KEY_FORWARD			1
-#define		AUTOMAP_KEY_BACK           2
+#define		AUTOMAP_KEY_BACK			2
 #define		AUTOMAP_KEY_YAWLEFT			3
-#define		AUTOMAP_KEY_YAWRIGHT       4
+#define		AUTOMAP_KEY_YAWRIGHT		4
 #define		AUTOMAP_KEY_PITCHUP			5
 #define		AUTOMAP_KEY_PITCHDOWN		6
 #define		AUTOMAP_KEY_DEFAULTVIEW		7
@@ -778,7 +776,7 @@ void IN_Button5Up(void) {IN_KeyUp(&in_buttons[5]);}
 void IN_Button6Down(void) {IN_KeyDown(&in_buttons[6]);}
 void IN_Button6Up(void) {IN_KeyUp(&in_buttons[6]);}
 void IN_Button7Down(void) {IN_KeyDown(&in_buttons[7]);}
-void IN_Button7Up(void) {IN_KeyUp(&in_buttons[7]);}
+void IN_Button7Up(void){IN_KeyUp(&in_buttons[7]);}
 void IN_Button8Down(void) {IN_KeyDown(&in_buttons[8]);}
 void IN_Button8Up(void) {IN_KeyUp(&in_buttons[8]);}
 void IN_Button9Down(void) {IN_KeyDown(&in_buttons[9]);}
@@ -789,23 +787,13 @@ void IN_Button11Down(void) {IN_KeyDown(&in_buttons[11]);}
 void IN_Button11Up(void) {IN_KeyUp(&in_buttons[11]);}
 void IN_Button12Down(void) {IN_KeyDown(&in_buttons[12]);}
 void IN_Button12Up(void) {IN_KeyUp(&in_buttons[12]);}
-void IN_Button13Down(void)
-{
-   cl.gcmdSendValue = qtrue;
-   cl.gcmdValue = GENCMD_BLOCK;
-   IN_KeyDown(&in_buttons[13]);
-}
-void IN_Button13Up(void)
-{
-   cl.gcmdSendValue = qtrue;
-   cl.gcmdValue = GENCMD_BLOCK_STOP;
-   IN_KeyUp(&in_buttons[13]);
-}
-
+void IN_Button13Down(void) {IN_KeyDown(&in_buttons[13]);}
+void IN_Button13Up(void) {IN_KeyUp(&in_buttons[13]);}
 void IN_Button14Down(void) {IN_KeyDown(&in_buttons[14]);}
 void IN_Button14Up(void) {IN_KeyUp(&in_buttons[14]);}
 void IN_Button15Down(void) {IN_KeyDown(&in_buttons[15]);}
 void IN_Button15Up(void) {IN_KeyUp(&in_buttons[15]);}
+
 void IN_CenterView (void) {
 	cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
 }
@@ -888,7 +876,7 @@ CL_KeyMove
 Sets the usercmd_t based on key states
 ================
 */
-void CL_KeyMove(usercmd_t *cmd) {
+void CL_KeyMove( usercmd_t *cmd ) {
 	int		movespeed;
 	int		forward, side, up;
 
@@ -897,11 +885,10 @@ void CL_KeyMove(usercmd_t *cmd) {
 	// the walking flag is to keep animations consistant
 	// even during acceleration and develeration
 	//
-	if (in_speed.active ^ cl_run->integer) {
+	if ( in_speed.active ^ cl_run->integer ) {
 		movespeed = 127;
 		cmd->buttons &= ~BUTTON_WALKING;
-	}
-	else {
+	} else {
 		cmd->buttons |= BUTTON_WALKING;
 		movespeed = 46;
 	}
@@ -909,24 +896,24 @@ void CL_KeyMove(usercmd_t *cmd) {
 	forward = 0;
 	side = 0;
 	up = 0;
-	if (in_strafe.active) {
-		side += movespeed * CL_KeyState(&in_right);
-		side -= movespeed * CL_KeyState(&in_left);
+	if ( in_strafe.active ) {
+		side += movespeed * CL_KeyState (&in_right);
+		side -= movespeed * CL_KeyState (&in_left);
 	}
 
-	side += movespeed * CL_KeyState(&in_moveright);
-	side -= movespeed * CL_KeyState(&in_moveleft);
+	side += movespeed * CL_KeyState (&in_moveright);
+	side -= movespeed * CL_KeyState (&in_moveleft);
 
 
-	up += movespeed * CL_KeyState(&in_up);
-	up -= movespeed * CL_KeyState(&in_down);
+	up += movespeed * CL_KeyState (&in_up);
+	up -= movespeed * CL_KeyState (&in_down);
 
-	forward += movespeed * CL_KeyState(&in_forward);
-	forward -= movespeed * CL_KeyState(&in_back);
+	forward += movespeed * CL_KeyState (&in_forward);
+	forward -= movespeed * CL_KeyState (&in_back);
 
-	cmd->forwardmove = ClampChar(forward);
-	cmd->rightmove = ClampChar(side);
-	cmd->upmove = ClampChar(up);
+	cmd->forwardmove = ClampChar( forward );
+	cmd->rightmove = ClampChar( side );
+	cmd->upmove = ClampChar( up );
 }
 
 /*
@@ -1686,8 +1673,8 @@ static const cmdList_t inputCmds[] =
 	{ "-use", NULL, IN_Button5Up, NULL },
 	{ "+force_grip", "Hold to use grip force power", IN_Button6Down, NULL },
 	{ "-force_grip", NULL, IN_Button6Up, NULL },
-	{ "+altattack", "Manual block", IN_Button13Down, NULL },
-	{ "-altattack", NULL, IN_Button13Up, NULL },
+	{ "+altattack", "Alternate Attack", IN_Button7Down, NULL },
+	{ "-altattack", NULL, IN_Button7Up, NULL },
 	{ "+useforce", "Use selected force power", IN_Button9Down, NULL },
 	{ "-useforce", NULL, IN_Button9Up, NULL },
 	{ "+force_lightning", "Hold to use lightning force power", IN_Button10Down, NULL },

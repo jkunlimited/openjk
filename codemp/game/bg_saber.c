@@ -2690,8 +2690,6 @@ int bg_parryDebounce[NUM_FORCE_POWER_LEVELS] =
 	500,//if don't even have defense, can't use defense!
 	300,
 	150,
-	50,
-	50,
 	50
 };
 
@@ -3537,14 +3535,6 @@ weapChecks:
 
 		// ***************************************************
 		// Pressing attack, so we must look up the proper attack move.
-		
-		// [ Jedi Knight Unlimited ]
-		//if (pm->ps->fd.forcePower < jku_force_cost_attack.integer &&
-		//	pm->ps->selectedClass == 1) // FS. Doesn't apply to gunners yet... 
-		//{
-		//	anim = LS_NONE;
-		//}
-		// [ Jedi Knight Unlimited ]
 
 		if ( pm->ps->weaponTime > 0 )
 		{	// Last attack is not yet complete.
@@ -3729,9 +3719,6 @@ void PM_SetSaberMove(short newMove)
 
 	if ( newMove == LS_READY || newMove == LS_A_FLIP_STAB || newMove == LS_A_FLIP_SLASH )
 	{//finished with a kata (or in a special move) reset attack counter
-		// JKU-Bunisher: Below is bugged atm, so disabling it...
-		// JKU-Bunisher: Subtract force power points for attacking
-		// pm->ps->fd.forcePower =- jku_ATTACK_DEFAULT_FORCE_COST;
 		pm->ps->saberAttackChainCount = 0;
 	}
 	else if ( BG_SaberInAttack( newMove ) )
@@ -3884,7 +3871,7 @@ void PM_SetSaberMove(short newMove)
 		}
 
 		// [Jedi Knight: Unlimited]
-		if (pm->ps->isBlock) {
+		if (pm->ps->userInt1) {
 		   anim = PM_GetSaberStance();
 		}
 

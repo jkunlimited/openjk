@@ -987,18 +987,8 @@ netField_t	entityStateFields[] =
 { NETF(userVec1[2]), 1 },
 { NETF(userVec2[0]), 1 },
 { NETF(userVec2[1]), 1 },
-{ NETF(userVec2[2]), 1 },
-
-//JKU-Fnuki: Add new JKU functionality
-{ NETF(isBlockInitiated), 1 },
-{ NETF(isBlock), 1 },
-
-// JKU-Bunisher: Add new JKU class functionality
-{ NETF(selectedClass), 1 },
-{ NETF(selectedClassPerk), 1 } 
+{ NETF(userVec2[2]), 1 }
 };
-
-
 
 // if (int)f == f and (int)f + ( 1<<(FLOAT_INT_BITS-1) ) < ( 1 << FLOAT_INT_BITS )
 // the float will be sent with FLOAT_INT_BITS, otherwise all 32 bits will be sent
@@ -1434,15 +1424,7 @@ netField_t	playerStateFields[] =
 { PSF(userVec1[2]), 1 },
 { PSF(userVec2[0]), 1 },
 { PSF(userVec2[1]), 1 },
-{ PSF(userVec2[2]), 1 },
-
-//JKU-Fnuki: Add new JKU functionality
-{ PSF(isBlockInitiated), 1 },
-{ PSF(isBlock), 1 },
-
-//JKU-Bunisher: Add new JKU class functionality
-{ PSF(selectedClass), 1 },
-{ PSF(selectedClassPerk), 1 }
+{ PSF(userVec2[2]), 1 }
 };
 
 netField_t	pilotPlayerStateFields[] =
@@ -1606,15 +1588,7 @@ netField_t	pilotPlayerStateFields[] =
 { PSF(userVec1[2]), 1 },
 { PSF(userVec2[0]), 1 },
 { PSF(userVec2[1]), 1 },
-{ PSF(userVec2[2]), 1 },
-
-//JKU-Fnuki: Add new JKU functionality
-{ PSF(isBlockInitiated), 1 },
-{ PSF(isBlock), 1 },
-
-//JKU-Bunisher: Add new JKU class functionality
-{ PSF(selectedClass), 1 },
-{ PSF(selectedClassPerk), 1 }
+{ PSF(userVec2[2]), 1 }
 };
 
 netField_t	vehPlayerStateFields[] =
@@ -1700,15 +1674,7 @@ netField_t	vehPlayerStateFields[] =
 { PSF(userVec1[2]), 1 },
 { PSF(userVec2[0]), 1 },
 { PSF(userVec2[1]), 1 },
-{ PSF(userVec2[2]), 1 },
-
-//JKU-Fnuki: Add new JKU functionality
-{ PSF(isBlockInitiated), 1 },
-{ PSF(isBlock), 1 },
-
-//JKU-Bunisher: Add new JKU class functionality
-{ PSF(selectedClass), 1 },
-{ PSF(selectedClassPerk), 1}
+{ PSF(userVec2[2]), 1 }
 };
 
 //=====_OPTIMIZED_VEHICLE_NETWORKING=======================================================================
@@ -1871,15 +1837,7 @@ netField_t	playerStateFields[] =
 { PSF(userVec1[2]), 1 },
 { PSF(userVec2[0]), 1 },
 { PSF(userVec2[1]), 1 },
-{ PSF(userVec2[2]), 1 },
-
-//JKU-Fnuki: Add new JKU functionality
-{ PSF(isBlockInitiated), 1 },
-{ PSF(isBlock), 1 },
-
-//JKU-Bunisher: Add new JKU class functionality
-{ PSF(selectedClass), 1 },
-{ PSF(selectedClassPerk), 1 }
+{ PSF(userVec2[2]), 1 }
 };
 
 //=====_OPTIMIZED_VEHICLE_NETWORKING=======================================================================
