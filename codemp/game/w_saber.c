@@ -3984,8 +3984,8 @@ qboolean WP_SaberCanPerfectBlock(gentity_t *self, vec3_t hitloc, qboolean missil
 	rightdot = DotProduct(right, diff);
 	zdiff = hitloc[2] - clEye[2];
 
-	if (zdiff > 0) {
-		if (rightdot > 0.3) {
+	if (zdiff > 0.001) {
+		if (rightdot > 0.001) {
 			if (self->client->pers.cmd.forwardmove > 0 && 
 				self->client->pers.cmd.rightmove > 0 && 
 				!(self->client->pers.cmd.forwardmove < 0) && 
@@ -3996,7 +3996,7 @@ qboolean WP_SaberCanPerfectBlock(gentity_t *self, vec3_t hitloc, qboolean missil
 				return qfalse;
 			}
 		}
-		else if (rightdot < -0.3) {
+		else if (rightdot < -0.001) {
 			if (self->client->pers.cmd.forwardmove > 0 && 
 				self->client->pers.cmd.rightmove < 0 && 
 				!(self->client->pers.cmd.forwardmove < 0) && 
@@ -4028,7 +4028,7 @@ qboolean WP_SaberCanPerfectBlock(gentity_t *self, vec3_t hitloc, qboolean missil
 		}
 	}
 	else if (zdiff > -20) {
-		if (rightdot > 0.1) {
+		if (rightdot > 0.001) {
 			if (self->client->pers.cmd.forwardmove > 0 &&
 				self->client->pers.cmd.rightmove > 0 &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
@@ -4039,7 +4039,7 @@ qboolean WP_SaberCanPerfectBlock(gentity_t *self, vec3_t hitloc, qboolean missil
 				return qfalse;
 			}
 		}
-		else if (rightdot < -0.1) {
+		else if (rightdot < -0.001) {
 			if (self->client->pers.cmd.forwardmove > 0 &&
 				self->client->pers.cmd.rightmove < 0 &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
@@ -4071,7 +4071,7 @@ qboolean WP_SaberCanPerfectBlock(gentity_t *self, vec3_t hitloc, qboolean missil
 		}
 	}
 	else {
-		if (rightdot >= 0) {
+		if (rightdot > 0.001) {
 			if ((self->client->pers.cmd.rightmove > 0 &&
 				!(self->client->pers.cmd.rightmove < 0) &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
@@ -4086,7 +4086,7 @@ qboolean WP_SaberCanPerfectBlock(gentity_t *self, vec3_t hitloc, qboolean missil
 				return qfalse;
 			}
 		}
-		else {
+		else if (rightdot < -0.001) {
 			if ((self->client->pers.cmd.rightmove < 0 &&
 				!(self->client->pers.cmd.rightmove > 0) &&
 				!(self->client->pers.cmd.forwardmove < 0) &&
@@ -4102,6 +4102,8 @@ qboolean WP_SaberCanPerfectBlock(gentity_t *self, vec3_t hitloc, qboolean missil
 			}
 		}
 	}
+    // Ultimate control path - assume you didn't perfectly block
+    return qfalse;
 }
 
 // Do saber block effect
@@ -4186,7 +4188,7 @@ static QINLINE void FP_SubtractVictimForcePower(gentity_t *hitEntity, qboolean p
 
 	else
 	{
-		if (!(hitEntity->client->pers.cmd.buttons & BUTTON_WALKING) && hitEntity->client->pers.cmd.forwardmove != 0 || hitEntity->client->pers.cmd.rightmove != 0)
+		if (!(hitEntity->client->pers.cmd.buttons & BUTTON_WALKING) && (hitEntity->client->pers.cmd.forwardmove != 0 || hitEntity->client->pers.cmd.rightmove != 0))
 		{
 			// Punish running by 2.0f
 			hitEntity->client->ps.fd.forcePower = hitEntity->client->ps.fd.forcePower - (baseSubtraction * 2.0f);
