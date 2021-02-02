@@ -1,5 +1,5 @@
 # Builder image
-FROM ubuntu:16.04 as builder
+FROM ubuntu:18.04 as builder
 
 # Install build tools and libraries
 RUN dpkg --add-architecture i386 &&\
@@ -13,7 +13,7 @@ COPY . /usr/src/openjk
 # Build i386 arch
 RUN mkdir /usr/src/openjk/build.i386 &&\
 	cd /usr/src/openjk/build.i386 &&\
-	cmake -DCMAKE_TOOLCHAIN_FILE=cmake/Toolchains/linux-i686.cmake \
+	cmake -DCMAKE_TOOLCHAIN_FILE=/usr/src/openjk/cmake/Toolchains/linux-i686.cmake \
 		-DCMAKE_INSTALL_PREFIX=/opt \
 		-DBuildMPCGame=OFF -DBuildMPEngine=OFF -DBuildMPRdVanilla=OFF -DBuildMPUI=OFF \
 		-DBuildSPEngine=OFF -DBuildSPGame=OFF -DBuildSPRdVanilla=OFF \
@@ -33,7 +33,7 @@ RUN mkdir /usr/src/openjk/build.x86_64 &&\
 
 
 # Server image
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 # Install utilities and libraries
 RUN dpkg --add-architecture i386 &&\
