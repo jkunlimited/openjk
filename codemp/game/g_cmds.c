@@ -24,7 +24,8 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 #include "g_local.h"
 #include "bg_saga.h"
-#include "ui/menudef.h"			// for the voice chats
+#include "ui/menudef.h"				// for the voice chats
+#include <openssl\sha.h>
 
 //rww - for getting bot commands...
 int AcceptBotCommand(char *cmd, gentity_t *pl);
@@ -3359,6 +3360,31 @@ void Cmd_AddBot_f( gentity_t *ent ) {
 	trap->SendServerCommand( ent-g_entities, va( "print \"%s.\n\"", G_GetStringEdString( "MP_SVGAME", "ONLY_ADD_BOTS_AS_SERVER" ) ) );
 }
 
+void Cmd_Sha256_f(gentity_t *ent) 
+{
+	if (trap->Argc() != 2)  {
+		trap->SendServerCommand(ent - g_entities, "print \"Usage: /sha256 <password>\n\"");
+	}
+	else 
+	{
+		unsigned char password[SHA256_DIGEST_LENGTH];
+		unsigned char md[SHA256_DIGEST_LENGTH];
+		
+		trap->Argv(1, password, sizeof(password));
+
+		int x;
+
+		SHA256_CTX context;
+		SHA256_Init(&context);
+		SHA256_Update(&context, (unsigned char*)password, strlen(password));
+		SHA256_Final(md, &context);
+		
+		for (x = 0; x < SHA256_DIGEST_LENGTH; x++) {
+			trap->SendServerCommand(ent - g_entities, va("print \"%02x\"", md[x]));
+		}
+	}
+}
+
 /*
 =================
 ClientCommand
@@ -3419,6 +3445,7 @@ command_t commands[] = {
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
+	{ "sha256",				Cmd_Sha256_f,				CMD_NOINTERMISSION }
 };
 static const size_t numCommands = ARRAY_LEN( commands );
 

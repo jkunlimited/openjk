@@ -1454,16 +1454,15 @@ static void ClientCleanName( const char *in, char *out, int outSize )
 		Q_strncpyz( out, "Padawan", outSize );
 }
 
-#ifdef _DEBUG
-void G_DebugWrite(const char *path, const char *text)
-{
-	fileHandle_t f;
 
-	trap->FS_Open( path, &f, FS_APPEND );
-	trap->FS_Write(text, strlen(text), f);
-	trap->FS_Close(f);
-}
-#endif
+//void G_DebugWrite(const char *path, const char *text)
+//{
+//	fileHandle_t f;
+//
+//	trap->FS_Open( path, &f, FS_APPEND );
+//	trap->FS_Write(text, strlen(text), f);
+//	trap->FS_Close(f);
+//}
 
 qboolean G_SaberModelSetup(gentity_t *ent)
 {
@@ -2599,6 +2598,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot )
 	te->s.eventParm = clientNum;
 
 	return NULL;
+
 }
 
 void G_WriteClientSessionData( gclient_t *client );
