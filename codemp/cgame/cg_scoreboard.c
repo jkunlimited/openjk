@@ -60,6 +60,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #define SB_SCORE_X			(SB_SCORELINE_X + .55 * SB_SCORELINE_WIDTH)
 #define SB_PING_X			(SB_SCORELINE_X + .70 * SB_SCORELINE_WIDTH)
 #define SB_TIME_X			(SB_SCORELINE_X + .85 * SB_SCORELINE_WIDTH)
+#define SB_PERFECT_X		(SB_SCORELINE_X + .85 * SB_SCORELINE_WIDTH)
 
 // The new and improved score board
 //
@@ -162,7 +163,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		}
 
 		hcolor[3] = fade * 0.7;
-		CG_FillRect( SB_SCORELINE_X - 5, y + 2, 640 - SB_SCORELINE_X * 2 + 10, largeFormat?SB_NORMAL_HEIGHT:SB_INTER_HEIGHT, hcolor );
+		// CG_FillRect( SB_SCORELINE_X - 5, y + 2, 640 - SB_SCORELINE_X * 2 + 10, largeFormat?SB_NORMAL_HEIGHT:SB_INTER_HEIGHT, hcolor );
 	}
 
 	CG_Text_Paint (SB_NAME_X, y, 0.9f * scale, colorWhite, ci->name,0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
@@ -177,15 +178,27 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 			}
 			else
 			{
-				CG_Text_Paint (SB_SCORE_X, y, 1.0f * scale, colorWhite, va("%i", score->score),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+				// Hiding the score for the scoreboard-revamp
+				// CG_Text_Paint (SB_SCORE_X, y, 1.0f * scale, colorWhite, va("%i", score->score),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
 			}
 		}
 
 		if ( cg_scoreboardBots.integer && ci->botSkill != -1 )
 			CG_Text_Paint( SB_PING_X, y, 1.0f * scale, colorWhite, "BOT", 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
 		else
-			CG_Text_Paint (SB_PING_X, y, 1.0f * scale, colorWhite, va("%i", score->ping),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
-		CG_Text_Paint (SB_TIME_X, y, 1.0f * scale, colorWhite, va("%i", score->time),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+			// Hiding the ping value for the scoreboard-revamp
+			// CG_Text_Paint (SB_PING_X, y, 1.0f * scale, colorWhite, va("%i", score->ping),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+		
+		// Change this to use as an indicator of status (being active/inactive(afk))
+		// CG_Text_Paint (SB_TIME_X, y, 1.0f * scale, colorWhite, va("%i", score->time),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL );
+		if ( score->perfect == 1 ) {
+			// client is active, thus set his status indicator in scoreboard to active
+			CG_Text_Paint(SB_PERFECT_X, y, 1.0f * scale, colorWhite, "Active", 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL);
+		}
+		else if ( score->perfect == 0 ){
+			// client is not active, thus set his status indicator in scoreboard to inactive
+			CG_Text_Paint(SB_PERFECT_X, y, 1.0f * scale, colorWhite, "Inactive", 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_SMALL);
+		}
 	}
 	else
 	{
@@ -426,13 +439,14 @@ qboolean CG_DrawOldScoreboard( void )
 			trap->SE_GetStringTextString("MP_INGAME_OF",		sOf,	sizeof(sOf));
 			trap->SE_GetStringTextString("MP_INGAME_WITH",	sWith,	sizeof(sWith));
 
-			s = va("%s %s (%s %i) %s %i",
-				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
-				sPlace,
-				sOf,
-				cg.numScores,
-				sWith,
-				cg.snap->ps.persistant[PERS_SCORE] );
+			s = "Online";
+			// s = va("%s %s (%s %i) %s %i",
+			//     CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
+			//     sPlace,
+			//     sOf,
+			//     cg.numScores,
+			//     sWith,
+			//     cg.snap->ps.persistant[PERS_SCORE] );
 		//	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 			x = ( SCREEN_WIDTH ) / 2;
 			y = 60;
@@ -475,7 +489,7 @@ qboolean CG_DrawOldScoreboard( void )
 	// scoreboard
 	y = SB_HEADER;
 
-	CG_DrawPic ( SB_SCORELINE_X - 40, y - 5, SB_SCORELINE_WIDTH + 80, 40, trap->R_RegisterShaderNoMip ( "gfx/menus/menu_buttonback.tga" ) );
+	//CG_DrawPic ( SB_SCORELINE_X - 40, y - 5, SB_SCORELINE_WIDTH + 80, 40, trap->R_RegisterShaderNoMip ( "gfx/menus/menu_buttonback.tga" ) );
 
 	CG_Text_Paint ( SB_NAME_X, y, 1.0f, colorWhite, CG_GetStringEdString("MP_INGAME", "NAME"),0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 	if (cgs.gametype == GT_DUEL || cgs.gametype == GT_POWERDUEL)
@@ -487,10 +501,10 @@ qboolean CG_DrawOldScoreboard( void )
 	}
 	else
 	{
-		CG_Text_Paint ( SB_SCORE_X, y, 1.0f, colorWhite, CG_GetStringEdString("MP_INGAME", "SCORE"), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
+		//CG_Text_Paint ( SB_SCORE_X, y, 1.0f, colorWhite, CG_GetStringEdString("MP_INGAME", "SCORE"), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 	}
-	CG_Text_Paint ( SB_PING_X, y, 1.0f, colorWhite, CG_GetStringEdString("MP_INGAME", "PING"), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
-	CG_Text_Paint ( SB_TIME_X, y, 1.0f, colorWhite, CG_GetStringEdString("MP_INGAME", "TIME"), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
+	//CG_Text_Paint ( SB_PING_X, y, 1.0f, colorWhite, CG_GetStringEdString("MP_INGAME", "PING"), 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
+	CG_Text_Paint ( SB_TIME_X, y, 1.0f, colorWhite, "Status", 0, 0, ITEM_TEXTSTYLE_OUTLINED, FONT_MEDIUM );
 
 	y = SB_TOP;
 

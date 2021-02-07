@@ -1454,15 +1454,16 @@ static void ClientCleanName( const char *in, char *out, int outSize )
 		Q_strncpyz( out, "Padawan", outSize );
 }
 
+#ifdef DEBUG
+void G_DebugWrite(const char *path, const char *text)
+{
+	fileHandle_t f;
 
-//void G_DebugWrite(const char *path, const char *text)
-//{
-//	fileHandle_t f;
-//
-//	trap->FS_Open( path, &f, FS_APPEND );
-//	trap->FS_Write(text, strlen(text), f);
-//	trap->FS_Close(f);
-//}
+	trap->FS_Open( path, &f, FS_APPEND );
+	trap->FS_Write(text, strlen(text), f);
+	trap->FS_Close(f);
+}
+#endif
 
 qboolean G_SaberModelSetup(gentity_t *ent)
 {

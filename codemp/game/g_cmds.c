@@ -48,7 +48,9 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 	int			stringlength;
 	int			i, j;
 	gclient_t	*cl;
-	int			numSorted, scoreFlags, accuracy, perfect;
+	int			numSorted, scoreFlags, accuracy;
+	// removed in favour of referencing pers. stored active state
+	// int		perfect
 
 	// send the latest information on all clients
 	string[0] = 0;
@@ -79,7 +81,6 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 		else {
 			accuracy = 0;
 		}
-		perfect = ( cl->ps.persistant[PERS_RANK] == 0 && cl->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
 
 		Com_sprintf (entry, sizeof(entry),
 			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
@@ -90,7 +91,7 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			cl->ps.persistant[PERS_GAUNTLET_FRAG_COUNT],
 			cl->ps.persistant[PERS_DEFEND_COUNT],
 			cl->ps.persistant[PERS_ASSIST_COUNT],
-			perfect,
+			cl->pers.active,
 			cl->ps.persistant[PERS_CAPTURES]);
 		j = strlen(entry);
 		if (stringlength + j > 1022)
@@ -1568,60 +1569,66 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
 }
 
 void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) {
-	int			j;
 	gentity_t	*other;
+	int			j;
 	int			color;
 	char		name[64];
-	// don't let text be too long for malicious reasons
-	char		text[MAX_SAY_TEXT];
+	char		text[MAX_SAY_TEXT]; // don't let text be too long for malicious reasons
 	char		location[64];
 	char		*locMsg = NULL;
+	char		*chatprefix;
 
-	if ( level.gametype < GT_TEAM && mode == SAY_TEAM ) {
+	if ( level.gametype < GT_TEAM && 
+		mode == SAY_TEAM ) {
 		mode = SAY_ALL;
 	}
 
 	Q_strncpyz( text, chatText, sizeof(text) );
-
 	Q_strstrip( text, "\n\r", "  " );
 
 	switch ( mode ) {
-	default:
-	case SAY_ALL:
-		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, text );
-		Com_sprintf (name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
-		color = COLOR_GREEN;
-		break;
-	case SAY_TEAM:
-		G_LogPrintf( "sayteam: %s: %s\n", ent->client->pers.netname, text );
-		if (Team_GetLocationMsg(ent, location, sizeof(location)))
-		{
-			Com_sprintf (name, sizeof(name), EC"(%s%c%c"EC")"EC": ",
-				ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
-			locMsg = location;
+		default:
+		case SAY_ALL: {
+			chatprefix = (char *)chatText;
+			Com_sprintf(name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE);
+			color = COLOR_GREEN;
+			break;
 		}
-		else
-		{
-			Com_sprintf (name, sizeof(name), EC"(%s%c%c"EC")"EC": ",
-				ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		case SAY_SHOUT: {
+			chatprefix = (char *)chatText + 1;
+			Com_sprintf(name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE);
+			color = COLOR_RED;
+			break;
 		}
-		color = COLOR_CYAN;
-		break;
-	case SAY_TELL:
-		if (target && target->inuse && target->client && level.gametype >= GT_TEAM &&
-			target->client->sess.sessionTeam == ent->client->sess.sessionTeam &&
-			Team_GetLocationMsg(ent, location, sizeof(location)))
-		{
-			Com_sprintf (name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
-			locMsg = location;
+		case SAY_TEAM: {
+			chatprefix = (char *)chatText;
+			if (Team_GetLocationMsg(ent, location, sizeof(location))) {
+				Com_sprintf(name, sizeof(name), EC"(%s%c%c"EC")"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE);
+				locMsg = location;
+			}
+			else {
+				Com_sprintf(name, sizeof(name), EC"(%s%c%c"EC")"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE);
+			}
+			color = COLOR_CYAN;
+			break;
 		}
-		else
-		{
-			Com_sprintf (name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		case SAY_TELL: {
+			chatprefix = (char *)chatText;
+			if (target && target->inuse && target->client && level.gametype >= GT_TEAM && target->client->sess.sessionTeam == ent->client->sess.sessionTeam && Team_GetLocationMsg(ent, location, sizeof(location))) {
+				Com_sprintf(name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE);
+				locMsg = location;
+			}
+			else {
+				Com_sprintf(name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE);
+			}
+			color = COLOR_MAGENTA;
+			break;
 		}
-		color = COLOR_MAGENTA;
-		break;
 	}
+
+	// Remove the beginning chatprefix (!,@, etc.)
+	Q_strncpyz(text, chatprefix, sizeof(text));
+	G_LogPrintf("(Chat) %s: %s\n", ent->client->pers.netname, text);
 
 	if ( target ) {
 		G_SayTo( ent, target, mode, color, name, text, locMsg );
@@ -1659,7 +1666,12 @@ static void Cmd_Say_f( gentity_t *ent ) {
 		G_SecurityLogPrintf( "Cmd_Say_f from %d (%s) has been truncated: %s\n", ent->s.number, ent->client->pers.netname, p );
 	}
 
-	G_Say( ent, NULL, SAY_ALL, p );
+	if (!(Q_stricmpn("!", p, 1))) {
+		G_Say(ent, NULL, SAY_SHOUT, p);
+	}
+	else {
+		G_Say(ent, NULL, SAY_ALL, p);
+	}
 }
 
 /*
@@ -3283,104 +3295,157 @@ void Cmd_TargetUse_f( gentity_t *ent )
 	}
 }
 
-void Cmd_TheDestroyer_f( gentity_t *ent ) {
-	if ( !ent->client->ps.saberHolstered || ent->client->ps.weapon != WP_SABER )
+void Cmd_TheDestroyer_f(gentity_t *ent) {
+	if (!ent->client->ps.saberHolstered || ent->client->ps.weapon != WP_SABER)
 		return;
 
-	Cmd_ToggleSaber_f( ent );
+	Cmd_ToggleSaber_f(ent);
 }
 
-void Cmd_BotMoveForward_f( gentity_t *ent ) {
+void Cmd_BotMoveForward_f(gentity_t *ent) {
 	int arg = 4000;
 	int bCl = 0;
 	char sarg[MAX_STRING_CHARS];
 
-	assert( trap->Argc() > 1 );
-	trap->Argv( 1, sarg, sizeof( sarg ) );
+	assert(trap->Argc() > 1);
+	trap->Argv(1, sarg, sizeof(sarg));
 
-	assert( sarg[0] );
-	bCl = atoi( sarg );
-	Bot_SetForcedMovement( bCl, arg, -1, -1 );
+	assert(sarg[0]);
+	bCl = atoi(sarg);
+	Bot_SetForcedMovement(bCl, arg, -1, -1);
 }
 
-void Cmd_BotMoveBack_f( gentity_t *ent ) {
+void Cmd_BotMoveBack_f(gentity_t *ent) {
 	int arg = -4000;
 	int bCl = 0;
 	char sarg[MAX_STRING_CHARS];
 
-	assert( trap->Argc() > 1 );
-	trap->Argv( 1, sarg, sizeof( sarg ) );
+	assert(trap->Argc() > 1);
+	trap->Argv(1, sarg, sizeof(sarg));
 
-	assert( sarg[0] );
-	bCl = atoi( sarg );
-	Bot_SetForcedMovement( bCl, arg, -1, -1 );
+	assert(sarg[0]);
+	bCl = atoi(sarg);
+	Bot_SetForcedMovement(bCl, arg, -1, -1);
 }
 
-void Cmd_BotMoveRight_f( gentity_t *ent ) {
+void Cmd_BotMoveRight_f(gentity_t *ent) {
 	int arg = 4000;
 	int bCl = 0;
 	char sarg[MAX_STRING_CHARS];
 
-	assert( trap->Argc() > 1 );
-	trap->Argv( 1, sarg, sizeof( sarg ) );
+	assert(trap->Argc() > 1);
+	trap->Argv(1, sarg, sizeof(sarg));
 
-	assert( sarg[0] );
-	bCl = atoi( sarg );
-	Bot_SetForcedMovement( bCl, -1, arg, -1 );
+	assert(sarg[0]);
+	bCl = atoi(sarg);
+	Bot_SetForcedMovement(bCl, -1, arg, -1);
 }
 
-void Cmd_BotMoveLeft_f( gentity_t *ent ) {
+void Cmd_BotMoveLeft_f(gentity_t *ent) {
 	int arg = -4000;
 	int bCl = 0;
 	char sarg[MAX_STRING_CHARS];
 
-	assert( trap->Argc() > 1 );
-	trap->Argv( 1, sarg, sizeof( sarg ) );
+	assert(trap->Argc() > 1);
+	trap->Argv(1, sarg, sizeof(sarg));
 
-	assert( sarg[0] );
-	bCl = atoi( sarg );
-	Bot_SetForcedMovement( bCl, -1, arg, -1 );
+	assert(sarg[0]);
+	bCl = atoi(sarg);
+	Bot_SetForcedMovement(bCl, -1, arg, -1);
 }
 
-void Cmd_BotMoveUp_f( gentity_t *ent ) {
+void Cmd_BotMoveUp_f(gentity_t *ent) {
 	int arg = 4000;
 	int bCl = 0;
 	char sarg[MAX_STRING_CHARS];
 
-	assert( trap->Argc() > 1 );
-	trap->Argv( 1, sarg, sizeof( sarg ) );
+	assert(trap->Argc() > 1);
+	trap->Argv(1, sarg, sizeof(sarg));
 
-	assert( sarg[0] );
-	bCl = atoi( sarg );
-	Bot_SetForcedMovement( bCl, -1, -1, arg );
+	assert(sarg[0]);
+	bCl = atoi(sarg);
+	Bot_SetForcedMovement(bCl, -1, -1, arg);
 }
 
-void Cmd_AddBot_f( gentity_t *ent ) {
+void Cmd_AddBot_f(gentity_t *ent) {
 	//because addbot isn't a recognized command unless you're the server, but it is in the menus regardless
-	trap->SendServerCommand( ent-g_entities, va( "print \"%s.\n\"", G_GetStringEdString( "MP_SVGAME", "ONLY_ADD_BOTS_AS_SERVER" ) ) );
+	trap->SendServerCommand(ent - g_entities, va("print \"%s.\n\"", G_GetStringEdString("MP_SVGAME", "ONLY_ADD_BOTS_AS_SERVER")));
 }
 
-void Cmd_Sha256_f(gentity_t *ent) 
+// Set status to either active or inactive.
+// These values are used in the revamped scoreboard.
+void Cmd_Afk_f(gentity_t *ent)
 {
-	if (trap->Argc() != 2)  {
-		trap->SendServerCommand(ent - g_entities, "print \"Usage: /sha256 <password>\n\"");
+	if (ent->client->pers.active == 1) {
+		// Player is currently active (1), set to inactive (0)
+		ent->client->pers.active = 0;
 	}
-	else 
+	else if (ent->client->pers.active == 0) {
+		// Player is currently inactive (0) set to active (1)
+		ent->client->pers.active = 1;
+	}
+}
+
+// Register an account to use for persisting information
+// Accounts are stored in text files relative to the server documents
+// Passwords are hashed using SHA256 by OpenSSL
+
+void Cmd_Register_f(gentity_t *ent)
+{
+	if (trap->Argc() != 3) {
+		trap->SendServerCommand(ent - g_entities, "print \"Validation Error: /register <username> <password>\n\"");
+	}
+	else
 	{
-		unsigned char password[SHA256_DIGEST_LENGTH];
-		unsigned char md[SHA256_DIGEST_LENGTH];
+		fileHandle_t accountfilehandle;
+		unsigned char accountfile[SHA256_DIGEST_LENGTH];
+		unsigned char user[SHA256_DIGEST_LENGTH];
 		
-		trap->Argv(1, password, sizeof(password));
+		trap->Argv(1, user, sizeof(user));
+		strcpy(accountfile, va("accounts/%s.acc", user));
 
-		int x;
+		if (trap->FS_Open(accountfile, &accountfilehandle, FS_READ) > 0) { 
+			// non-zero filehandle only
+			// account already exists - do not overwrite
+			trap->SendServerCommand(ent - g_entities, "print \"Registration Error: Account already exists\n\"");
+			// exit out now
+			return; 
+		}
+		else {
+			// account does not exist - create it
+			unsigned char accountfilecontent[MAX_STRING_CHARS];
+			unsigned char pw[SHA256_DIGEST_LENGTH];
+			unsigned char md[SHA256_DIGEST_LENGTH];
+			unsigned char mdstring[SHA256_DIGEST_LENGTH * 2 + 1];
+			// double the size of md (char sequence + \0) + 1 for end-string null terminator
+			// converting the final hash product to string in order to easily write to file using Q3 I/O functionality
+			// relatively ugly, should maybe put it in SQLITE or something else... but this will do for now
+			int x;
 
-		SHA256_CTX context;
-		SHA256_Init(&context);
-		SHA256_Update(&context, (unsigned char*)password, strlen(password));
-		SHA256_Final(md, &context);
-		
-		for (x = 0; x < SHA256_DIGEST_LENGTH; x++) {
-			trap->SendServerCommand(ent - g_entities, va("print \"%02x\"", md[x]));
+			trap->Argv(2, pw, sizeof(pw));
+
+			SHA256_CTX context;
+			SHA256_Init(&context);
+			SHA256_Update(&context, (unsigned char*)pw, strlen(pw));
+			SHA256_Final(md, &context);
+
+			for (x = 0; x < SHA256_DIGEST_LENGTH; x++) {
+				sprintf(mdstring + (x * 2), "%02x", md[x]);
+			}
+
+			// whitespace separated for sscanf adaptation 
+			strcpy(accountfilecontent, va("%s %s %d %d %d",
+				user, // username
+				mdstring, // hashed version of the password
+				ent->client->pers.level, // account level
+				ent->client->pers.faction, // faction
+				ent->client->pers.factionRank // faction rank
+			));
+
+			trap->FS_Open(accountfile, &accountfilehandle, FS_WRITE);
+			trap->FS_Write(accountfilecontent, strlen(accountfilecontent), accountfilehandle);
+			trap->FS_Close(accountfilehandle);
+			trap->SendServerCommand(ent - g_entities, "print \"Registration Succeeded: Account created. Please login using /login <username> <password>\n\"");
 		}
 	}
 }
@@ -3445,7 +3510,8 @@ command_t commands[] = {
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
-	{ "sha256",				Cmd_Sha256_f,				CMD_NOINTERMISSION }
+	{ "register",			Cmd_Register_f,				CMD_NOINTERMISSION },
+	{ "afk",				Cmd_Afk_f,					CMD_NOINTERMISSION }
 };
 static const size_t numCommands = ARRAY_LEN( commands );
 

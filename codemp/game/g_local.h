@@ -500,12 +500,18 @@ typedef struct clientPersistant_s {
 	qboolean	teamInfo;			// send team overlay updates?
 
 	int			connectTime;
-
 	char		saber1[MAX_QPATH], saber2[MAX_QPATH];
-
 	int			vote, teamvote; // 0 = none, 1 = yes, 2 = no
-
 	char		guid[33];
+
+	// jkunlimited add
+	int			level; // level indicator, 0 = user, 1 = mod, 2 = admin
+	int			active; // afk indicator, 0 = inactive, 1 = active
+	int			loggedin; // logged-in indicator, 0 = not logged in, 1 = logged in
+
+	int			faction; // faction allegiance
+	int			factionRank; // faction rank
+
 } clientPersistant_t;
 
 typedef struct renderInfo_s
