@@ -1792,6 +1792,7 @@ typedef enum {
 #define SAY_ALL		0
 #define SAY_TEAM	1
 #define SAY_TELL	2
+#define SAY_SHOUT	3
 
 /*
 Ghoul2 Insert Start

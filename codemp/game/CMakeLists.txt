@@ -259,3 +259,7 @@ set_target_properties(${MPGame} PROPERTIES PROJECT_LABEL "MP Game Library")
 if(MPGameLibraries)
 	target_link_libraries(${MPGame} ${MPGameLibraries})
 endif(MPGameLibraries)
+
+# add openssl to hash passwords safely within mpgame regardless of above conditions
+find_package(OpenSSL REQUIRED)
+target_link_libraries(${MPGame} OpenSSL::Crypto)
