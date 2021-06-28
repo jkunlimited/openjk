@@ -261,5 +261,5 @@ if(MPGameLibraries)
 endif(MPGameLibraries)
 
 # add openssl to hash passwords safely within mpgame regardless of above conditions
-find_package(OpenSSL REQUIRED)
-target_link_libraries(${MPGame} OpenSSL::Crypto)
+#find_package(OpenSSL REQUIRED)
+#target_link_libraries(${MPGame} OpenSSL::Crypto)

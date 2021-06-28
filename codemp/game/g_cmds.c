@@ -25,7 +25,7 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "g_local.h"
 #include "bg_saga.h"
 #include "ui/menudef.h"				// for the voice chats
-#include <openssl\sha.h>
+//#include <openssl\sha.h>
 
 //rww - for getting bot commands...
 int AcceptBotCommand(char *cmd, gentity_t *pl);
@@ -3390,65 +3390,65 @@ void Cmd_Afk_f(gentity_t *ent)
 // Accounts are stored in text files relative to the server documents
 // Passwords are hashed using SHA256 by OpenSSL
 
-void Cmd_Register_f(gentity_t *ent)
-{
-	if (trap->Argc() != 3) {
-		trap->SendServerCommand(ent - g_entities, "print \"Validation Error: /register <username> <password>\n\"");
-	}
-	else
-	{
-		fileHandle_t accountfilehandle;
-		unsigned char accountfile[SHA256_DIGEST_LENGTH];
-		unsigned char user[SHA256_DIGEST_LENGTH];
-		
-		trap->Argv(1, user, sizeof(user));
-		strcpy(accountfile, va("accounts/%s.acc", user));
-
-		if (trap->FS_Open(accountfile, &accountfilehandle, FS_READ) > 0) { 
-			// non-zero filehandle only
-			// account already exists - do not overwrite
-			trap->SendServerCommand(ent - g_entities, "print \"Registration Error: Account already exists\n\"");
-			// exit out now
-			return; 
-		}
-		else {
-			// account does not exist - create it
-			unsigned char accountfilecontent[MAX_STRING_CHARS];
-			unsigned char pw[SHA256_DIGEST_LENGTH];
-			unsigned char md[SHA256_DIGEST_LENGTH];
-			unsigned char mdstring[SHA256_DIGEST_LENGTH * 2 + 1];
-			// double the size of md (char sequence + \0) + 1 for end-string null terminator
-			// converting the final hash product to string in order to easily write to file using Q3 I/O functionality
-			// relatively ugly, should maybe put it in SQLITE or something else... but this will do for now
-			int x;
-
-			trap->Argv(2, pw, sizeof(pw));
-
-			SHA256_CTX context;
-			SHA256_Init(&context);
-			SHA256_Update(&context, (unsigned char*)pw, strlen(pw));
-			SHA256_Final(md, &context);
-
-			for (x = 0; x < SHA256_DIGEST_LENGTH; x++) {
-				sprintf(mdstring + (x * 2), "%02x", md[x]);
-			}
-
-			// whitespace separated for sscanf adaptation 
-			strcpy(accountfilecontent, va("%s %s %d %d %d",
-				user, // username
-				mdstring, // hashed version of the password
-				ent->client->pers.level, // account level
-				ent->client->pers.faction, // faction
-				ent->client->pers.factionRank // faction rank
-			));
-
-			trap->FS_Open(accountfile, &accountfilehandle, FS_WRITE);
-			trap->FS_Write(accountfilecontent, strlen(accountfilecontent), accountfilehandle);
-			trap->FS_Close(accountfilehandle);
-			trap->SendServerCommand(ent - g_entities, "print \"Registration Succeeded: Account created. Please login using /login <username> <password>\n\"");
-		}
-	}
-}
+//void Cmd_Register_f(gentity_t *ent)
+//{
+//	if (trap->Argc() != 3) {
+//		trap->SendServerCommand(ent - g_entities, "print \"Validation Error: /register <username> <password>\n\"");
+//	}
+//	else
+//	{
+//		fileHandle_t accountfilehandle;
+//		unsigned char accountfile[SHA256_DIGEST_LENGTH];
+//		unsigned char user[SHA256_DIGEST_LENGTH];
+//		
+//		trap->Argv(1, user, sizeof(user));
+//		strcpy(accountfile, va("accounts/%s.acc", user));
+//
+//		if (trap->FS_Open(accountfile, &accountfilehandle, FS_READ) > 0) { 
+//			// non-zero filehandle only
+//			// account already exists - do not overwrite
+//			trap->SendServerCommand(ent - g_entities, "print \"Registration Error: Account already exists\n\"");
+//			// exit out now
+//			return; 
+//		}
+//		else {
+//			// account does not exist - create it
+//			unsigned char accountfilecontent[MAX_STRING_CHARS];
+//			unsigned char pw[SHA256_DIGEST_LENGTH];
+//			unsigned char md[SHA256_DIGEST_LENGTH];
+//			unsigned char mdstring[SHA256_DIGEST_LENGTH * 2 + 1];
+//			// double the size of md (char sequence + \0) + 1 for end-string null terminator
+//			// converting the final hash product to string in order to easily write to file using Q3 I/O functionality
+//			// relatively ugly, should maybe put it in SQLITE or something else... but this will do for now
+//			int x;
+//
+//			trap->Argv(2, pw, sizeof(pw));
+//
+//			SHA256_CTX context;
+//			SHA256_Init(&context);
+//			SHA256_Update(&context, (unsigned char*)pw, strlen(pw));
+//			SHA256_Final(md, &context);
+//
+//			for (x = 0; x < SHA256_DIGEST_LENGTH; x++) {
+//				sprintf(mdstring + (x * 2), "%02x", md[x]);
+//			}
+//
+//			// whitespace separated for sscanf adaptation 
+//			strcpy(accountfilecontent, va("%s %s %d %d %d",
+//				user, // username
+//				mdstring, // hashed version of the password
+//				ent->client->pers.level, // account level
+//				ent->client->pers.faction, // faction
+//				ent->client->pers.factionRank // faction rank
+//			));
+//
+//			trap->FS_Open(accountfile, &accountfilehandle, FS_WRITE);
+//			trap->FS_Write(accountfilecontent, strlen(accountfilecontent), accountfilehandle);
+//			trap->FS_Close(accountfilehandle);
+//			trap->SendServerCommand(ent - g_entities, "print \"Registration Succeeded: Account created. Please login using /login <username> <password>\n\"");
+//		}
+//	}
+//}
 
 /*
 =================
@@ -3510,7 +3510,7 @@ command_t commands[] = {
 	{ "voice_cmd",			Cmd_VoiceCommand_f,			CMD_NOINTERMISSION },
 	{ "vote",				Cmd_Vote_f,					CMD_NOINTERMISSION },
 	{ "where",				Cmd_Where_f,				CMD_NOINTERMISSION },
-	{ "register",			Cmd_Register_f,				CMD_NOINTERMISSION },
+//	{ "register",			Cmd_Register_f,				CMD_NOINTERMISSION },
 	{ "afk",				Cmd_Afk_f,					CMD_NOINTERMISSION }
 };
 static const size_t numCommands = ARRAY_LEN( commands );
